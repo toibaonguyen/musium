@@ -1,13 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using JobNet.Models;
+using JobNet.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<JobNetDatabaseSettings>(builder.Configuration.GetSection("JobNetDatabase"));
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<UserContext>(opt =>
-    opt.UseInMemoryDatabase("UserList"));
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

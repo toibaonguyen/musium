@@ -15,5 +15,6 @@ public class User
     public required ObjectId[] Certifications { get; set; }
     public required ObjectId[] Educations { get; set; }
     public required string[] Skills { get; set; }
+    public bool? IsHiring { get; set; }
     public bool IsActive { get; set; }
 }

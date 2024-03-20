@@ -1,10 +1,9 @@
 using System;
-using MongoDB.Bson;
+using Microsoft.EntityFrameworkCore;
 namespace JobNet.Models.Entities;
 public class User
 {
-    //may be i will change later
-    public ObjectId? Id { get; set; }
+    public int Id { get; set; }
     public required string Name { get; set; }
     public required string Avatar { get; set; }
     public required string BackgroundImage { get; set; }
@@ -12,11 +11,12 @@ public class User
     public required string Password { get; set; }
     public required string Location { get; set; }
     public DateTime Birthday { get; set; }
-    public required IEnumerable<ObjectId> Experiences { get; set; }
-    public required IEnumerable<ObjectId> Certifications { get; set; }
-    public required IEnumerable<ObjectId> Educations { get; set; }
-    public required IEnumerable<ObjectId> JobNetGroups { get; set; }
-    public required IEnumerable<string> Skills { get; set; }
+    public required ICollection<Experience> Experiences { get; set; }
+    public required ICollection<Certification> Certifications { get; set; }
+    public required ICollection<Education> Educations { get; set; }
+    public required ICollection<Group> JobNetGroups { get; set; }
+    public required ICollection<Post> Posts { get; set; }
+    public required IList<string> Skills { get; set; }
     public bool? IsHiring { get; set; }
     public bool IsActive { get; set; }
 }

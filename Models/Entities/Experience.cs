@@ -1,15 +1,13 @@
 using System;
 using JobNet.Enums;
-using MongoDB.Bson;
 namespace JobNet.Models.Entities;
 public class Experience
 {
-    //may be i will change later
-    public ObjectId? Id { get; set; }
-    public required ObjectId Author { get; set; }
+    public int Id { get; set; }
+    public required User Author { get; set; }
     public required string Title { get; set; }
     public required EmploymentType EmploymentType { get; set; }
-    public required ObjectId Company { get; set; }
+    public required Company Company { get; set; }
     public required string Location { get; set; }
     public required LocationType LocationType { get; set; }
     public required string Description { get; set; }

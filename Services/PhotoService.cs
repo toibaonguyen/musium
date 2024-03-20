@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using JobNet.Models;
 using JobNet.Settings;
 using JobNet.Data;

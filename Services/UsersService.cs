@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using JobNet.Models;
 using JobNet.Settings;
 using JobNet.Data;
@@ -16,15 +15,9 @@ public class UsersService
     private readonly JobNetDatabaseContext _databaseContext;
     public UsersService(JobNetDatabaseContext databaseContext)
     {
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("Cai con cac j z");
-        Console.ResetColor();
         this._databaseContext = databaseContext;
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("Cai con cac j z 2 2 2");
-        Console.ResetColor();
     }
-    public async Task<int> CreateNewUser(CreateUserDTO newUser)
+    public async Task<int> TestCreateNewUser(CreateUserDTO newUser)
     {
 
         // _ = await _databaseContext.AddAsync<User>(newUser.ToActiveUser("", ""));
@@ -39,7 +32,7 @@ public class UsersService
                 Email = "",
                 Password = "",
                 Location = "",
-                Birthday = new DateTime(2024, 1, 1),
+                Birthday = (new DateTime(2024, 1, 1)).ToUniversalTime(),
                 Experiences = [],
                 Certifications = [],
                 Educations = [],
@@ -49,6 +42,24 @@ public class UsersService
             });
             await _databaseContext.SaveChangesAsync();
             return 5;
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("Loi nua roi dume");
+            throw;
+        }
+
+
+    }
+    public async Task<User?> testGetUserWithId1()
+    {
+
+        // _ = await _databaseContext.AddAsync<User>(newUser.ToActiveUser("", ""));
+        // // await _databaseContext.SaveChangesAsync();
+        try
+        {
+            var user = await _databaseContext.Users.FirstOrDefaultAsync(user => user.Id == 1);
+            return user;
         }
         catch (Exception)
         {

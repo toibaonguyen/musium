@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using JobNet.Settings;
-using MongoDB.Driver;
 using JobNet.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
@@ -12,17 +11,16 @@ builder.Logging.AddConsole();
 // Add services to the container.
 JobNetDatabaseSettings dbsettings = builder.Configuration.GetSection("JobNetDatabase").Get<JobNetDatabaseSettings>() ?? throw new Exception("Something wrongs with setting the database");
 string connectionString = dbsettings.ConnectionString;
-string databaseName = dbsettings.DatabaseName;
 if (connectionString.IsNullOrEmpty())
 {
     throw new Exception("Connection string is missing!");
 }
 builder.Services.Configure<JobNetDatabaseSettings>(builder.Configuration.GetSection("JobNetDatabase"));
+builder.Services.AddDbContext<JobNetDatabaseContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddScoped<UsersService>();
 builder.Services.AddScoped<PostsService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson();
-builder.Services.AddDbContext<JobNetDatabaseContext>(options => options.UseMongoDB(connectionString, databaseName).GetType());
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -1,5 +1,6 @@
 using JobNet.DTOs;
 using JobNet.Extensions;
+using JobNet.Models.Entities;
 using JobNet.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,18 +16,11 @@ public class AuthController : ControllerBase
         this._userService = usersService;
     }
     [HttpGet]
-    public async Task<ActionResult<int>> Get()
+    public async Task<ActionResult<User?>> Get()
     {
         try
         {
-            var test = await _userService.CreateNewUser(new()
-            {
-                Name = "1",
-                Email = "2",
-                Password = "3",
-                Location = "4",
-                Birthday = new DateTime(7, 7, 7)
-            });
+            var test = await _userService.testGetUserWithId1();
             return Ok(test);
         }
         catch (Exception e)

@@ -1,10 +1,6 @@
 
 using JobNet.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using Microsoft.Extensions.Configuration;
-using MongoDB.EntityFrameworkCore.Extensions;
 using JobNet.Settings;
 using Microsoft.Extensions.Options;
 
@@ -20,9 +16,11 @@ public class JobNetDatabaseContext : DbContext
     public DbSet<Group> Groups { get; set; }
     public DbSet<Experience> Experiences { get; set; }
     public DbSet<Education> Educations { get; set; }
+    public DbSet<CompanyPost> CompanyPosts { get; set; }
     public DbSet<Company> Companies { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Certification> Certifications { get; set; }
+    public DbSet<AdminAccount> AdminAccounts { get; set; }
 
 
 
@@ -34,20 +32,20 @@ public class JobNetDatabaseContext : DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        Console.WriteLine($"May del lam viec ak 0 {modelBuilder}");
         base.OnModelCreating(modelBuilder);
-        Console.WriteLine($"May del lam viec ak {modelBuilder}");
-
-        modelBuilder.Entity<User>().ToCollection(_settings.UsersCollectionName);
-        modelBuilder.Entity<Post>().ToCollection(_settings.PostsCollectionName);
-        modelBuilder.Entity<Message>().ToCollection(_settings.MessagesCollectionName);
-        modelBuilder.Entity<JobPost>().ToCollection(_settings.JobPostsCollectionName);
-        modelBuilder.Entity<Industry>().ToCollection(_settings.IndustriesCollectionName);
-        modelBuilder.Entity<Group>().ToCollection(_settings.GroupsCollectionName);
-        modelBuilder.Entity<Experience>().ToCollection(_settings.ExperiencesCollectionName);
-        modelBuilder.Entity<Education>().ToCollection(_settings.EducationsCollectionName);
-        modelBuilder.Entity<Company>().ToCollection(_settings.CompaniesCollectionName);
-        modelBuilder.Entity<Comment>().ToCollection(_settings.CommentsCollectionName);
-        modelBuilder.Entity<Certification>().ToCollection(_settings.CertificationsCollectionName);
+        modelBuilder.UseIdentityByDefaultColumns();
+        modelBuilder.Entity<User>().ToTable(_settings.UsersTableName);
+        modelBuilder.Entity<Post>().ToTable(_settings.PostsTableName);
+        modelBuilder.Entity<Message>().ToTable(_settings.MessagesTableName);
+        modelBuilder.Entity<JobPost>().ToTable(_settings.JobPostsTableName);
+        modelBuilder.Entity<Industry>().ToTable(_settings.IndustriesTableName);
+        modelBuilder.Entity<Group>().ToTable(_settings.GroupsTableName);
+        modelBuilder.Entity<Experience>().ToTable(_settings.ExperiencesTableName);
+        modelBuilder.Entity<Education>().ToTable(_settings.EducationsTableName);
+        modelBuilder.Entity<CompanyPost>().ToTable(_settings.CompanyPostsTableName);
+        modelBuilder.Entity<Company>().ToTable(_settings.CompaniesTableName);
+        modelBuilder.Entity<Comment>().ToTable(_settings.CommentsTableName);
+        modelBuilder.Entity<Certification>().ToTable(_settings.CertificationsTableName);
+        modelBuilder.Entity<AdminAccount>().ToTable(_settings.AdminAccountsTableName);
     }
 }

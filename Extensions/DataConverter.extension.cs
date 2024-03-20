@@ -47,22 +47,22 @@ public static class DataConverterExtensions
         };
         return user;
     }
-    public static UserDTO ToUserDTO(this User user)
-    {
-        UserDTO dto = new()
-        {
-            Id = user.Id ?? throw new Exception("This user entity has not been created yet!"),
-            Name = user.Name,
-            Avatar = user.Avatar,
-            BackgroundImage = user.BackgroundImage,
-            Email = user.Email,
-            Location = user.Location,
-            Birthday = user.Birthday,
-            Certifications = user.Certifications,
-            Educations = user.Educations,
-            Skills = user.Skills,
-            IsHiring = user.IsHiring,
-        };
-        return dto;
-    }
+    // public static UserDTO ToUserDTO(this User user)
+    // {
+    //     UserDTO dto = new()
+    //     {
+    //         Id = user.Id,
+    //         Name = user.Name,
+    //         Avatar = user.Avatar,
+    //         BackgroundImage = user.BackgroundImage,
+    //         Email = user.Email,
+    //         Location = user.Location,
+    //         Birthday = user.Birthday,
+    //         Certifications = user.Certifications,
+    //         Educations = user.Educations,
+    //         Skills = user.Skills,
+    //         IsHiring = user.IsHiring,
+    //     };
+    //     return dto;
+    // }
 }

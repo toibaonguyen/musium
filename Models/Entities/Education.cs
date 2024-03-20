@@ -1,10 +1,8 @@
 using System;
-using MongoDB.Bson;
 namespace JobNet.Models.Entities;
 public class Education
 {
-    //may be i will change later
-    public ObjectId? Id { get; set; }
+    public int Id { get; set; }
     public required string SchoolName { get; set; }
     public required string Degree { get; set; }
     public required string FieldOfStudy { get; set; }

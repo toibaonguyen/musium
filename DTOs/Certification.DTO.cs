@@ -3,7 +3,6 @@
 namespace JobNet.DTOs;
 public class CertificationDTO
 {
-    //may be i will change later
     public required int Id { get; set; }
     public required string Name { get; set; }
     public required string IssuingOrganizationName { get; set; }

@@ -9,7 +9,7 @@ public class ExperienceDTO
     public required string Location { get; set; }
     public required string LocationType { get; set; }
     public required string Description { get; set; }
-    public bool IsUserWorkingAt { get; set; }
+    public bool IsUserCurentlyWorking { get; set; }
     public required DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
 }

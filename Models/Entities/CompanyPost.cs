@@ -3,7 +3,8 @@ namespace JobNet.Models.Entities;
 public class CompanyPost
 {
     public int Id { get; set; }
-    public required Company Owner { get; set; }
+    public int CompanyId { get; set; }
+    public Company Owner { get; set; } = null!;
     public required string Content { get; set; }
     public required IList<string> Images { get; set; }
     public DateTime CreatedAt { get; set; }

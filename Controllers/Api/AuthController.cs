@@ -15,22 +15,6 @@ public class AuthController : ControllerBase
     {
         this._userService = usersService;
     }
-    [HttpGet]
-    public async Task<ActionResult<User?>> Get()
-    {
-        try
-        {
-            var test = await _userService.testGetUserWithId1();
-            return Ok(test);
-        }
-        catch (Exception e)
-        {
-            Console.BackgroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine(e.Message);
-            Console.ResetColor();
-            throw;
-        }
-    }
     // [HttpPost("register-user")]
     // public async Task<ActionResult<UserDTO>> RegisterUser([FromBody] CreateUserDTO newUser)
     // {

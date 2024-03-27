@@ -15,7 +15,7 @@ public class PostsService
     {
         this._databaseContext = databaseContext;
     }
-    // public async Task<PostDTO> CreateNewPost(CreatePostDTO newPost)
+    // public async Task<PostDTO> CreateNewPost(, CreatePostDTO newPost)
     // {
 
     // }

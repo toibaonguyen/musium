@@ -5,8 +5,10 @@ public class JobPost
 {
     public int Id { get; set; }
     public required string JobTitle { get; set; }
-    public required User Author { get; set; }
-    public required Company Company { get; set; }
+    public int AuthorId { get; set; }
+    public User Author { get; set; } = null!;
+    public int CompanyId { get; set; }
+    public Company Company { get; set; } = null!;
     public required LocationType WorkplaceType { get; set; }
     public required string JobLocation { get; set; }
     public required EmploymentType JobType { get; set; }

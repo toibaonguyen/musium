@@ -10,11 +10,11 @@ namespace JobNet.Services;
 
 public class PhotoService
 {
-    private readonly JobNetDatabaseContext _databaseContext;
-    public PhotoService(JobNetDatabaseContext databaseContext)
-    {
-        this._databaseContext = databaseContext;
-    }
+    // private readonly JobNetDatabaseContext _databaseContext;
+    // public PhotoService(JobNetDatabaseContext databaseContext)
+    // {
+    //     this._databaseContext = databaseContext;
+    // }
 
     // public async Task<PostDTO> CreateNewPost(CreatePostDTO newPost)
     // {

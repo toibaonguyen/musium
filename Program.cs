@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using JobNet.Settings;
 using JobNet.Services;
-using Microsoft.IdentityModel.Tokens;
+// using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
 using JobNet.Data;
 
@@ -11,7 +11,7 @@ builder.Logging.AddConsole();
 // Add services to the container.
 JobNetDatabaseSettings dbsettings = builder.Configuration.GetSection("JobNetDatabase").Get<JobNetDatabaseSettings>() ?? throw new Exception("Something wrongs with setting the database");
 string connectionString = dbsettings.ConnectionString;
-if (connectionString.IsNullOrEmpty())
+if (String.IsNullOrEmpty(connectionString))
 {
     throw new Exception("Connection string is missing!");
 }

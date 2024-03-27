@@ -9,4 +9,6 @@ public class Certification
     public DateTime? ExpirationDate { get; set; }
     public string? CredentialID { get; set; }
     public string? CredentialURL { get; set; }
+    public int UserId { get; set; }
+    public User User { get; set; } = null!;
 }

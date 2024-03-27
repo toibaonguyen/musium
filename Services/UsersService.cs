@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using JobNet.DTOs;
 using JobNet.Models.Entities;
 using JobNet.Extensions;
+using Microsoft.AspNetCore.JsonPatch;
 
 
 namespace JobNet.Services;
@@ -17,68 +18,32 @@ public class UsersService
     {
         this._databaseContext = databaseContext;
     }
-    public async Task<int> TestCreateNewUser(CreateUserDTO newUser)
+    public async Task CreateNewUser(CreateUserDTO user, string avatar, string backgroundImage)
     {
-
-        // _ = await _databaseContext.AddAsync<User>(newUser.ToActiveUser("", ""));
-        // // await _databaseContext.SaveChangesAsync();
         try
         {
-            _databaseContext.Users.Add(new()
-            {
-                Name = "",
-                Avatar = "",
-                BackgroundImage = "",
-                Email = "",
-                Password = "",
-                Location = "",
-                Birthday = (new DateTime(2024, 1, 1)).ToUniversalTime(),
-                Experiences = [],
-                Certifications = [],
-                Educations = [],
-                JobNetGroups = [],
-                Skills = [],
-                IsActive = true
-            });
+            await _databaseContext.Users.AddAsync(user.ToActiveUser(avatar, backgroundImage));
             await _databaseContext.SaveChangesAsync();
-            return 5;
         }
         catch (Exception)
         {
-            Console.WriteLine("Loi nua roi dume");
             throw;
         }
-
-
     }
-    public async Task<User?> testGetUserWithId1()
+    public async Task<ProfileUserDTO?> GetProfileUserDTO(int id)
     {
-
-        // _ = await _databaseContext.AddAsync<User>(newUser.ToActiveUser("", ""));
-        // // await _databaseContext.SaveChangesAsync();
         try
         {
-            var user = await _databaseContext.Users.FirstOrDefaultAsync(user => user.Id == 1);
-            return user;
+            User? user = await _databaseContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null)
+            {
+                return null;
+            }
+            return user.ToProfileUserDTO();
         }
         catch (Exception)
         {
-            Console.WriteLine("Loi nua roi dume");
             throw;
         }
-
-
     }
-    // public async Task<UserDTO> GetUserByID(string id)
-    // {
-
-    // }
-    // public async Task<UserDTO> UpdatePatchUser(string id)
-    // {
-
-    // }
-    // public async Task DisableUser(string id)
-    // {
-
-    // }
 }

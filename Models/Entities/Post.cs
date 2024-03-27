@@ -8,7 +8,8 @@ public class Post
     public int? GroupId { get; set; }
     public Group? Group { get; set; }
     public required string Content { get; set; }
-    public required IList<string> Images { get; set; }
+    public IList<string> Images { get; set; } = new List<string>();
+    public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public required bool IsActive { get; set; }

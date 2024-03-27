@@ -16,7 +16,8 @@ public class Company
     public required string Headquarters { get; set; }
     public required DateTime FoundedAt { get; set; }
     public ICollection<CompanyPost> Posts { get; } = new List<CompanyPost>();
+    public ICollection<Experience> Experiences { get; } = new List<Experience>();
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public DateTime IsActive { get; set; }
+    public bool IsActive { get; set; }
 }

@@ -18,11 +18,11 @@ public class UsersService
     {
         this._databaseContext = databaseContext;
     }
-    public async Task CreateNewUser(CreateUserDTO user, string avatar, string backgroundImage)
+    public async Task CreateNewUser(User user)
     {
         try
         {
-            await _databaseContext.Users.AddAsync(user.ToActiveUser(avatar, backgroundImage));
+            await _databaseContext.Users.AddAsync(user);
             await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)

@@ -74,7 +74,7 @@ namespace JobNet.Migrations
                     ExpirationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CredentialID = table.Column<string>(type: "text", nullable: true),
                     CredentialURL = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: true)
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -83,7 +83,8 @@ namespace JobNet.Migrations
                         name: "FK_certifications_users_UserId",
                         column: x => x.UserId,
                         principalTable: "users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -104,7 +105,7 @@ namespace JobNet.Migrations
                     FoundedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsActive = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -131,13 +132,13 @@ namespace JobNet.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     SchoolName = table.Column<string>(type: "text", nullable: false),
                     Degree = table.Column<string>(type: "text", nullable: false),
-                    FieldOfStudy = table.Column<string>(type: "text", nullable: false),
+                    Major = table.Column<string>(type: "text", nullable: false),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Grade = table.Column<string>(type: "text", nullable: true),
                     ActivitiesAndSocieties = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: true)
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -146,7 +147,8 @@ namespace JobNet.Migrations
                         name: "FK_educations_users_UserId",
                         column: x => x.UserId,
                         principalTable: "users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -216,7 +218,7 @@ namespace JobNet.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    OwnerId = table.Column<int>(type: "integer", nullable: false),
+                    CompanyId = table.Column<int>(type: "integer", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
                     Images = table.Column<string[]>(type: "text[]", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -227,8 +229,8 @@ namespace JobNet.Migrations
                 {
                     table.PrimaryKey("PK_company_posts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_company_posts_companies_OwnerId",
-                        column: x => x.OwnerId,
+                        name: "FK_company_posts_companies_CompanyId",
+                        column: x => x.CompanyId,
                         principalTable: "companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -247,7 +249,7 @@ namespace JobNet.Migrations
                     Location = table.Column<string>(type: "text", nullable: false),
                     LocationType = table.Column<int>(type: "integer", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    IsUserWorkingAt = table.Column<bool>(type: "boolean", nullable: false),
+                    IsUserCurentlyWorking = table.Column<bool>(type: "boolean", nullable: false),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -306,30 +308,84 @@ namespace JobNet.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GroupUser",
+                columns: table => new
+                {
+                    JobNetGroupsId = table.Column<int>(type: "integer", nullable: false),
+                    UsersId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupUser", x => new { x.JobNetGroupsId, x.UsersId });
+                    table.ForeignKey(
+                        name: "FK_GroupUser_groups_JobNetGroupsId",
+                        column: x => x.JobNetGroupsId,
+                        principalTable: "groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupUser_users_UsersId",
+                        column: x => x.UsersId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "posts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     OwnerId = table.Column<int>(type: "integer", nullable: false),
+                    GroupId = table.Column<int>(type: "integer", nullable: true),
                     Content = table.Column<string>(type: "text", nullable: false),
                     Images = table.Column<string[]>(type: "text[]", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    CompanyId = table.Column<int>(type: "integer", nullable: true)
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_posts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_posts_companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "companies",
+                        name: "FK_posts_groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "groups",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_posts_users_OwnerId",
                         column: x => x.OwnerId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "company_post_comments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PostId = table.Column<int>(type: "integer", nullable: false),
+                    AuthorId = table.Column<int>(type: "integer", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_company_post_comments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_company_post_comments_company_posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "company_posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_company_post_comments_users_AuthorId",
+                        column: x => x.AuthorId,
                         principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -391,9 +447,19 @@ namespace JobNet.Migrations
                 column: "ManagerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_company_posts_OwnerId",
+                name: "IX_company_post_comments_AuthorId",
+                table: "company_post_comments",
+                column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_company_post_comments_PostId",
+                table: "company_post_comments",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_company_posts_CompanyId",
                 table: "company_posts",
-                column: "OwnerId");
+                column: "CompanyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_educations_UserId",
@@ -421,6 +487,11 @@ namespace JobNet.Migrations
                 column: "IndustryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GroupUser_UsersId",
+                table: "GroupUser",
+                column: "UsersId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_job_posts_AuthorId",
                 table: "job_posts",
                 column: "AuthorId");
@@ -441,9 +512,9 @@ namespace JobNet.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_posts_CompanyId",
+                name: "IX_posts_GroupId",
                 table: "posts",
-                column: "CompanyId");
+                column: "GroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_posts_OwnerId",
@@ -464,7 +535,7 @@ namespace JobNet.Migrations
                 name: "comments");
 
             migrationBuilder.DropTable(
-                name: "company_posts");
+                name: "company_post_comments");
 
             migrationBuilder.DropTable(
                 name: "educations");
@@ -473,7 +544,7 @@ namespace JobNet.Migrations
                 name: "experiences");
 
             migrationBuilder.DropTable(
-                name: "groups");
+                name: "GroupUser");
 
             migrationBuilder.DropTable(
                 name: "job_posts");
@@ -483,6 +554,12 @@ namespace JobNet.Migrations
 
             migrationBuilder.DropTable(
                 name: "posts");
+
+            migrationBuilder.DropTable(
+                name: "company_posts");
+
+            migrationBuilder.DropTable(
+                name: "groups");
 
             migrationBuilder.DropTable(
                 name: "companies");

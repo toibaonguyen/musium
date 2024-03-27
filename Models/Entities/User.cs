@@ -14,10 +14,14 @@ public class User
     public ICollection<Experience> Experiences { get; } = new List<Experience>();
     public ICollection<Certification> Certifications { get; } = new List<Certification>();
     public ICollection<Education> Educations { get; } = new List<Education>();
+    public ICollection<Group> AdminAtJobNetGroups { get; } = new List<Group>();
     public ICollection<Group> JobNetGroups { get; } = new List<Group>();
     public ICollection<Post> Posts { get; } = new List<Post>();
-    public ICollection<Message> Messages { get; } = new List<Message>();
-    public required IList<string> Skills { get; set; }
+    public ICollection<JobPost> JobPosts { get; } = new List<JobPost>();
+    public ICollection<Message> SentMessages { get; } = new List<Message>();
+    public ICollection<Message> ReceivedMessages { get; } = new List<Message>();
+    public ICollection<Comment> Comments { get; } = new List<Comment>();
+    public IList<string> Skills { get; set; } = new List<string>();
     public bool? IsHiring { get; set; }
     public bool IsActive { get; set; }
 }

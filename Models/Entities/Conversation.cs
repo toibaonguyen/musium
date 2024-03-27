@@ -1,6 +1,6 @@
 using System;
 namespace JobNet.Models.Entities;
-public class Message
+public class Conversation
 {
     public int Id { get; set; }
     public int SenderId { get; set; }

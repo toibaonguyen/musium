@@ -16,4 +16,5 @@ public class JobNetDatabaseSettings
     public string CommentsTableName { get; set; } = string.Empty;
     public string CertificationsTableName { get; set; } = string.Empty;
     public string AdminAccountsTableName { get; set; } = string.Empty;
+    public string CompanyPostComment { get; set; } = string.Empty;
 }

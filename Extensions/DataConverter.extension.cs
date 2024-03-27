@@ -6,7 +6,6 @@ namespace JobNet.Extensions;
 
 public static class DataConverterExtensions
 {
-
     public static User ToActiveUser(this CreateUserDTO dto, string avatar, string backgroundImage)
     {
         User user = new()
@@ -18,7 +17,6 @@ public static class DataConverterExtensions
             Password = dto.Password,
             Location = dto.Location,
             Birthday = dto.Birthday,
-            Skills = [],
             IsActive = true
         };
         return user;
@@ -34,7 +32,6 @@ public static class DataConverterExtensions
             Password = dto.Password,
             Location = dto.Location,
             Birthday = dto.Birthday,
-            Skills = [],
             IsActive = false,
         };
         return user;

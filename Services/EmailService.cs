@@ -8,7 +8,10 @@ using JobNet.DTOs;
 
 namespace JobNet.Services;
 
-public class PhotoService
+public class EmailService
 {
+    public async Task SendVerifyUserMail(string email)
+    {
 
+    }
 }

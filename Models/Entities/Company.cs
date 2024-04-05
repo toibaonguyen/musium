@@ -1,6 +1,6 @@
 using System;
 namespace JobNet.Models.Entities;
-public class Company
+public class Company : Entity
 {
     public int Id { get; set; }
     public int ManagerId { get; set; }

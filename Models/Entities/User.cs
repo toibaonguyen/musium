@@ -1,7 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 namespace JobNet.Models.Entities;
-public class User
+public class User : Entity
 {
     public int Id { get; set; }
     public required string Name { get; set; }
@@ -9,6 +9,7 @@ public class User
     public required string BackgroundImage { get; set; }
     public required string Email { get; set; }
     public required string Password { get; set; }
+    public required byte[] PasswordSalt { get; set; }
     public required string Location { get; set; }
     public DateTime Birthday { get; set; }
     public ICollection<Experience> Experiences { get; } = new List<Experience>();
@@ -24,4 +25,5 @@ public class User
     public IList<string> Skills { get; set; } = new List<string>();
     public bool? IsHiring { get; set; }
     public bool IsActive { get; set; }
+    public bool IsEmailConfirmed { get; set; } = false;
 }

@@ -7,6 +7,8 @@ using JobNet.Data;
 using NRedisStack;
 using NRedisStack.RedisStackCommands;
 using StackExchange.Redis;
+using JobNet.Middlewares;
+using JobNet.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
@@ -26,8 +28,8 @@ if (String.IsNullOrEmpty(connectionString))
 builder.Services.Configure<JobNetDatabaseSettings>(builder.Configuration.GetSection("JobNetDatabase"));
 builder.Services.AddDbContext<JobNetDatabaseContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
-builder.Services.AddScoped<UsersService>();
-builder.Services.AddScoped<PostsService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UsersService>();
 
 
 builder.Services.AddControllers().AddNewtonsoftJson();
@@ -44,6 +46,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 

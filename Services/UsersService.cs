@@ -7,22 +7,29 @@ using JobNet.DTOs;
 using JobNet.Models.Entities;
 using JobNet.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
+using JobNet.Interfaces.Services;
 
 
 namespace JobNet.Services;
 
-public class UsersService
+public class UsersService : IUserService
 {
+
     private readonly JobNetDatabaseContext _databaseContext;
     public UsersService(JobNetDatabaseContext databaseContext)
     {
         this._databaseContext = databaseContext;
     }
-    public async Task CreateNewUser(User user)
+    public async Task CreateNewInactiveUser(CreateUserDTO user)
     {
         try
         {
-            await _databaseContext.Users.AddAsync(user);
+            var existence = await _databaseContext.Users.FirstOrDefaultAsync(e => e.Email == user.Email);
+            if (existence != null)
+            {
+                //Throw exception because this user has been existed
+            }
+            await _databaseContext.Users.AddAsync(user.ToInactiveUser());
             await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
@@ -30,16 +37,158 @@ public class UsersService
             throw;
         }
     }
-    public async Task<ProfileUserDTO?> GetProfileUserDTO(int id)
+    public async Task CreateNewActiveUser(CreateUserDTO user)
     {
         try
         {
-            User? user = await _databaseContext.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (user == null)
+            var existence = await _databaseContext.Users.FirstOrDefaultAsync(e => e.Email == user.Email);
+            if (existence != null)
             {
-                return null;
+                //Throw exception because this user has been existed
             }
-            return user.ToProfileUserDTO();
+            await _databaseContext.Users.AddAsync(user.ToActiveUser());
+            await _databaseContext.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task<User?> GetUserByEmail(string email)
+    {
+        try
+        {
+            var existence = await _databaseContext.Users.FirstOrDefaultAsync(e => e.Email == email);
+            return existence;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task<User?> GetUserById(int id)
+    {
+        try
+        {
+            var existence = await _databaseContext.Users.FindAsync(id);
+            return existence;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task<ProfileUserDTO?> GetProfileUserById(int id)
+    {
+        try
+        {
+            var existence = await _databaseContext.Users.FindAsync(id);
+            return existence?.ToProfileUserDTO();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task<IEnumerable<ListUserDTO>> GetListOfUser()
+    {
+        try
+        {
+            var users = await _databaseContext.Users.ToListAsync();
+            var listUsers = new List<ListUserDTO>();
+            foreach (User user in users)
+            {
+                listUsers.Add(user.ToListUserDTO());
+            }
+            return listUsers ?? ([]);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ChangeUserAvatar(int userId, string newAvatar)
+    {
+        try
+        {
+            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.Avatar, newAvatar));
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ChangeUserBackground(int userId, string newBackground)
+    {
+        try
+        {
+            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.BackgroundImage, newBackground));
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ChangeUserName(int userId, string name)
+    {
+        try
+        {
+            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.Name, name));
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ChangeSkills(int userId, IList<string> skills)
+    {
+        try
+        {
+            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.Skills, skills));
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ChangeBirthday(int userId, DateTime birthday)
+    {
+        try
+        {
+            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.Birthday, birthday));
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ChangeLocation(int userId, string location)
+    {
+        try
+        {
+            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.Location, location));
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ChangeActiveStatus(int userId, bool isActive)
+    {
+        try
+        {
+            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.IsActive, isActive));
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ChangeEmailConfirmationStatus(int userId, bool isEmailConfirmed)
+    {
+        try
+        {
+            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.IsEmailConfirmed, isEmailConfirmed));
         }
         catch (Exception)
         {

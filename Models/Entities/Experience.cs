@@ -1,7 +1,7 @@
 using System;
 using JobNet.Enums;
 namespace JobNet.Models.Entities;
-public class Experience
+public class Experience : Entity
 {
     public int Id { get; set; }
     public int AuthorId { get; set; }

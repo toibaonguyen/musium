@@ -1,6 +1,6 @@
 using System;
 namespace JobNet.Models.Entities;
-public class Education
+public class Education : Entity
 {
     public int Id { get; set; }
     public required string SchoolName { get; set; }

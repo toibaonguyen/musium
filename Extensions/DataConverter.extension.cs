@@ -1,35 +1,42 @@
 
+using System.Text;
+using System.Web;
 using JobNet.DTOs;
 using JobNet.Models.Entities;
+using JobNet.Utilities;
 
 namespace JobNet.Extensions;
 
 public static class DataConverterExtensions
 {
-    public static User ToActiveUser(this CreateUserDTO dto, string avatar, string backgroundImage)
+    public static User ToActiveUser(this CreateUserDTO dto)
     {
+        string hashedPassword = PasswordUtil.HashPassword(dto.Password, out byte[] salt);
         User user = new()
         {
             Name = dto.Name,
             Email = dto.Email,
-            Avatar = avatar,
-            BackgroundImage = backgroundImage,
-            Password = dto.Password,
+            Avatar = "default",
+            BackgroundImage = "default",
+            Password = hashedPassword,
+            PasswordSalt = salt,
             Location = dto.Location,
             Birthday = dto.Birthday,
             IsActive = true
         };
         return user;
     }
-    public static User ToInactiveUser(this CreateUserDTO dto, string avatar, string backgroundImage)
+    public static User ToInactiveUser(this CreateUserDTO dto)
     {
+        string hashedPassword = PasswordUtil.HashPassword(dto.Password, out byte[] salt);
         User user = new()
         {
             Name = dto.Name,
             Email = dto.Email,
-            Avatar = avatar,
-            BackgroundImage = backgroundImage,
-            Password = dto.Password,
+            Avatar = "default",
+            BackgroundImage = "default",
+            Password = hashedPassword,
+            PasswordSalt = salt,
             Location = dto.Location,
             Birthday = dto.Birthday,
             IsActive = false,
@@ -146,6 +153,30 @@ public static class DataConverterExtensions
             Experiences = user.Experiences.Select(e => e.ToExperienceDTO()),
             Skills = user.Skills,
             IsHiring = user.IsHiring,
+        };
+        return dto;
+    }
+    public static ListUserDTO ToListUserDTO(this User user)
+    {
+        var experience = user.Experiences.OrderByDescending(e => e.StartDate).FirstOrDefault();
+        StringBuilder currentJobPosition = new();
+        if (experience != null)
+        {
+            if (experience.IsUserCurentlyWorking)
+            {
+                currentJobPosition.Append(experience.Title);
+                currentJobPosition.Append(" at ");
+                //Test here
+                currentJobPosition.Append(experience.Company.Name);
+            }
+        }
+        ListUserDTO dto = new()
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Avatar = user.Avatar,
+            Location = user.Location,
+            CurrentJobPosition = currentJobPosition.ToString()
         };
         return dto;
     }

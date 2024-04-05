@@ -20,7 +20,7 @@ public class JobNetDatabaseContext : DbContext
     public DbSet<Company> Companies { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Certification> Certifications { get; set; }
-    public DbSet<AdminAccount> AdminAccounts { get; set; }
+    public DbSet<Admin> AdminAccounts { get; set; }
 
 
 
@@ -69,7 +69,7 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<Education>().ToTable(_settings.EducationsTableName);
 
         //CompanyPostComment
-        modelBuilder.Entity<CompanyPostComment>().ToTable(_settings.CompanyPostComment);
+        modelBuilder.Entity<CompanyPostComment>().ToTable(_settings.CompanyPostCommentsTableName);
 
         //CompanyPost
         modelBuilder.Entity<CompanyPost>().ToTable(_settings.CompanyPostsTableName).HasMany(e => e.Comments).WithOne(e => e.Post).HasForeignKey(e => e.PostId).IsRequired();
@@ -85,6 +85,6 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<Certification>().ToTable(_settings.CertificationsTableName);
 
         //AdminAccount
-        modelBuilder.Entity<AdminAccount>().ToTable(_settings.AdminAccountsTableName);
+        modelBuilder.Entity<Admin>().ToTable(_settings.AdminsTableName);
     }
 }

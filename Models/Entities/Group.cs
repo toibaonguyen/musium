@@ -1,6 +1,6 @@
 using System;
 namespace JobNet.Models.Entities;
-public class Group
+public class Group : Entity
 {
     public int Id { get; set; }
     public required string Name { get; set; }

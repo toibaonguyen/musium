@@ -1,5 +1,8 @@
 using JobNet.DTOs;
 using JobNet.Extensions;
+using JobNet.Interfaces.Services;
+using JobNet.Models.Core.Requests;
+using JobNet.Models.Core.Responses;
 using JobNet.Models.Entities;
 using JobNet.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -10,16 +13,26 @@ namespace JobNet.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly UsersService _userService;
-    public AuthController(UsersService usersService)
+    private readonly IAuthService _authService;
+    private readonly ILogger<AuthController> _logger;
+    public AuthController(ILogger<AuthController> logger, IAuthService authService)
     {
-        this._userService = usersService;
+        this._authService = authService;
+        this._logger = logger;
     }
-    // [HttpPost("register-user")]
-    // public async Task<ActionResult<UserDTO>> RegisterUser([FromBody] CreateUserDTO newUser)
-    // {
 
-    //     return Ok();
+    // [HttpPost("register-user")]
+    // public async Task<ActionResult<BaseResponse>> RegisterUser([FromBody] RegisterUserRequest requestBody)
+    // {
+    //     try
+    //     {
+
+    //     }
+    //     catch (Exception e)
+    //     {
+
+    //         throw;
+    //     }
     // }
     // [HttpPost("login-user")]
     // public async Task<ActionResult> LoginAsUser([FromBody] AccountDTO account)

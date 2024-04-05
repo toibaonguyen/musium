@@ -1,7 +1,7 @@
 using System;
 using JobNet.Enums;
 namespace JobNet.Models.Entities;
-public class JobPost
+public class JobPost : Entity
 {
     public int Id { get; set; }
     public required string JobTitle { get; set; }

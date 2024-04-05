@@ -1,6 +1,6 @@
 using System;
 namespace JobNet.Models.Entities;
-public class CompanyPostComment
+public class CompanyPostComment : Entity
 {
     public int Id { get; set; }
     public int PostId { get; set; }

@@ -1,6 +1,6 @@
 using System;
 namespace JobNet.Models.Entities;
-public class Certification
+public class Certification : Entity
 {
     public int Id { get; set; }
     public required string Name { get; set; }

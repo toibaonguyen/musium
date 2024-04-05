@@ -1,4 +1,5 @@
 using JobNet.DTOs;
+using JobNet.Interfaces.Services;
 using JobNet.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,12 @@ namespace JobNet.Controllers;
 [ApiController]
 public class UsersController : ControllerBase
 {
-    private readonly UsersService _userService;
-    public UsersController(UsersService usersService)
+    private readonly IUserService _userService;
+    private readonly ILogger<UsersController> _logger;
+    public UsersController(ILogger<UsersController> logger, IUserService usersService)
     {
         this._userService = usersService;
+        this._logger = logger;
     }
 
     // [HttpGet]

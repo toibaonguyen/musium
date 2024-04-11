@@ -394,7 +394,21 @@ public class AuthService : IAuthService
         try
         {
             var user = await _usersService.GetUserByEmail(email) ?? throw new BadRequestException("Invalid user");
-            string confirmationUrl =;
+            var authClaims = new List<Claim>
+            {
+                new(ClaimTypes.Email,user.Email),
+                new(ClaimTypes.Name, user.Name),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(ClaimTypes.Role,UserRoles.User)
+            };
+            var token = this.CreateToken(authClaims);
+            var urlHelper = _urlHelperFactory.GetUrlHelper(new ActionContext());
+            string? confirmationUrl = urlHelper.Action("ConfirmResetPassword", "api/auth", new { userId = user.Id, token = new JwtSecurityTokenHandler().WriteToken(token) });
+            if (confirmationUrl is null)
+            {
+                await _usersService.DeleteUser(user.Id);
+                throw new Exception("Can't generate confirmationUrl link, please contact us!");
+            }
             await _emailService.SendResetPasswordConfirmation(email, confirmationUrl);
         }
         catch (Exception)

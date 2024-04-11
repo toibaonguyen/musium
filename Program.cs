@@ -9,6 +9,7 @@ using NRedisStack.RedisStackCommands;
 using StackExchange.Redis;
 using JobNet.Middlewares;
 using JobNet.Interfaces.Services;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
@@ -25,12 +26,13 @@ if (String.IsNullOrEmpty(connectionString))
 {
     throw new Exception("Connection string is missing!");
 }
+builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
 builder.Services.Configure<JobNetDatabaseSettings>(builder.Configuration.GetSection("JobNetDatabase"));
 builder.Services.AddDbContext<JobNetDatabaseContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UsersService>();
-
+builder.Services.AddScoped<IAdminService, AdminsService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 

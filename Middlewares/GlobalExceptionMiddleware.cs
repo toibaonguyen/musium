@@ -1,3 +1,4 @@
+using JobNet.Exceptions;
 using JobNet.Models.Core.Responses;
 
 namespace JobNet.Middlewares;
@@ -23,17 +24,22 @@ public class GlobalExceptionMiddleware
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
-
-            var problemDetails = new ErrorDetailsResponse
+            _logger.LogError(exception, "Exception occurred: {Message}", exception);
+            if (exception.GetType() == typeof(BaseRequestException))
             {
-                StatusCode = StatusCodes.Status500InternalServerError,
-                Message = "Server Error!"
-            };
-
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
-            await context.Response.WriteAsJsonAsync(problemDetails);
+                var requestException = (BaseRequestException)exception;
+                context.Response.StatusCode = requestException.StatusCode;
+                MessageResponse response = new()
+                {
+                    Message = requestException.Message
+                };
+                await context.Response.WriteAsJsonAsync(response);
+            }
+            else
+            {
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsJsonAsync(exception.Message);
+            }
         }
     }
 

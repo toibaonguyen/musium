@@ -18,4 +18,3 @@ public class CreateUserDTO
     [Required]
     public required DateTime Birthday { get; set; }
 }
-

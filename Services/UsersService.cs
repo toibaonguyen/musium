@@ -8,6 +8,8 @@ using JobNet.Models.Entities;
 using JobNet.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using JobNet.Interfaces.Services;
+using JobNet.Exceptions;
+using JobNet.Utilities;
 
 
 namespace JobNet.Services;
@@ -20,7 +22,7 @@ public class UsersService : IUserService
     {
         this._databaseContext = databaseContext;
     }
-    public async Task CreateNewInactiveUser(CreateUserDTO user)
+    public async Task CreateNewInactiveUser(CreateUserDTO user, bool isEmailConfirmed)
     {
         try
         {
@@ -29,7 +31,7 @@ public class UsersService : IUserService
             {
                 //Throw exception because this user has been existed
             }
-            await _databaseContext.Users.AddAsync(user.ToInactiveUser());
+            await _databaseContext.Users.AddAsync(user.ToInactiveUser(isEmailConfirmed));
             await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
@@ -37,7 +39,22 @@ public class UsersService : IUserService
             throw;
         }
     }
-    public async Task CreateNewActiveUser(CreateUserDTO user)
+    public async Task ChangeUserPassword(int userId, string newPassword)
+    {
+        try
+        {
+            var existence = await _databaseContext.Users.FindAsync(userId) ?? throw new BadRequestException("User is not exist");
+            string hashedPassword = PasswordUtil.HashPassword(newPassword, out byte[] salt);
+            existence.Password = hashedPassword;
+            existence.PasswordSalt = salt;
+            await _databaseContext.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task CreateNewActiveUser(CreateUserDTO user, bool isEmailConfirmed)
     {
         try
         {
@@ -46,7 +63,7 @@ public class UsersService : IUserService
             {
                 //Throw exception because this user has been existed
             }
-            await _databaseContext.Users.AddAsync(user.ToActiveUser());
+            await _databaseContext.Users.AddAsync(user.ToActiveUser(isEmailConfirmed));
             await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
@@ -189,6 +206,19 @@ public class UsersService : IUserService
         try
         {
             await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.IsEmailConfirmed, isEmailConfirmed));
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task DeleteUser(int userId)
+    {
+        try
+        {
+            User? user = await _databaseContext.Users.FindAsync(userId) ?? throw new BadRequestException("User is not exist");
+            _databaseContext.Users.Remove(user);
+            await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
         {

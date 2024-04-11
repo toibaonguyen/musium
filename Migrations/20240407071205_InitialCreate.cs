@@ -13,18 +13,20 @@ namespace JobNet.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "admin_accounts",
+                name: "admins",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserName = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false),
-                    IsActive = table.Column<string>(type: "text", nullable: false)
+                    PasswordSalt = table.Column<byte[]>(type: "bytea", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_admin_accounts", x => x.Id);
+                    table.PrimaryKey("PK_admins", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -51,11 +53,13 @@ namespace JobNet.Migrations
                     BackgroundImage = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false),
+                    PasswordSalt = table.Column<byte[]>(type: "bytea", nullable: false),
                     Location = table.Column<string>(type: "text", nullable: false),
                     Birthday = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Skills = table.Column<string[]>(type: "text[]", nullable: false),
                     IsHiring = table.Column<bool>(type: "boolean", nullable: true),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IsEmailConfirmed = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -526,7 +530,7 @@ namespace JobNet.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "admin_accounts");
+                name: "admins");
 
             migrationBuilder.DropTable(
                 name: "certifications");

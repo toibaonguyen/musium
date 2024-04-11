@@ -24,6 +24,6 @@ public class User : Entity
     public ICollection<Comment> Comments { get; } = new List<Comment>();
     public IList<string> Skills { get; set; } = new List<string>();
     public bool? IsHiring { get; set; }
-    public bool IsActive { get; set; }
-    public bool IsEmailConfirmed { get; set; } = false;
+    public required bool IsActive { get; set; }
+    public required bool IsEmailConfirmed { get; set; } = false;
 }

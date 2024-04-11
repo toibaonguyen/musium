@@ -17,7 +17,10 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 using JobNet.Models.Core.Common;
 using System.Text.Json;
-
+using Microsoft.AspNetCore.WebUtilities;
+using System.Security.Policy;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 namespace JobNet.Services;
 
 public class AuthService : IAuthService
@@ -25,6 +28,8 @@ public class AuthService : IAuthService
     private readonly IUserService _usersService;
     private readonly IAdminService _adminsService;
     private readonly IConnectionMultiplexer _redis;
+    private readonly IEmailSenderService _emailService;
+    private readonly IUrlHelperFactory _urlHelperFactory;
     private readonly string _secretKey;
     private readonly int _tokenValidityInMinutes;
     private readonly int _refreshTokenValidityInDays;
@@ -32,11 +37,13 @@ public class AuthService : IAuthService
     private readonly string _validAudienceURL;
 
 
-    public AuthService(IAdminService adminsService, IUserService usersService, IConnectionMultiplexer redis, IConfiguration configuration)
+    public AuthService(IUrlHelperFactory urlHelperFactory, IAdminService adminsService, IUserService usersService, IEmailSenderService emailService, IConnectionMultiplexer redis, IConfiguration configuration)
     {
+        this._urlHelperFactory = urlHelperFactory;
         this._usersService = usersService;
         this._adminsService = adminsService;
         this._redis = redis;
+        this._emailService = emailService;
         this._secretKey = configuration["JWTAuth:SecretKey"] ?? throw new Exception("Missing SecretKey");
         this._tokenValidityInMinutes = Int32.Parse(configuration["JWTAuth:TokenValidityInMinutes"] ?? throw new Exception("Missing TokenValidityInMinutes"));
         this._refreshTokenValidityInDays = Int32.Parse(configuration["JWTAuth:RefreshTokenValidityInDays"] ?? throw new Exception("Missing RefreshTokenValidityInDays"));
@@ -48,10 +55,19 @@ public class AuthService : IAuthService
         try
         {
             var user = await _usersService.GetUserByEmail(email) ?? throw new BadRequestException("This user is not exist!");
+            if (user.IsEmailConfirmed == false)
+            {
+                throw new UnauthorizedAccessException("User's email is not confirmed!");
+            }
+            if (user.IsActive == false)
+            {
+                throw new UnauthorizedAccessException("This user is inactive!");
+            }
             if (PasswordUtil.VerifyPassword(password, user.Password, user.PasswordSalt))
             {
                 var authClaims = new List<Claim>
                 {
+                    new(ClaimTypes.Email,user.Email),
                     new(ClaimTypes.Name, user.Name),
                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new(ClaimTypes.Role,UserRoles.User)
@@ -66,8 +82,9 @@ public class AuthService : IAuthService
                 };
                 var db = _redis.GetDatabase();
                 string authModelJson = JsonSerializer.Serialize(authModel);
-                await db.KeyDeleteAsync($"Token:{UserRoles.User}:{user.Id}");
-                await db.StringSetAsync($"Token:{UserRoles.User}:{user.Id}", authModelJson);
+                string key = $"Token:{UserRoles.User}:{user.Id}";
+                await db.KeyDeleteAsync(key);
+                await db.StringSetAsync(key, authModelJson);
                 AuthenticationTokenWithUserInfoDTO auth = new()
                 {
                     AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
@@ -94,10 +111,15 @@ public class AuthService : IAuthService
         try
         {
             var admin = await _adminsService.GetAdminByEmail(email) ?? throw new BadRequestException("This admin is not exist!");
+            if (admin.IsActive == false)
+            {
+                throw new UnauthorizedException("this admin is inactive!");
+            }
             if (PasswordUtil.VerifyPassword(password, admin.Password, admin.PasswordSalt))
             {
                 var authClaims = new List<Claim>
                 {
+                    new(ClaimTypes.Email,admin.Email),
                     new(ClaimTypes.Name, admin.Name),
                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new(ClaimTypes.Role,UserRoles.Admin)
@@ -112,8 +134,9 @@ public class AuthService : IAuthService
                 };
                 var db = _redis.GetDatabase();
                 string authModelJson = JsonSerializer.Serialize(authModel);
-                await db.KeyDeleteAsync($"Token:{UserRoles.Admin}:{admin.Id}");
-                await db.StringSetAsync($"Token:{UserRoles.Admin}:{admin.Id}", authModelJson);
+                string key = $"Token:{UserRoles.Admin}:{admin.Id}";
+                await db.KeyDeleteAsync(key);
+                await db.StringSetAsync(key, authModelJson);
                 AuthenticationTokenWithUserInfoDTO auth = new()
                 {
                     AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
@@ -152,16 +175,82 @@ public class AuthService : IAuthService
                 if (DateTime.Compare(fetchedAuthModel.RefreshTokenExpiryTime, DateTime.Now) < 0)
                 {
                     await db.KeyDeleteAsync(key);
-                    throw new BadRequestException("Invalid token, please login again!");
+                    throw new BadRequestException("Expired token, please login again!");
                 }
                 else
                 {
 
+                    switch (role)
+                    {
+                        case UserRoles.Admin:
+                            {
+                                var admin = await this._adminsService.GetAdminById(userId) ?? throw new BadRequestException("Invalid admin");
+                                if (admin.IsActive == false)
+                                {
+                                    throw new UnauthorizedException("this admin is inactive!");
+                                }
+                                var authClaims = new List<Claim>
+                                {
+                                    new(ClaimTypes.Email,admin.Email),
+                                    new(ClaimTypes.Name, admin.Name),
+                                    new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                                    new(ClaimTypes.Role,UserRoles.Admin)
+                                };
+                                var token = CreateToken(authClaims);
+                                var newRefreshToken = GenerateRefreshToken();
+                                fetchedAuthModel.RefreshTokenExpiryTime = DateTime.Now.AddDays(this._refreshTokenValidityInDays);
+                                fetchedAuthModel.UsedRefreshTokens.Add(fetchedAuthModel.RefreshToken);
+                                fetchedAuthModel.RefreshToken = newRefreshToken;
+                                await db.StringSetAsync(key, JsonSerializer.Serialize(fetchedAuthModel));
+                                AuthenticationTokenDTO auth = new()
+                                {
+                                    AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
+                                    RefreshToken = newRefreshToken,
+                                    Role = UserRoles.Admin
+                                };
+                                return auth;
+                            }
+                        case UserRoles.User:
+                            {
+                                var user = await this._usersService.GetUserById(userId) ?? throw new BadRequestException("Invalid user");
+                                if (user.IsActive == false)
+                                {
+                                    throw new UnauthorizedException("this user is inactive!");
+                                }
+                                var authClaims = new List<Claim>
+                                {
+                                    new(ClaimTypes.Email,user.Email),
+                                    new(ClaimTypes.Name, user.Name),
+                                    new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                                    new(ClaimTypes.Role,UserRoles.User)
+                                };
+                                var token = CreateToken(authClaims);
+                                var newRefreshToken = GenerateRefreshToken();
+                                fetchedAuthModel.RefreshToken = newRefreshToken;
+                                fetchedAuthModel.RefreshTokenExpiryTime = DateTime.Now.AddDays(this._refreshTokenValidityInDays);
+                                fetchedAuthModel.UsedRefreshTokens.Add(fetchedAuthModel.RefreshToken);
+                                await db.StringSetAsync(key, JsonSerializer.Serialize(fetchedAuthModel));
+                                AuthenticationTokenDTO auth = new()
+                                {
+                                    AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
+                                    RefreshToken = newRefreshToken,
+                                    Role = UserRoles.User
+                                };
+                                return auth;
+                            }
+                        default:
+                            throw new BadRequestException("Invalid role");
+                    }
                 }
             }
             else
             {
-
+                if (fetchedAuthModel.UsedRefreshTokens.Contains(refreshToken))
+                {
+                    await db.KeyDeleteAsync(key);
+                    throw new BadRequestException("Expired token, please login again!");
+                }
+                throw new ForbiddenException("Don't have permission to request for new token");
             }
         }
         catch (Exception)
@@ -169,6 +258,153 @@ public class AuthService : IAuthService
             throw;
         }
     }
+    public async Task CreateNewAdmin(CreateAdminDTO DTO)
+    {
+        try
+        {
+            await _adminsService.CreateNewAdmin(DTO);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task RegisterUser(CreateUserDTO dto)
+    {
+        try
+        {
+            await _usersService.CreateNewActiveUser(dto, false);
+            var user = await _usersService.GetUserByEmail(dto.Email) ?? throw new Exception("Something wrong when get this user from database");
+            //Send confirm email here
+            var authClaims = new List<Claim>
+            {
+                new(ClaimTypes.Email,user.Email),
+                new(ClaimTypes.Name, user.Name),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(ClaimTypes.Role,UserRoles.User)
+            };
+            var token = this.CreateToken(authClaims);
+            var urlHelper = _urlHelperFactory.GetUrlHelper(new ActionContext());
+            string? verificationUrl = urlHelper.Action("VerifyEmail", "api/auth", new { userId = user.Id, token = new JwtSecurityTokenHandler().WriteToken(token) });
+            if (verificationUrl is null)
+            {
+                await _usersService.DeleteUser(user.Id);
+                throw new Exception("Can't generate verification link, please contact us!");
+            }
+
+            await _emailService.SendEmailVerification(dto.Email, verificationUrl);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ConfirmUser(int userId, string token)
+    {
+        try
+        {
+            var user = await _usersService.GetUserById(userId) ?? throw new BadRequestException("Invalid userId");
+            if (user.IsEmailConfirmed)
+            {
+                throw new BadRequestException("This user is already confirmed!");
+            }
+            var isValid = this.ValidateToken(token, out JwtSecurityToken? jwt);
+            if (isValid)
+            {
+                if (jwt is null)
+                {
+                    throw new Exception();
+                }
+                if (jwt.Claims.Single(x => x.Type == ClaimTypes.Email).Value == user.Email)
+                {
+                    await _usersService.ChangeEmailConfirmationStatus(userId, true);
+                }
+                else
+                {
+                    throw new UnauthorizedException("You don't have permission to confirm this user");
+                }
+            }
+            else
+            {
+                throw new UnauthorizedException("You don't have permission to confirm this user");
+            }
+
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ResendConfirmationEmail(string email)
+    {
+        try
+        {
+            var user = await _usersService.GetUserByEmail(email) ?? throw new Exception("Invalid user");
+            if (user.IsEmailConfirmed)
+            {
+                throw new BadRequestException("This user is already confirmed!");
+            }
+            //Send confirm email here
+            var authClaims = new List<Claim>
+            {
+                new(ClaimTypes.Email,user.Email),
+                new(ClaimTypes.Name, user.Name),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(ClaimTypes.Role,UserRoles.User)
+            };
+            var token = this.CreateToken(authClaims);
+            var urlHelper = _urlHelperFactory.GetUrlHelper(new ActionContext());
+            string? verificationUrl = urlHelper.Action("VerifyEmail", "api/auth", new { userId = user.Id, token = new JwtSecurityTokenHandler().WriteToken(token) });
+            if (verificationUrl is null)
+            {
+                await _usersService.DeleteUser(user.Id);
+                throw new Exception("Can't generate verification link, please contact us!");
+            }
+            await _emailService.SendEmailVerification(email, verificationUrl);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ChangeUserPassword(int userId, string newPassword)
+    {
+        try
+        {
+            await _usersService.ChangeUserPassword(userId, newPassword);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task ChangeAdminPassword(int adminId, string newPassword)
+    {
+        try
+        {
+            await _adminsService.ChangeAdminPassword(adminId, newPassword);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task SendResetUserPasswordEmail(string email)
+    {
+        try
+        {
+            var user = await _usersService.GetUserByEmail(email) ?? throw new BadRequestException("Invalid user");
+            string confirmationUrl =;
+            await _emailService.SendResetPasswordConfirmation(email, confirmationUrl);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    //-------------------------------------PRIVATE-------------------------------------//
+
     private JwtSecurityToken CreateToken(List<Claim> authClaims)
     {
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
@@ -187,5 +423,52 @@ public class AuthService : IAuthService
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
+    }
+    private bool ValidateToken(string token, out JwtSecurityToken? jwt)
+    {
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = _validIssuerURL,
+            ValidateAudience = true,
+            ValidAudience = _validAudienceURL,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.Zero,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey))
+        };
+
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+            jwt = (JwtSecurityToken)validatedToken;
+            return true;
+        }
+        catch (SecurityTokenValidationException ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+            jwt = null;
+            return false;
+        }
+    }
+    private static string GenerateRandomPassword()
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+        byte[] randomBytes = new byte[4];
+        using (RNGCryptoServiceProvider rng = new())
+        {
+            rng.GetBytes(randomBytes);
+        }
+        Random random = new Random(BitConverter.ToInt32(randomBytes, 0));
+        int passwordLength = random.Next(8, 15 + 1);
+        char[] password = new char[passwordLength];
+
+        for (int i = 0; i < passwordLength; i++)
+        {
+            password[i] = chars[random.Next(chars.Length)];
+        }
+
+        return new string(password);
     }
 }

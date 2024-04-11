@@ -20,7 +20,7 @@ public class JobNetDatabaseContext : DbContext
     public DbSet<Company> Companies { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Certification> Certifications { get; set; }
-    public DbSet<Admin> AdminAccounts { get; set; }
+    public DbSet<Admin> Admins { get; set; }
 
 
 

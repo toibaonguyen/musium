@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JobNet.Migrations
 {
     [DbContext(typeof(JobNetDatabaseContext))]
-    [Migration("20240327063703_InitialCreate")]
+    [Migration("20240407071205_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -40,7 +40,7 @@ namespace JobNet.Migrations
                     b.ToTable("GroupUser");
                 });
 
-            modelBuilder.Entity("JobNet.Models.Entities.AdminAccount", b =>
+            modelBuilder.Entity("JobNet.Models.Entities.Admin", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -48,7 +48,14 @@ namespace JobNet.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("IsActive")
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -56,13 +63,13 @@ namespace JobNet.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserName")
+                    b.Property<byte[]>("PasswordSalt")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("bytea");
 
                     b.HasKey("Id");
 
-                    b.ToTable("admin_accounts", (string)null);
+                    b.ToTable("admins", (string)null);
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.Certification", b =>
@@ -587,6 +594,9 @@ namespace JobNet.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsEmailConfirmed")
+                        .HasColumnType("boolean");
+
                     b.Property<bool?>("IsHiring")
                         .HasColumnType("boolean");
 
@@ -601,6 +611,10 @@ namespace JobNet.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("bytea");
 
                     b.Property<string[]>("Skills")
                         .IsRequired()

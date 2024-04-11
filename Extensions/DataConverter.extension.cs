@@ -9,7 +9,7 @@ namespace JobNet.Extensions;
 
 public static class DataConverterExtensions
 {
-    public static User ToActiveUser(this CreateUserDTO dto)
+    public static User ToActiveUser(this CreateUserDTO dto, bool isEmailConfirmed)
     {
         string hashedPassword = PasswordUtil.HashPassword(dto.Password, out byte[] salt);
         User user = new()
@@ -22,11 +22,12 @@ public static class DataConverterExtensions
             PasswordSalt = salt,
             Location = dto.Location,
             Birthday = dto.Birthday,
-            IsActive = true
+            IsActive = true,
+            IsEmailConfirmed = isEmailConfirmed
         };
         return user;
     }
-    public static User ToInactiveUser(this CreateUserDTO dto)
+    public static User ToInactiveUser(this CreateUserDTO dto, bool isEmailConfirmed)
     {
         string hashedPassword = PasswordUtil.HashPassword(dto.Password, out byte[] salt);
         User user = new()
@@ -40,6 +41,7 @@ public static class DataConverterExtensions
             Location = dto.Location,
             Birthday = dto.Birthday,
             IsActive = false,
+            IsEmailConfirmed = isEmailConfirmed
         };
         return user;
     }
@@ -179,5 +181,18 @@ public static class DataConverterExtensions
             CurrentJobPosition = currentJobPosition.ToString()
         };
         return dto;
+    }
+    public static Admin ToAdmin(this CreateAdminDTO dto)
+    {
+        string hashedPassword = PasswordUtil.HashPassword(dto.Password, out byte[] salt);
+        Admin admin = new()
+        {
+            Name = dto.Name,
+            Email = dto.Email,
+            Password = hashedPassword,
+            PasswordSalt = salt,
+            IsActive = dto.IsActive
+        };
+        return admin;
     }
 }

@@ -466,8 +466,9 @@ public class AuthService : IAuthService
                 }
                 if (jwt.Claims.Single(x => x.Type == ClaimTypes.Email).Value == user.Email)
                 {
-                    await _usersService.ChangeEmailConfirmationStatus(userId, true);
-                    await _emailService.SendNewResetPasswordEmailAsync(user.Email, GenerateRandomPassword());
+                    string newPassword = GenerateRandomPassword();
+                    await _usersService.ChangeUserPassword(userId, newPassword);
+                    await _emailService.SendNewResetPasswordEmailAsync(user.Email, newPassword);
                 }
                 else
                 {
@@ -541,11 +542,13 @@ public class AuthService : IAuthService
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
         byte[] randomBytes = new byte[4];
+#pragma warning disable SYSLIB0023 // Type or member is obsolete
         using (RNGCryptoServiceProvider rng = new())
         {
             rng.GetBytes(randomBytes);
         }
-        Random random = new Random(BitConverter.ToInt32(randomBytes, 0));
+#pragma warning restore SYSLIB0023 // Type or member is obsolete
+        Random random = new(BitConverter.ToInt32(randomBytes, 0));
         int passwordLength = random.Next(8, 15 + 1);
         char[] password = new char[passwordLength];
 

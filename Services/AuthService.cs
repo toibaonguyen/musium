@@ -52,11 +52,11 @@ public class AuthService : IAuthService
             var user = await _usersService.GetUserByEmail(email) ?? throw new BadRequestException("This user is not exist!");
             if (user.IsEmailConfirmed == false)
             {
-                throw new UnauthorizedAccessException("User's email is not confirmed!");
+                throw new UnauthorizedException("User's email is not confirmed!");
             }
             if (user.IsActive == false)
             {
-                throw new UnauthorizedAccessException("This user is inactive!");
+                throw new UnauthorizedException("This user is inactive!");
             }
             if (PasswordUtil.VerifyPassword(password, user.Password, user.PasswordSalt))
             {
@@ -297,8 +297,6 @@ public class AuthService : IAuthService
                 throw new Exception("Can't generate verification link!");
             }
             verificationUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + verificationUrl;
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine($"verificationUrl la:::: {verificationUrl}");
             try
             {
                 await _emailService.SendEmailVerificationAsync(dto.Email, verificationUrl);
@@ -386,6 +384,7 @@ public class AuthService : IAuthService
                 await _usersService.DeleteUser(user.Id);
                 throw new Exception("Can't generate verification link, please contact us!");
             }
+            verificationUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + verificationUrl;
             await _emailService.SendEmailVerificationAsync(email, verificationUrl);
         }
         catch (Exception)
@@ -444,6 +443,8 @@ public class AuthService : IAuthService
                 await _usersService.DeleteUser(user.Id);
                 throw new Exception("Can't generate confirmationUrl link, please contact us!");
             }
+            confirmationUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + confirmationUrl;
+
             await _emailService.SendResetPasswordConfirmationAsync(email, confirmationUrl);
         }
         catch (Exception)

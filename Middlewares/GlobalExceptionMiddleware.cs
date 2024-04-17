@@ -36,7 +36,7 @@ public class GlobalExceptionMiddleware
                 return;
             }
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsJsonAsync("Internal Server Error");
+            await context.Response.WriteAsJsonAsync(exception.Message);
             return;
         }
     }

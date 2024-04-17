@@ -30,6 +30,7 @@ public class UsersService : IUserService
             if (existence != null)
             {
                 //Throw exception because this user has been existed
+                throw new BadRequestException("User is already register!");
             }
             await _databaseContext.Users.AddAsync(user.ToInactiveUser(isEmailConfirmed));
             await _databaseContext.SaveChangesAsync();
@@ -62,6 +63,7 @@ public class UsersService : IUserService
             if (existence != null)
             {
                 //Throw exception because this user has been existed
+                throw new BadRequestException("User is already register!");
             }
             await _databaseContext.Users.AddAsync(user.ToActiveUser(isEmailConfirmed));
             await _databaseContext.SaveChangesAsync();

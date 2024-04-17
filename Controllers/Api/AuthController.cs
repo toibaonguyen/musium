@@ -4,6 +4,7 @@ using JobNet.Models.Core.Requests;
 using JobNet.Models.Core.Responses;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace JobNet.Controllers;
 
@@ -13,33 +14,35 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
-    public AuthController(ILogger<AuthController> logger, IAuthService authService)
+    private readonly IUrlHelperFactory _urlHelperFactory;
+    public AuthController(ILogger<AuthController> logger, IAuthService authService, IUrlHelperFactory urlHelperFactory)
     {
         this._authService = authService;
         this._logger = logger;
+        this._urlHelperFactory = urlHelperFactory;
     }
 
-    [HttpPost("register-user")]
+    [HttpPost("users")]
     public async Task<ActionResult<BaseResponse>> RegisterUser([FromBody] RegisterUserRequest requestBody)
     {
         try
         {
+            IUrlHelper urlHelper = Url;
+            string requestScheme = Request.Scheme;
             await _authService.RegisterUser(requestBody.Data);
 
             var res = new MessageResponse
             {
-                Message = "Create successfully, please confirm email!"
+                Message = "Create account successfully, please confirm email!"
             };
-
             return Ok(res);
         }
         catch (Exception)
         {
-
             throw;
         }
     }
-    [HttpPost("user/login")]
+    [HttpPost("users/login")]
     public async Task<ActionResult<BaseResponse>> LoginAsUser([FromBody] LoginRequest account)
     {
         try
@@ -60,7 +63,24 @@ public class AuthController : ControllerBase
             throw;
         }
     }
-    [HttpPost("admin/login")]
+    [HttpPost("users/re-verify-email")]
+    public async Task<ActionResult<BaseResponse>> ReVerifyEmailUser([FromBody] LoginRequest account)
+    {
+        try
+        {
+            await _authService.ResendVerificationEmail(account.Email);
+            var Response = new MessageResponse
+            {
+                Message = "Please check your email!"
+            };
+            return Ok(Response);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    [HttpPost("admins/login")]
     public async Task<ActionResult<BaseResponse>> LoginAsAdmin([FromBody] LoginRequest account)
     {
         try
@@ -77,7 +97,7 @@ public class AuthController : ControllerBase
             throw;
         }
     }
-    [HttpPost("user/refresh-tokens")]
+    [HttpPost("users/refresh-tokens")]
     public async Task<ActionResult<BaseResponse>> RefreshUserToken([FromHeader(Name = "userid")] int userId, [FromBody] RefreshTokenRequest refreshToken)
     {
         try
@@ -98,7 +118,7 @@ public class AuthController : ControllerBase
             throw;
         }
     }
-    [HttpPost("admin/refresh-tokens")]
+    [HttpPost("admins/refresh-tokens")]
     public async Task<ActionResult<BaseResponse>> RefreshAdminToken([FromHeader(Name = "userid")] int userId, [FromBody] RefreshTokenRequest refreshToken)
     {
         try
@@ -119,7 +139,7 @@ public class AuthController : ControllerBase
             throw;
         }
     }
-    [HttpPost("admin")]
+    [HttpPost("admins")]
     public async Task<ActionResult<BaseResponse>> CreateNewAdmin([FromBody] CreateAdminRequest request)
     {
         try
@@ -132,17 +152,16 @@ public class AuthController : ControllerBase
             throw;
         }
     }
-    [HttpGet("confirm-email")]
-    public async Task<ActionResult<BaseResponse>> ConfirmEmail(int userId, string token)
+    [HttpPost("users/reset-password")]
+    public async Task<ActionResult<BaseResponse>> ResetPassword([FromBody] ResetPasswordRequest request)
     {
-        if (string.IsNullOrEmpty(token))
-        {
-            return BadRequest(new MessageResponse { Message = "Can't confirm email!" });
-        }
         try
         {
-            await _authService.ConfirmUser(userId, token);
-            return Ok(new MessageResponse { Message = "Confirm email successfully!" });
+            await _authService.SendResetUserPasswordConfirmationEmail(request.Email);
+            return Ok(new MessageResponse
+            {
+                Message = "Please check your email!"
+            });
         }
         catch (Exception)
         {

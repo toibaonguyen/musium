@@ -25,21 +25,19 @@ public class GlobalExceptionMiddleware
         catch (Exception exception)
         {
             _logger.LogError(exception, "Exception occurred: {Message}", exception);
-            if (exception.GetType() == typeof(BaseRequestException))
+            if (exception is BaseRequestException requestException)
             {
-                var requestException = (BaseRequestException)exception;
                 context.Response.StatusCode = requestException.StatusCode;
                 MessageResponse response = new()
                 {
                     Message = requestException.Message
                 };
                 await context.Response.WriteAsJsonAsync(response);
+                return;
             }
-            else
-            {
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await context.Response.WriteAsJsonAsync(exception.Message);
-            }
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsJsonAsync("Internal Server Error");
+            return;
         }
     }
 

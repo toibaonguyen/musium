@@ -28,12 +28,16 @@ public class JobNetDatabaseContext : DbContext
         : base(options)
     {
         Console.WriteLine($"Setting nay co connection string la:{settings.Value.ConnectionString}");
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
         this._settings = settings.Value;
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.UseIdentityByDefaultColumns();
+
+
         //User
         modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.Experiences).WithOne(e => e.Author).HasForeignKey(e => e.AuthorId).IsRequired();
         modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.Certifications).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();

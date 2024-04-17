@@ -6,7 +6,7 @@ namespace JobNet.Interfaces.Services;
 
 public interface IEmailSenderService
 {
-    Task SendEmailVerification(string toEmail, string verificationUrl);
-    Task SendResetPasswordEmail(string toEmail, string newPassword);
-    Task SendResetPasswordConfirmation(string toEmail, string confirmationUrl);
+    Task SendEmailVerificationAsync(string toEmail, string verificationUrl);
+    Task SendNewResetPasswordEmailAsync(string toEmail, string newPassword);
+    Task SendResetPasswordConfirmationAsync(string toEmail, string confirmationUrl);
 }

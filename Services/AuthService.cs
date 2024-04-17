@@ -1,10 +1,5 @@
 using StackExchange.Redis;
-using Microsoft.AspNetCore.Identity;
 using JobNet.DTOs;
-using JobNet.Models.Entities;
-using JobNet.Extensions;
-using JobNet.Interfaces;
-using JobNet.Models.Core.Responses;
 using JobNet.Interfaces.Services;
 using JobNet.Exceptions;
 using JobNet.Utilities;
@@ -14,13 +9,11 @@ using JobNet.Contants;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Cryptography;
-using Microsoft.Extensions.Options;
 using JobNet.Models.Core.Common;
 using System.Text.Json;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Security.Policy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 namespace JobNet.Services;
 
 public class AuthService : IAuthService
@@ -30,6 +23,7 @@ public class AuthService : IAuthService
     private readonly IConnectionMultiplexer _redis;
     private readonly IEmailSenderService _emailService;
     private readonly IUrlHelperFactory _urlHelperFactory;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly string _secretKey;
     private readonly int _tokenValidityInMinutes;
     private readonly int _refreshTokenValidityInDays;
@@ -37,8 +31,9 @@ public class AuthService : IAuthService
     private readonly string _validAudienceURL;
 
 
-    public AuthService(IUrlHelperFactory urlHelperFactory, IAdminService adminsService, IUserService usersService, IEmailSenderService emailService, IConnectionMultiplexer redis, IConfiguration configuration)
+    public AuthService(IHttpContextAccessor httpContextAccessor, IUrlHelperFactory urlHelperFactory, IAdminService adminsService, IUserService usersService, IEmailSenderService emailService, IConnectionMultiplexer redis, IConfiguration configuration)
     {
+        this._httpContextAccessor = httpContextAccessor;
         this._urlHelperFactory = urlHelperFactory;
         this._usersService = usersService;
         this._adminsService = adminsService;
@@ -284,15 +279,35 @@ public class AuthService : IAuthService
                 new(ClaimTypes.Role,UserRoles.User)
             };
             var token = this.CreateToken(authClaims);
-            var urlHelper = _urlHelperFactory.GetUrlHelper(new ActionContext());
-            string? verificationUrl = urlHelper.Action("VerifyEmail", "api/auth", new { userId = user.Id, token = new JwtSecurityTokenHandler().WriteToken(token) });
+            if (_httpContextAccessor.HttpContext is null)
+            {
+                throw new Exception("HttpContext is null");
+            }
+            var urlHelper = this._urlHelperFactory.GetUrlHelper(new ActionContext(_httpContextAccessor.HttpContext, new RouteData(), new ActionDescriptor()));
+            if (urlHelper is null)
+            {
+                await _usersService.DeleteUser(user.Id);
+                throw new Exception("urlHelper is null");
+            }
+
+            string? verificationUrl = urlHelper.Action("VerifyEmail", "Authentication", new { userId = user.Id, token = new JwtSecurityTokenHandler().WriteToken(token) });
             if (verificationUrl is null)
             {
                 await _usersService.DeleteUser(user.Id);
-                throw new Exception("Can't generate verification link, please contact us!");
+                throw new Exception("Can't generate verification link!");
             }
-
-            await _emailService.SendEmailVerification(dto.Email, verificationUrl);
+            verificationUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + verificationUrl;
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine($"verificationUrl la:::: {verificationUrl}");
+            try
+            {
+                await _emailService.SendEmailVerificationAsync(dto.Email, verificationUrl);
+            }
+            catch (Exception)
+            {
+                await _usersService.DeleteUser(user.Id);
+                throw;
+            }
         }
         catch (Exception)
         {
@@ -309,6 +324,8 @@ public class AuthService : IAuthService
                 throw new BadRequestException("This user is already confirmed!");
             }
             var isValid = this.ValidateToken(token, out JwtSecurityToken? jwt);
+
+            Console.WriteLine("is valid:", isValid);
             if (isValid)
             {
                 if (jwt is null)
@@ -335,7 +352,7 @@ public class AuthService : IAuthService
             throw;
         }
     }
-    public async Task ResendConfirmationEmail(string email)
+    public async Task ResendVerificationEmail(string email)
     {
         try
         {
@@ -353,14 +370,23 @@ public class AuthService : IAuthService
                 new(ClaimTypes.Role,UserRoles.User)
             };
             var token = this.CreateToken(authClaims);
-            var urlHelper = _urlHelperFactory.GetUrlHelper(new ActionContext());
-            string? verificationUrl = urlHelper.Action("VerifyEmail", "api/auth", new { userId = user.Id, token = new JwtSecurityTokenHandler().WriteToken(token) });
+            if (_httpContextAccessor.HttpContext is null)
+            {
+                throw new Exception("HttpContext is null");
+            }
+            var urlHelper = this._urlHelperFactory.GetUrlHelper(new ActionContext(_httpContextAccessor.HttpContext, new RouteData(), new ActionDescriptor()));
+            if (urlHelper is null)
+            {
+                await _usersService.DeleteUser(user.Id);
+                throw new Exception("urlHelper is null");
+            }
+            string? verificationUrl = urlHelper.Action("VerifyEmail", "Authentication", new { userId = user.Id, token = new JwtSecurityTokenHandler().WriteToken(token) });
             if (verificationUrl is null)
             {
                 await _usersService.DeleteUser(user.Id);
                 throw new Exception("Can't generate verification link, please contact us!");
             }
-            await _emailService.SendEmailVerification(email, verificationUrl);
+            await _emailService.SendEmailVerificationAsync(email, verificationUrl);
         }
         catch (Exception)
         {
@@ -389,7 +415,7 @@ public class AuthService : IAuthService
             throw;
         }
     }
-    public async Task SendResetUserPasswordEmail(string email)
+    public async Task SendResetUserPasswordConfirmationEmail(string email)
     {
         try
         {
@@ -402,21 +428,62 @@ public class AuthService : IAuthService
                 new(ClaimTypes.Role,UserRoles.User)
             };
             var token = this.CreateToken(authClaims);
-            var urlHelper = _urlHelperFactory.GetUrlHelper(new ActionContext());
-            string? confirmationUrl = urlHelper.Action("ConfirmResetPassword", "api/auth", new { userId = user.Id, token = new JwtSecurityTokenHandler().WriteToken(token) });
+            if (_httpContextAccessor.HttpContext is null)
+            {
+                throw new Exception("HttpContext is null");
+            }
+            var urlHelper = this._urlHelperFactory.GetUrlHelper(new ActionContext(_httpContextAccessor.HttpContext, new RouteData(), new ActionDescriptor()));
+            if (urlHelper is null)
+            {
+                await _usersService.DeleteUser(user.Id);
+                throw new Exception("urlHelper is null");
+            }
+            string? confirmationUrl = urlHelper.Action("ConfirmResetPassword", "Authentication", new { userId = user.Id, token = new JwtSecurityTokenHandler().WriteToken(token) });
             if (confirmationUrl is null)
             {
                 await _usersService.DeleteUser(user.Id);
                 throw new Exception("Can't generate confirmationUrl link, please contact us!");
             }
-            await _emailService.SendResetPasswordConfirmation(email, confirmationUrl);
+            await _emailService.SendResetPasswordConfirmationAsync(email, confirmationUrl);
         }
         catch (Exception)
         {
             throw;
         }
     }
+    public async Task ConfirmResetPassword(int userId, string token)
+    {
+        try
+        {
+            var user = await _usersService.GetUserById(userId) ?? throw new BadRequestException("Invalid userId");
+            var isValid = this.ValidateToken(token, out JwtSecurityToken? jwt);
+            if (isValid)
+            {
+                if (jwt is null)
+                {
+                    throw new Exception();
+                }
+                if (jwt.Claims.Single(x => x.Type == ClaimTypes.Email).Value == user.Email)
+                {
+                    await _usersService.ChangeEmailConfirmationStatus(userId, true);
+                    await _emailService.SendNewResetPasswordEmailAsync(user.Email, GenerateRandomPassword());
+                }
+                else
+                {
+                    throw new UnauthorizedException("You don't have permission to reset password of user");
+                }
+            }
+            else
+            {
+                throw new UnauthorizedException("You don't have permission to reset password of user");
+            }
 
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
     //-------------------------------------PRIVATE-------------------------------------//
 
     private JwtSecurityToken CreateToken(List<Claim> authClaims)
@@ -442,16 +509,17 @@ public class AuthService : IAuthService
     {
         var validationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidIssuer = _validIssuerURL,
+            //Co gi do sai sai o day
+            ValidateIssuer = false,
+            // Ngay phia tren
             ValidateAudience = true,
-            ValidAudience = _validAudienceURL,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ClockSkew = TimeSpan.Zero,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey))
+            ValidAudience = _validAudienceURL,
+            ValidIssuer = _validIssuerURL,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey)),
         };
-
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -466,6 +534,8 @@ public class AuthService : IAuthService
             return false;
         }
     }
+
+
     private static string GenerateRandomPassword()
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";

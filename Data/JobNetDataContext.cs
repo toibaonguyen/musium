@@ -27,7 +27,6 @@ public class JobNetDatabaseContext : DbContext
     public JobNetDatabaseContext(DbContextOptions options, IOptions<JobNetDatabaseSettings> settings)
         : base(options)
     {
-        Console.WriteLine($"Setting nay co connection string la:{settings.Value.ConnectionString}");
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
         this._settings = settings.Value;

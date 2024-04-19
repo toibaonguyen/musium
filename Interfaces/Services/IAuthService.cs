@@ -18,7 +18,5 @@ public interface IAuthService
     Task SendResetUserPasswordConfirmationEmail(string email);
     Task RegisterUser(CreateUserDTO user);
     Task ConfirmResetPassword(int userId, string token);
-    // Task<AuthenticationResponse> ResendConfirmationEmail(ResendEmailConfirmationRequest requestBody);
-    // Task<AuthenticationResponse> SendResetPasswordEmail(SendResetPasswordEmailRequest requestBody);
-    // Task<AuthenticationResponse> DeleteUser(int UserId);
+    Task Logout(string userRole, int userId);
 }

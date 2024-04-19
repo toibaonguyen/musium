@@ -14,24 +14,26 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using JobNet.Settings;
+using Microsoft.Extensions.Options;
 namespace JobNet.Services;
 
 public class AuthService : IAuthService
 {
+    private readonly int MIN_PASSWORD_LENGTH = 8, MAX_PASSWORD_LENGTH = 15;
+    private readonly JWTAuthSettings _jwtAuthSettings;
     private readonly IUserService _usersService;
     private readonly IAdminService _adminsService;
     private readonly IConnectionMultiplexer _redis;
     private readonly IEmailSenderService _emailService;
     private readonly IUrlHelperFactory _urlHelperFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly string _secretKey;
-    private readonly int _tokenValidityInMinutes;
-    private readonly int _refreshTokenValidityInDays;
-    private readonly string _validIssuerURL;
-    private readonly string _validAudienceURL;
 
-
-    public AuthService(IHttpContextAccessor httpContextAccessor, IUrlHelperFactory urlHelperFactory, IAdminService adminsService, IUserService usersService, IEmailSenderService emailService, IConnectionMultiplexer redis, IConfiguration configuration)
+    private string GetRedisStoredKey(string userRole, int userId)
+    {
+        return $"Token:{userRole}:{userId}";
+    }
+    public AuthService(IOptions<JWTAuthSettings> jwtAuthOptions, IHttpContextAccessor httpContextAccessor, IUrlHelperFactory urlHelperFactory, IAdminService adminsService, IUserService usersService, IEmailSenderService emailService, IConnectionMultiplexer redis)
     {
         this._httpContextAccessor = httpContextAccessor;
         this._urlHelperFactory = urlHelperFactory;
@@ -39,11 +41,7 @@ public class AuthService : IAuthService
         this._adminsService = adminsService;
         this._redis = redis;
         this._emailService = emailService;
-        this._secretKey = configuration["JWTAuth:SecretKey"] ?? throw new Exception("Missing SecretKey");
-        this._tokenValidityInMinutes = Int32.Parse(configuration["JWTAuth:TokenValidityInMinutes"] ?? throw new Exception("Missing TokenValidityInMinutes"));
-        this._refreshTokenValidityInDays = Int32.Parse(configuration["JWTAuth:RefreshTokenValidityInDays"] ?? throw new Exception("Missing RefreshTokenValidityInDays"));
-        this._validIssuerURL = configuration["JWTAuth:ValidIssuerURL"] ?? throw new Exception("Missing ValidIssuerURL");
-        this._validAudienceURL = configuration["JWTAuth:ValidAudienceURL"] ?? throw new Exception("Missing ValidAudienceURL");
+        this._jwtAuthSettings = jwtAuthOptions.Value;
     }
     public async Task<AuthenticationTokenDTO> LoginAsUser(string email, string password)
     {
@@ -63,21 +61,21 @@ public class AuthService : IAuthService
                 var authClaims = new List<Claim>
                 {
                     new(ClaimTypes.Email,user.Email),
-                    new(ClaimTypes.Name, user.Name),
+                    new("userId", user.Id.ToString()),
                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new(ClaimTypes.Role,UserRoles.User)
                 };
-                var token = CreateToken(authClaims);
-                var refreshToken = GenerateRefreshToken();
+                var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.TokenValidityInMinutes);
+                var refreshToken = TokenUtil.GenerateRefreshToken();
                 AuthModel authModel = new()
                 {
                     RefreshToken = refreshToken,
-                    RefreshTokenExpiryTime = DateTime.Now.AddDays(this._refreshTokenValidityInDays),
+                    RefreshTokenExpiryTime = DateTime.Now.AddDays(_jwtAuthSettings.RefreshTokenValidityInDays),
                     UsedRefreshTokens = []
                 };
                 var db = _redis.GetDatabase();
                 string authModelJson = JsonSerializer.Serialize(authModel);
-                string key = $"Token:{UserRoles.User}:{user.Id}";
+                string key = GetRedisStoredKey(UserRoles.User, user.Id);
                 await db.KeyDeleteAsync(key);
                 await db.StringSetAsync(key, authModelJson);
                 AuthenticationTokenWithUserInfoDTO auth = new()
@@ -115,21 +113,21 @@ public class AuthService : IAuthService
                 var authClaims = new List<Claim>
                 {
                     new(ClaimTypes.Email,admin.Email),
-                    new(ClaimTypes.Name, admin.Name),
+                    new("userId", admin.Id.ToString()),
                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new(ClaimTypes.Role,UserRoles.Admin)
                 };
-                var token = CreateToken(authClaims);
-                var refreshToken = GenerateRefreshToken();
+                var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.TokenValidityInMinutes);
+                var refreshToken = TokenUtil.GenerateRefreshToken();
                 AuthModel authModel = new()
                 {
                     RefreshToken = refreshToken,
-                    RefreshTokenExpiryTime = DateTime.Now.AddDays(this._refreshTokenValidityInDays),
+                    RefreshTokenExpiryTime = DateTime.Now.AddDays(this._jwtAuthSettings.RefreshTokenValidityInDays),
                     UsedRefreshTokens = []
                 };
                 var db = _redis.GetDatabase();
                 string authModelJson = JsonSerializer.Serialize(authModel);
-                string key = $"Token:{UserRoles.Admin}:{admin.Id}";
+                string key = GetRedisStoredKey(UserRoles.Admin, admin.Id);
                 await db.KeyDeleteAsync(key);
                 await db.StringSetAsync(key, authModelJson);
                 AuthenticationTokenWithUserInfoDTO auth = new()
@@ -157,7 +155,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            string key = $"Token:{role}:{userId}";
+            string key = GetRedisStoredKey(role, userId);
             var db = this._redis.GetDatabase();
             string? fetchedAuthModelJson = await db.StringGetAsync(key);
             if (fetchedAuthModelJson is null)
@@ -187,13 +185,13 @@ public class AuthService : IAuthService
                                 var authClaims = new List<Claim>
                                 {
                                     new(ClaimTypes.Email,admin.Email),
-                                    new(ClaimTypes.Name, admin.Name),
+                                    new("userId", admin.Id.ToString()),
                                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                                     new(ClaimTypes.Role,UserRoles.Admin)
                                 };
-                                var token = CreateToken(authClaims);
-                                var newRefreshToken = GenerateRefreshToken();
-                                fetchedAuthModel.RefreshTokenExpiryTime = DateTime.Now.AddDays(this._refreshTokenValidityInDays);
+                                var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.TokenValidityInMinutes);
+                                var newRefreshToken = TokenUtil.GenerateRefreshToken();
+                                fetchedAuthModel.RefreshTokenExpiryTime = DateTime.Now.AddDays(_jwtAuthSettings.RefreshTokenValidityInDays);
                                 fetchedAuthModel.UsedRefreshTokens.Add(fetchedAuthModel.RefreshToken);
                                 fetchedAuthModel.RefreshToken = newRefreshToken;
                                 await db.StringSetAsync(key, JsonSerializer.Serialize(fetchedAuthModel));
@@ -215,14 +213,14 @@ public class AuthService : IAuthService
                                 var authClaims = new List<Claim>
                                 {
                                     new(ClaimTypes.Email,user.Email),
-                                    new(ClaimTypes.Name, user.Name),
+                                    new("userId", user.Id.ToString()),
                                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                                     new(ClaimTypes.Role,UserRoles.User)
                                 };
-                                var token = CreateToken(authClaims);
-                                var newRefreshToken = GenerateRefreshToken();
+                                var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.TokenValidityInMinutes);
+                                var newRefreshToken = TokenUtil.GenerateRefreshToken();
                                 fetchedAuthModel.RefreshToken = newRefreshToken;
-                                fetchedAuthModel.RefreshTokenExpiryTime = DateTime.Now.AddDays(this._refreshTokenValidityInDays);
+                                fetchedAuthModel.RefreshTokenExpiryTime = DateTime.Now.AddDays(_jwtAuthSettings.RefreshTokenValidityInDays);
                                 fetchedAuthModel.UsedRefreshTokens.Add(fetchedAuthModel.RefreshToken);
                                 await db.StringSetAsync(key, JsonSerializer.Serialize(fetchedAuthModel));
                                 AuthenticationTokenDTO auth = new()
@@ -274,11 +272,11 @@ public class AuthService : IAuthService
             var authClaims = new List<Claim>
             {
                 new(ClaimTypes.Email,user.Email),
-                new(ClaimTypes.Name, user.Name),
+                new("userId", user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(ClaimTypes.Role,UserRoles.User)
             };
-            var token = this.CreateToken(authClaims);
+            var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.TokenValidityInMinutes);
             if (_httpContextAccessor.HttpContext is null)
             {
                 throw new Exception("HttpContext is null");
@@ -321,7 +319,7 @@ public class AuthService : IAuthService
             {
                 throw new BadRequestException("This user is already confirmed!");
             }
-            var isValid = this.ValidateToken(token, out JwtSecurityToken? jwt);
+            var isValid = TokenUtil.ValidateToken(token, out JwtSecurityToken? jwt, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.SecretKey);
 
             Console.WriteLine("is valid:", isValid);
             if (isValid)
@@ -363,11 +361,11 @@ public class AuthService : IAuthService
             var authClaims = new List<Claim>
             {
                 new(ClaimTypes.Email,user.Email),
-                new(ClaimTypes.Name, user.Name),
+                new("userId", user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(ClaimTypes.Role,UserRoles.User)
             };
-            var token = this.CreateToken(authClaims);
+            var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.TokenValidityInMinutes);
             if (_httpContextAccessor.HttpContext is null)
             {
                 throw new Exception("HttpContext is null");
@@ -422,11 +420,11 @@ public class AuthService : IAuthService
             var authClaims = new List<Claim>
             {
                 new(ClaimTypes.Email,user.Email),
-                new(ClaimTypes.Name, user.Name),
+                new("userId", user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(ClaimTypes.Role,UserRoles.User)
             };
-            var token = this.CreateToken(authClaims);
+            var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.TokenValidityInMinutes);
             if (_httpContextAccessor.HttpContext is null)
             {
                 throw new Exception("HttpContext is null");
@@ -457,7 +455,7 @@ public class AuthService : IAuthService
         try
         {
             var user = await _usersService.GetUserById(userId) ?? throw new BadRequestException("Invalid userId");
-            var isValid = this.ValidateToken(token, out JwtSecurityToken? jwt);
+            var isValid = TokenUtil.ValidateToken(token, out JwtSecurityToken? jwt, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.SecretKey);
             if (isValid)
             {
                 if (jwt is null)
@@ -466,7 +464,7 @@ public class AuthService : IAuthService
                 }
                 if (jwt.Claims.Single(x => x.Type == ClaimTypes.Email).Value == user.Email)
                 {
-                    string newPassword = GenerateRandomPassword();
+                    string newPassword = PasswordUtil.GenerateRandomPassword(this.MIN_PASSWORD_LENGTH, this.MAX_PASSWORD_LENGTH);
                     await _usersService.ChangeUserPassword(userId, newPassword);
                     await _emailService.SendNewResetPasswordEmailAsync(user.Email, newPassword);
                 }
@@ -486,77 +484,17 @@ public class AuthService : IAuthService
             throw;
         }
     }
-    //-------------------------------------PRIVATE-------------------------------------//
-
-    private JwtSecurityToken CreateToken(List<Claim> authClaims)
+    public async Task Logout(string userRole, int userId)
     {
-        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
-        var token = new JwtSecurityToken(
-            issuer: _validIssuerURL,
-            audience: _validAudienceURL,
-            expires: DateTime.Now.AddMinutes(_tokenValidityInMinutes),
-            claims: authClaims,
-            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-            );
-        return token;
-    }
-    private static string GenerateRefreshToken()
-    {
-        var randomNumber = new byte[64];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomNumber);
-        return Convert.ToBase64String(randomNumber);
-    }
-    private bool ValidateToken(string token, out JwtSecurityToken? jwt)
-    {
-        var validationParameters = new TokenValidationParameters
-        {
-            //Co gi do sai sai o day
-            ValidateIssuer = false,
-            // Ngay phia tren
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ClockSkew = TimeSpan.Zero,
-            ValidAudience = _validAudienceURL,
-            ValidIssuer = _validIssuerURL,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey)),
-        };
         try
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
-            jwt = (JwtSecurityToken)validatedToken;
-            return true;
+            var db = _redis.GetDatabase();
+            await db.KeyDeleteAsync(GetRedisStoredKey(userRole, userId));
         }
-        catch (SecurityTokenValidationException ex)
+        catch (Exception)
         {
-            Console.Error.WriteLine(ex.Message);
-            jwt = null;
-            return false;
+            throw;
         }
     }
 
-
-    private static string GenerateRandomPassword()
-    {
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
-        byte[] randomBytes = new byte[4];
-#pragma warning disable SYSLIB0023 // Type or member is obsolete
-        using (RNGCryptoServiceProvider rng = new())
-        {
-            rng.GetBytes(randomBytes);
-        }
-#pragma warning restore SYSLIB0023 // Type or member is obsolete
-        Random random = new(BitConverter.ToInt32(randomBytes, 0));
-        int passwordLength = random.Next(8, 15 + 1);
-        char[] password = new char[passwordLength];
-
-        for (int i = 0; i < passwordLength; i++)
-        {
-            password[i] = chars[random.Next(chars.Length)];
-        }
-
-        return new string(password);
-    }
 }

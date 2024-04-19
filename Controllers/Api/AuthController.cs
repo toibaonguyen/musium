@@ -2,6 +2,7 @@ using JobNet.Contants;
 using JobNet.Interfaces.Services;
 using JobNet.Models.Core.Requests;
 using JobNet.Models.Core.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -37,8 +38,9 @@ public class AuthController : ControllerBase
             };
             return Ok(res);
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            _logger.LogError(e.Message);
             throw;
         }
     }
@@ -97,8 +99,8 @@ public class AuthController : ControllerBase
             throw;
         }
     }
-    [HttpPost("users/refresh-tokens")]
-    public async Task<ActionResult<BaseResponse>> RefreshUserToken([FromHeader(Name = "userid")] int userId, [FromBody] RefreshTokenRequest refreshToken)
+    [HttpPost("users/{userId}/refresh-tokens")]
+    public async Task<ActionResult<BaseResponse>> RefreshUserToken(int userId, [FromBody] RefreshTokenRequest refreshToken)
     {
         try
         {
@@ -118,8 +120,8 @@ public class AuthController : ControllerBase
             throw;
         }
     }
-    [HttpPost("admins/refresh-tokens")]
-    public async Task<ActionResult<BaseResponse>> RefreshAdminToken([FromHeader(Name = "userid")] int userId, [FromBody] RefreshTokenRequest refreshToken)
+    [HttpPost("admins/{userId}/refresh-tokens")]
+    public async Task<ActionResult<BaseResponse>> RefreshAdminToken(int userId, [FromBody] RefreshTokenRequest refreshToken)
     {
         try
         {
@@ -139,6 +141,7 @@ public class AuthController : ControllerBase
             throw;
         }
     }
+    [Authorize(Policy = IdentityData.AdminPolicyName)]
     [HttpPost("admins")]
     public async Task<ActionResult<BaseResponse>> CreateNewAdmin([FromBody] CreateAdminRequest request)
     {
@@ -152,6 +155,7 @@ public class AuthController : ControllerBase
             throw;
         }
     }
+    [AllowAnonymous]
     [HttpPost("users/reset-password")]
     public async Task<ActionResult<BaseResponse>> ResetPassword([FromBody] ResetPasswordRequest request)
     {
@@ -161,6 +165,60 @@ public class AuthController : ControllerBase
             return Ok(new MessageResponse
             {
                 Message = "Please check your email!"
+            });
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    [Authorize(Policy = IdentityData.UserPolicyName)]
+    [HttpPost("users/logout")]
+    public async Task<ActionResult<BaseResponse>> LogoutUser()
+    {
+        try
+        {
+            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            if (userId == null)
+            {
+                return BadRequest(
+                    new MessageResponse
+                    {
+                        Message = "missing field in token"
+                    }
+                );
+            }
+            await _authService.Logout(UserRoles.User, int.Parse(userId));
+            return Ok(new MessageResponse
+            {
+                Message = "Logout successfully!"
+            });
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    [Authorize(Policy = IdentityData.AdminPolicyName)]
+    [HttpPost("admins/logout")]
+    public async Task<ActionResult<BaseResponse>> LogoutAdmin()
+    {
+        try
+        {
+            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            if (userId == null)
+            {
+                return BadRequest(
+                    new MessageResponse
+                    {
+                        Message = "missing field in token"
+                    }
+                );
+            }
+            await _authService.Logout(UserRoles.Admin, int.Parse(userId));
+            return Ok(new MessageResponse
+            {
+                Message = "Logout successfully!"
             });
         }
         catch (Exception)

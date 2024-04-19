@@ -3,6 +3,6 @@ using JobNet.Models.Core.Requests;
 
 public class RefreshTokenRequest : BaseRequest
 {
-    [Required]
+    [Required(ErrorMessage = "Refresh token is required")]
     public required string RefreshToken { get; set; }
 }

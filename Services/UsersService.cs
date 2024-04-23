@@ -16,11 +16,15 @@ namespace JobNet.Services;
 
 public class UsersService : IUserService
 {
-
+    private readonly string USER_EMAIL_IS_ALREADY_REGISTERED = "This user is already registered";
+    private readonly string USER_IS_NOT_EXIST = "This user is not exist";
+    private readonly string SKILL_IS_EXIST_BUT_CAN_NOT_GET = "Some thing wrong when take from database";
     private readonly JobNetDatabaseContext _databaseContext;
-    public UsersService(JobNetDatabaseContext databaseContext)
+    private readonly ISkillService _skillService;
+    public UsersService(JobNetDatabaseContext databaseContext, ISkillService skillService)
     {
-        this._databaseContext = databaseContext;
+        _databaseContext = databaseContext;
+        _skillService = skillService;
     }
     public async Task CreateNewInactiveUser(CreateUserDTO user, bool isEmailConfirmed)
     {
@@ -30,7 +34,7 @@ public class UsersService : IUserService
             if (existence != null)
             {
                 //Throw exception because this user has been existed
-                throw new BadRequestException("User is already register!");
+                throw new BadRequestException(USER_EMAIL_IS_ALREADY_REGISTERED);
             }
             await _databaseContext.Users.AddAsync(user.ToInactiveUser(isEmailConfirmed));
             await _databaseContext.SaveChangesAsync();
@@ -44,7 +48,7 @@ public class UsersService : IUserService
     {
         try
         {
-            var existence = await _databaseContext.Users.FindAsync(userId) ?? throw new BadRequestException("User is not exist");
+            var existence = await GetUserById(userId) ?? throw new BadRequestException("User is not exist");
             string hashedPassword = PasswordUtil.HashPassword(newPassword, out byte[] salt);
             existence.Password = hashedPassword;
             existence.PasswordSalt = salt;
@@ -59,11 +63,11 @@ public class UsersService : IUserService
     {
         try
         {
-            var existence = await _databaseContext.Users.FirstOrDefaultAsync(e => e.Email == user.Email);
+            var existence = await GetUserByEmail(user.Email);
             if (existence != null)
             {
                 //Throw exception because this user has been existed
-                throw new BadRequestException("User is already register!");
+                throw new BadRequestException(USER_EMAIL_IS_ALREADY_REGISTERED);
             }
             await _databaseContext.Users.AddAsync(user.ToActiveUser(isEmailConfirmed));
             await _databaseContext.SaveChangesAsync();
@@ -97,7 +101,7 @@ public class UsersService : IUserService
             throw;
         }
     }
-    public async Task<ProfileUserDTO?> GetProfileUserById(int id)
+    public async Task<ProfileUserDTO?> GetProfileUserDTOById(int id)
     {
         try
         {
@@ -109,7 +113,7 @@ public class UsersService : IUserService
             throw;
         }
     }
-    public async Task<IEnumerable<ListUserDTO>> GetListOfUser()
+    public async Task<IEnumerable<ListUserDTO>> GetListUserDTOs()
     {
         try
         {
@@ -130,7 +134,9 @@ public class UsersService : IUserService
     {
         try
         {
-            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.Avatar, newAvatar));
+            User? user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
+            user.Avatar = newAvatar;
+            await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
         {
@@ -141,7 +147,9 @@ public class UsersService : IUserService
     {
         try
         {
-            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.BackgroundImage, newBackground));
+            User? user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
+            user.BackgroundImage = newBackground;
+            await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
         {
@@ -152,7 +160,9 @@ public class UsersService : IUserService
     {
         try
         {
-            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.Name, name));
+            User? user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
+            user.Name = name;
+            await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
         {
@@ -163,7 +173,26 @@ public class UsersService : IUserService
     {
         try
         {
-            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.Skills, skills));
+            var user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
+            var userSkills = _databaseContext.UserSkills.Where(e => e.UserId == userId).ToList();
+            _databaseContext.UserSkills.RemoveRange(userSkills);
+            IList<UserSkill> newUserSkills = [];
+            foreach (var skill in skills)
+            {
+                var savedSkill = await _skillService.GetSkillByName(skill);
+                if (savedSkill == null)
+                {
+                    await _skillService.CreateNewSkill(skill);
+                    UserSkill userSkill = new()
+                    {
+                        UserId = userId,
+                        SkillId = (await _skillService.GetSkillByName(skill) ?? throw new Exception(SKILL_IS_EXIST_BUT_CAN_NOT_GET)).Id
+                    };
+                    newUserSkills.Add(userSkill);
+                }
+            }
+            await _databaseContext.UserSkills.AddRangeAsync(newUserSkills);
+            await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
         {
@@ -174,7 +203,9 @@ public class UsersService : IUserService
     {
         try
         {
-            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.Birthday, birthday));
+            User? user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
+            user.Birthday = birthday;
+            await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
         {
@@ -185,7 +216,9 @@ public class UsersService : IUserService
     {
         try
         {
-            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.Location, location));
+            User? user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
+            user.Location = location;
+            await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
         {
@@ -196,7 +229,9 @@ public class UsersService : IUserService
     {
         try
         {
-            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.IsActive, isActive));
+            User? user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
+            user.IsActive = isActive;
+            await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
         {
@@ -207,7 +242,9 @@ public class UsersService : IUserService
     {
         try
         {
-            await _databaseContext.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(setter => setter.SetProperty(u => u.IsEmailConfirmed, isEmailConfirmed));
+            User? user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
+            user.IsEmailConfirmed = isEmailConfirmed;
+            await _databaseContext.SaveChangesAsync();
         }
         catch (Exception)
         {
@@ -218,7 +255,7 @@ public class UsersService : IUserService
     {
         try
         {
-            User? user = await _databaseContext.Users.FindAsync(userId) ?? throw new BadRequestException("User is not exist");
+            User? user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
             _databaseContext.Users.Remove(user);
             await _databaseContext.SaveChangesAsync();
         }

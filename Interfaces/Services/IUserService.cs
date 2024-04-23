@@ -10,8 +10,8 @@ public interface IUserService
     Task CreateNewActiveUser(CreateUserDTO user, bool isEmailConfirmed);
     Task<User?> GetUserByEmail(string email);
     Task<User?> GetUserById(int id);
-    Task<ProfileUserDTO?> GetProfileUserById(int id);
-    Task<IEnumerable<ListUserDTO>> GetListOfUser();
+    Task<ProfileUserDTO?> GetProfileUserDTOById(int id);
+    Task<IEnumerable<ListUserDTO>> GetListUserDTOs();
     Task ChangeUserPassword(int userId, string newPassword);
     Task ChangeUserAvatar(int userId, string newAvatar);
     Task ChangeUserBackground(int userId, string newBackground);

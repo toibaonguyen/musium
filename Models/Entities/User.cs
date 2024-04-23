@@ -22,7 +22,8 @@ public class User : Entity
     public ICollection<Message> SentMessages { get; } = new List<Message>();
     public ICollection<Message> ReceivedMessages { get; } = new List<Message>();
     public ICollection<Comment> Comments { get; } = new List<Comment>();
-    public IList<string> Skills { get; set; } = new List<string>();
+    public List<Skill> Skills { get; } = [];
+    public List<UserSkill> UserSkills { get; } = [];
     public bool? IsHiring { get; set; }
     public required bool IsActive { get; set; }
     public required bool IsEmailConfirmed { get; set; } = false;

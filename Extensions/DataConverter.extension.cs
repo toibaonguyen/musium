@@ -153,7 +153,7 @@ public static class DataConverterExtensions
             Certifications = user.Certifications.Select(c => c.ToCertificationDTO()),
             Educations = user.Educations.Select(c => c.ToEducationDTO()),
             Experiences = user.Experiences.Select(e => e.ToExperienceDTO()),
-            Skills = user.Skills,
+            Skills = user.Skills.Select(e => new SkillDTO { Id = e.Id, Name = e.Name }).ToList(),
             IsHiring = user.IsHiring,
         };
         return dto;

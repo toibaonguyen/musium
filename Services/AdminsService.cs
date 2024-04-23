@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 namespace JobNet.Services;
 public class AdminsService : IAdminService
 {
+    private readonly string ADMIN_EMAIL_IS_ALREADY_REGISTERED = "This admin is already registered";
+    private readonly string ADMIN_IS_NOT_EXIST = "This admin is not exist";
     private readonly JobNetDatabaseContext _databaseContext;
     public AdminsService(JobNetDatabaseContext jobNetDatabaseContext)
     {
@@ -24,7 +26,7 @@ public class AdminsService : IAdminService
             if (existence != null)
             {
                 //Throw exception because this user has been existed
-                throw new ConflictException("This admin is already registered!");
+                throw new ConflictException(ADMIN_EMAIL_IS_ALREADY_REGISTERED);
             }
             await _databaseContext.Admins.AddAsync(admin.ToAdmin());
             await _databaseContext.SaveChangesAsync();
@@ -61,7 +63,7 @@ public class AdminsService : IAdminService
     {
         try
         {
-            var admin = await _databaseContext.Admins.FindAsync(adminId) ?? throw new BadRequestException("Invalid admin");
+            var admin = await _databaseContext.Admins.FindAsync(adminId) ?? throw new BadRequestException(ADMIN_IS_NOT_EXIST);
             admin.Name = newName;
             await _databaseContext.SaveChangesAsync();
         }
@@ -74,7 +76,7 @@ public class AdminsService : IAdminService
     {
         try
         {
-            var admin = await _databaseContext.Admins.FindAsync(adminId) ?? throw new BadRequestException("Invalid admin");
+            var admin = await _databaseContext.Admins.FindAsync(adminId) ?? throw new BadRequestException(ADMIN_IS_NOT_EXIST);
             admin.IsActive = isActive;
             await _databaseContext.SaveChangesAsync();
         }
@@ -87,7 +89,7 @@ public class AdminsService : IAdminService
     {
         try
         {
-            var existence = await _databaseContext.Admins.FindAsync(adminId) ?? throw new BadRequestException("User is not exist");
+            var existence = await _databaseContext.Admins.FindAsync(adminId) ?? throw new BadRequestException(ADMIN_IS_NOT_EXIST);
             string hashedPassword = PasswordUtil.HashPassword(newPassword, out byte[] salt);
             existence.Password = hashedPassword;
             existence.PasswordSalt = salt;

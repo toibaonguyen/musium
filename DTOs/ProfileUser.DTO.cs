@@ -13,7 +13,7 @@ public class ProfileUserDTO
     public required IEnumerable<CertificationDTO> Certifications { get; set; }
     public required IEnumerable<EducationDTO> Educations { get; set; }
     public required IEnumerable<ExperienceDTO> Experiences { get; set; }
-    public required IEnumerable<string> Skills { get; set; }
+    public required IEnumerable<SkillDTO> Skills { get; set; }
     public bool? IsHiring { get; set; }
 }
 

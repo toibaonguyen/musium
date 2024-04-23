@@ -12,8 +12,9 @@ public class JobPost : Entity
     public required LocationType WorkplaceType { get; set; }
     public required string JobLocation { get; set; }
     public required EmploymentType JobType { get; set; }
-    public required string Description { get; set; }
-    public required string[] SkillKeywords { get; set; }
+    public required string DescriptionInHtml { get; set; }
+    public List<Skill> Skills { get; } = [];
+    public List<JobPostSkill> JobPostSkills { get; } = [];
     public required string ReceiveApplicantsEmail { get; set; }
     public required DateTime ExpiredAt { get; set; }
     public required DateTime CreatedAt { get; set; }

@@ -13,19 +13,9 @@ public class UsersController : ControllerBase
     private readonly ILogger<UsersController> _logger;
     public UsersController(ILogger<UsersController> logger, IUserService usersService)
     {
-        this._userService = usersService;
-        this._logger = logger;
+        _userService = usersService;
+        _logger = logger;
     }
 
-    // [HttpGet]
-    // public async Task<ActionResult<IEnumerable<ListUserDTO>>> GetlistOfFilteredUser()
-    // {
-
-    // }
-    // [HttpGet("{id}")]
-    // public async Task<ActionResult<UserDTO>> GetDetailOfUser(string id)
-    // {
-
-    // }
 
 }

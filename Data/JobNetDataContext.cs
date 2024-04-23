@@ -8,9 +8,12 @@ namespace JobNet.Data;
 public class JobNetDatabaseContext : DbContext
 {
     private readonly JobNetDatabaseSettings _settings;
+    public DbSet<UserSkill> UserSkills { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Skill> Skills { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<Message> Messages { get; set; }
+    public DbSet<JobPostSkill> JobPostSkills { get; set; }
     public DbSet<JobPost> JobPosts { get; set; }
     public DbSet<Industry> Industries { get; set; }
     public DbSet<Group> Groups { get; set; }
@@ -36,24 +39,33 @@ public class JobNetDatabaseContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.UseIdentityByDefaultColumns();
 
+        //UserSkill
+        modelBuilder.Entity<UserSkill>().ToTable(_settings.UserSkillTableName);
 
         //User
         modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.Experiences).WithOne(e => e.Author).HasForeignKey(e => e.AuthorId).IsRequired();
-        modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.Certifications).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
-        modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.Educations).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
-        modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.AdminAtJobNetGroups).WithOne(e => e.Admin).HasForeignKey(e => e.AdminId).IsRequired();
-        modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.JobNetGroups).WithMany(e => e.Users);
-        modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.JobNetGroups).WithMany(e => e.Users);
-        modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.Posts).WithOne(e => e.Owner).HasForeignKey(e => e.OwnerId).IsRequired();
-        modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.JobPosts).WithOne(e => e.Author).HasForeignKey(e => e.AuthorId).IsRequired();
-        modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.SentMessages).WithOne(e => e.Sender).HasForeignKey(e => e.SenderId).IsRequired();
-        modelBuilder.Entity<User>().ToTable(_settings.UsersTableName).HasMany(e => e.ReceivedMessages).WithOne(e => e.Receiver).HasForeignKey(e => e.ReceiverId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.Certifications).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.Educations).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.AdminAtJobNetGroups).WithOne(e => e.Admin).HasForeignKey(e => e.AdminId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.JobNetGroups).WithMany(e => e.Users);
+        modelBuilder.Entity<User>().HasMany(e => e.JobNetGroups).WithMany(e => e.Users);
+        modelBuilder.Entity<User>().HasMany(e => e.Posts).WithOne(e => e.Owner).HasForeignKey(e => e.OwnerId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.JobPosts).WithOne(e => e.Author).HasForeignKey(e => e.AuthorId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.SentMessages).WithOne(e => e.Sender).HasForeignKey(e => e.SenderId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.ReceivedMessages).WithOne(e => e.Receiver).HasForeignKey(e => e.ReceiverId).IsRequired();
+
+        //Skill
+        modelBuilder.Entity<Skill>().ToTable(_settings.SkillTableName);
 
         //Post
         modelBuilder.Entity<Post>().ToTable(_settings.PostsTableName).HasMany(e => e.Comments).WithOne(e => e.Post).HasForeignKey(e => e.PostId).IsRequired();
+        modelBuilder.Entity<Post>().HasOne(e => e.BannedPost).WithOne(e => e.Post).HasForeignKey<BannedPost>(e => e.PostId).IsRequired(false);
 
         //Message
         modelBuilder.Entity<Message>().ToTable(_settings.MessagesTableName);
+
+        //JobPostSkill
+        modelBuilder.Entity<JobPostSkill>().ToTable(_settings.JobPostSkillTableName);
 
         //JobPost
         modelBuilder.Entity<JobPost>().ToTable(_settings.JobPostsTableName);
@@ -87,7 +99,10 @@ public class JobNetDatabaseContext : DbContext
         //Certification
         modelBuilder.Entity<Certification>().ToTable(_settings.CertificationsTableName);
 
-        //AdminAccount
+        //BannedPost
+        modelBuilder.Entity<BannedPost>().ToTable(_settings.BannedPostTableName);
+
+        //Admin
         modelBuilder.Entity<Admin>().ToTable(_settings.AdminsTableName);
     }
 }

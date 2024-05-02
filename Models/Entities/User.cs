@@ -1,5 +1,4 @@
-using System;
-using Microsoft.EntityFrameworkCore;
+
 namespace JobNet.Models.Entities;
 public class User : Entity
 {
@@ -12,18 +11,23 @@ public class User : Entity
     public required byte[] PasswordSalt { get; set; }
     public required string Location { get; set; }
     public DateTime Birthday { get; set; }
-    public ICollection<Experience> Experiences { get; } = new List<Experience>();
-    public ICollection<Certification> Certifications { get; } = new List<Certification>();
-    public ICollection<Education> Educations { get; } = new List<Education>();
-    public ICollection<Group> AdminAtJobNetGroups { get; } = new List<Group>();
-    public ICollection<Group> JobNetGroups { get; } = new List<Group>();
-    public ICollection<Post> Posts { get; } = new List<Post>();
-    public ICollection<JobPost> JobPosts { get; } = new List<JobPost>();
-    public ICollection<Message> SentMessages { get; } = new List<Message>();
-    public ICollection<Message> ReceivedMessages { get; } = new List<Message>();
-    public ICollection<Comment> Comments { get; } = new List<Comment>();
-    public List<Skill> Skills { get; } = [];
-    public List<UserSkill> UserSkills { get; } = [];
+    public ICollection<Experience> Experiences { get; } = [];
+    public ICollection<Certification> Certifications { get; } = [];
+    public ICollection<Education> Educations { get; } = [];
+    public ICollection<CompanyPageAdmin> PageAdminAtCompanies { get; } = [];
+    public ICollection<Connection> InviteeConnections { get; } = [];
+    public ICollection<Connection> InviterConnections { get; } = [];
+    public ICollection<Post> Posts { get; } = [];
+    public ICollection<JobPost> JobPosts { get; } = [];
+    public ICollection<Message> SentMessages { get; } = [];
+    public ICollection<Message> ReceivedMessages { get; } = [];
+    public ICollection<Comment> PostComments { get; } = [];
+    public ICollection<PostReaction> PostReactions { get; } = [];
+    public ICollection<UserFollowCompany> FollowCompanies { get; } = [];
+    public ICollection<CompanyPostComment> CompanyPostComments { get; } = [];
+    public ICollection<CompanyPostReaction> CompanyPostReactions { get; } = [];
+    public ICollection<CloudMessageRegistrationToken> CloudMessageRegistrationTokens { get; } = [];
+    public ICollection<UserSkill> UserSkills { get; } = [];
     public bool? IsHiring { get; set; }
     public required bool IsActive { get; set; }
     public required bool IsEmailConfirmed { get; set; } = false;

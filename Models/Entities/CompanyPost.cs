@@ -7,8 +7,12 @@ public class CompanyPost : Entity
     public Company OwnCompany { get; set; } = null!;
     public required string Content { get; set; }
     public required IList<string> Images { get; set; }
-    public ICollection<CompanyPostComment> Comments { get; set; } = new List<CompanyPostComment>();
+    public required IList<string> Videos { get; set; }
+    public required IList<string> OtherFiles { get; set; }
+    public ICollection<CompanyPostComment> Comments { get; } = [];
+    public ICollection<CompanyPostReaction> Reactions { get; } = [];
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public required bool IsActive { get; set; }
+    public CompanyPostNotification? Notification { get; set; }
 }

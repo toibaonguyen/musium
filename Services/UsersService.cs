@@ -1,12 +1,8 @@
-using Microsoft.Extensions.Options;
-using JobNet.Models;
-using JobNet.Settings;
 using JobNet.Data;
 using Microsoft.EntityFrameworkCore;
 using JobNet.DTOs;
 using JobNet.Models.Entities;
 using JobNet.Extensions;
-using Microsoft.AspNetCore.JsonPatch;
 using JobNet.Interfaces.Services;
 using JobNet.Exceptions;
 using JobNet.Utilities;
@@ -18,7 +14,7 @@ public class UsersService : IUserService
 {
     private readonly string USER_EMAIL_IS_ALREADY_REGISTERED = "This user is already registered";
     private readonly string USER_IS_NOT_EXIST = "This user is not exist";
-    private readonly string SKILL_IS_EXIST_BUT_CAN_NOT_GET = "Some thing wrong when take from database";
+    private readonly string SKILL_IS_EXIST_BUT_CAN_NOT_GET = "Some thing wrong when take skill from database";
     private readonly JobNetDatabaseContext _databaseContext;
     private readonly ISkillService _skillService;
     public UsersService(JobNetDatabaseContext databaseContext, ISkillService skillService)

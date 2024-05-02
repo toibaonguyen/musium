@@ -7,9 +7,9 @@ namespace JobNet.Interfaces.Services;
 
 public interface IAuthService
 {
-    Task<AuthenticationTokenDTO> LoginAsUser(string email, string password);
-    Task<AuthenticationTokenDTO> LoginAsAdmin(string email, string password);
-    Task<AuthenticationTokenDTO> RefreshTokens(int userId, string role, string refreshToken);
+    Task<AuthenticationResponse> LoginAsUser(string email, string password);
+    Task<AuthenticationResponse> LoginAsAdmin(string email, string password);
+    Task<AuthenticationResponse> RefreshTokens(int userId, string role, string refreshToken);
     Task CreateNewAdmin(CreateAdminDTO user);
     Task ConfirmUser(int userId, string token);
     Task ResendVerificationEmail(string email);
@@ -18,5 +18,5 @@ public interface IAuthService
     Task SendResetUserPasswordConfirmationEmail(string email);
     Task RegisterUser(CreateUserDTO user);
     Task ConfirmResetPassword(int userId, string token);
-    Task Logout(string userRole, int userId);
+    Task Logout(string userRole, int userId, string? notificationRegistrationToken);
 }

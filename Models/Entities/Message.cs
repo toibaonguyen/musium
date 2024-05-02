@@ -8,6 +8,9 @@ public class Message : Entity
     public int ReceiverId { get; set; }
     public User Receiver { get; set; } = null!;
     public required string Content { get; set; }
+    public string? Image { get; set; }
+    public string? Video { get; set; }
+    public string? OtherFile { get; set; }
     public DateTime CreatedAt { get; set; }
-    public bool IsImage { get; set; }
+    public MessageNotification? Notification { get; set; }
 }

@@ -16,14 +16,26 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using JobNet.Settings;
 using Microsoft.Extensions.Options;
+using JobNet.Models.Core.Responses;
+using JobNet.Extensions;
 namespace JobNet.Services;
 
 public class AuthService : IAuthService
 {
+    private readonly string USER_EMAIL_HAS_NOT_BEEN_CONFIRMED_YET = "User's email is not confirmed!";
+    private readonly string USER_IS_INACTIVE = "User is inactive!";
+    private readonly string USER_HAS_NOT_LOGIN_YET = "User has not login yet!";
+    private readonly string EXPIRED_TOKEN = "Expired token, please login again!";
+    private readonly string WRONG_EMAIL_OR_PASSWORD = "Wrong email or password!";
+    private readonly string USER_IS_INVALID = "User is invalid!";
+    private readonly string ROLE_IS_INVALID = "this role is invalid!";
+    private readonly string MISSING_REGISTRATION_TOKEN = "Missing registration token!";
+
     private readonly int MIN_PASSWORD_LENGTH = 8, MAX_PASSWORD_LENGTH = 15;
     private readonly JWTAuthSettings _jwtAuthSettings;
     private readonly IUserService _usersService;
     private readonly IAdminService _adminsService;
+    private readonly ICloudMessageRegistrationTokenService _cloudMessageRegistrationTokenService;
     private readonly IConnectionMultiplexer _redis;
     private readonly IEmailSenderService _emailService;
     private readonly IUrlHelperFactory _urlHelperFactory;
@@ -33,28 +45,29 @@ public class AuthService : IAuthService
     {
         return $"Token:{userRole}:{userId}";
     }
-    public AuthService(IOptions<JWTAuthSettings> jwtAuthOptions, IHttpContextAccessor httpContextAccessor, IUrlHelperFactory urlHelperFactory, IAdminService adminsService, IUserService usersService, IEmailSenderService emailService, IConnectionMultiplexer redis)
+    public AuthService(IOptions<JWTAuthSettings> jwtAuthOptions, IHttpContextAccessor httpContextAccessor, IUrlHelperFactory urlHelperFactory, IAdminService adminsService, IUserService usersService, IEmailSenderService emailService, ICloudMessageRegistrationTokenService cloudMessageRegistrationTokenService, IConnectionMultiplexer redis)
     {
-        this._httpContextAccessor = httpContextAccessor;
-        this._urlHelperFactory = urlHelperFactory;
-        this._usersService = usersService;
-        this._adminsService = adminsService;
-        this._redis = redis;
-        this._emailService = emailService;
-        this._jwtAuthSettings = jwtAuthOptions.Value;
+        _cloudMessageRegistrationTokenService = cloudMessageRegistrationTokenService;
+        _httpContextAccessor = httpContextAccessor;
+        _urlHelperFactory = urlHelperFactory;
+        _usersService = usersService;
+        _adminsService = adminsService;
+        _redis = redis;
+        _emailService = emailService;
+        _jwtAuthSettings = jwtAuthOptions.Value;
     }
-    public async Task<AuthenticationTokenDTO> LoginAsUser(string email, string password)
+    public async Task<AuthenticationResponse> LoginAsUser(string email, string password)
     {
         try
         {
-            var user = await _usersService.GetUserByEmail(email) ?? throw new BadRequestException("This user is not exist!");
+            var user = await _usersService.GetUserByEmail(email) ?? throw new BadRequestException(WRONG_EMAIL_OR_PASSWORD);
             if (user.IsEmailConfirmed == false)
             {
-                throw new UnauthorizedException("User's email is not confirmed!");
+                throw new UnauthorizedException(USER_EMAIL_HAS_NOT_BEEN_CONFIRMED_YET);
             }
             if (user.IsActive == false)
             {
-                throw new UnauthorizedException("This user is inactive!");
+                throw new UnauthorizedException(USER_IS_INACTIVE);
             }
             if (PasswordUtil.VerifyPassword(password, user.Password, user.PasswordSalt))
             {
@@ -87,11 +100,15 @@ public class AuthService : IAuthService
                     Email = user.Email,
                     Role = UserRoles.User
                 };
-                return auth;
+                return new AuthenticationResponse
+                {
+                    Data = auth,
+                    User = user.ToUserIdentityDTO()
+                };
             }
             else
             {
-                throw new BadRequestException("Wrong password!");
+                throw new BadRequestException(WRONG_EMAIL_OR_PASSWORD);
             }
         }
         catch (Exception)
@@ -99,14 +116,14 @@ public class AuthService : IAuthService
             throw;
         }
     }
-    public async Task<AuthenticationTokenDTO> LoginAsAdmin(string email, string password)
+    public async Task<AuthenticationResponse> LoginAsAdmin(string email, string password)
     {
         try
         {
-            var admin = await _adminsService.GetAdminByEmail(email) ?? throw new BadRequestException("This admin is not exist!");
+            var admin = await _adminsService.GetAdminByEmail(email) ?? throw new BadRequestException(WRONG_EMAIL_OR_PASSWORD);
             if (admin.IsActive == false)
             {
-                throw new UnauthorizedException("this admin is inactive!");
+                throw new UnauthorizedException(USER_IS_INACTIVE);
             }
             if (PasswordUtil.VerifyPassword(password, admin.Password, admin.PasswordSalt))
             {
@@ -139,11 +156,15 @@ public class AuthService : IAuthService
                     Email = admin.Email,
                     Role = UserRoles.Admin
                 };
-                return auth;
+                return new AuthenticationResponse
+                {
+                    Data = auth,
+                    User = admin.ToUserIdentityDTO()
+                };
             }
             else
             {
-                throw new BadRequestException("Wrong password!");
+                throw new BadRequestException(WRONG_EMAIL_OR_PASSWORD);
             }
         }
         catch (Exception)
@@ -151,7 +172,7 @@ public class AuthService : IAuthService
             throw;
         }
     }
-    public async Task<AuthenticationTokenDTO> RefreshTokens(int userId, string role, string refreshToken)
+    public async Task<AuthenticationResponse> RefreshTokens(int userId, string role, string refreshToken)
     {
         try
         {
@@ -160,15 +181,15 @@ public class AuthService : IAuthService
             string? fetchedAuthModelJson = await db.StringGetAsync(key);
             if (fetchedAuthModelJson is null)
             {
-                throw new ForbiddenException("This user have not login yet");
+                throw new ForbiddenException(USER_HAS_NOT_LOGIN_YET);
             }
-            AuthModel? fetchedAuthModel = JsonSerializer.Deserialize<AuthModel>(fetchedAuthModelJson) ?? throw new Exception("There something wrong with storing auth token!");
+            AuthModel? fetchedAuthModel = JsonSerializer.Deserialize<AuthModel>(fetchedAuthModelJson) ?? throw new Exception();
             if (fetchedAuthModel.RefreshToken == refreshToken)
             {
                 if (DateTime.Compare(fetchedAuthModel.RefreshTokenExpiryTime, DateTime.Now) < 0)
                 {
                     await db.KeyDeleteAsync(key);
-                    throw new BadRequestException("Expired token, please login again!");
+                    throw new BadRequestException(EXPIRED_TOKEN);
                 }
                 else
                 {
@@ -177,10 +198,10 @@ public class AuthService : IAuthService
                     {
                         case UserRoles.Admin:
                             {
-                                var admin = await this._adminsService.GetAdminById(userId) ?? throw new BadRequestException("Invalid admin");
+                                var admin = await this._adminsService.GetAdminById(userId) ?? throw new BadRequestException(WRONG_EMAIL_OR_PASSWORD);
                                 if (admin.IsActive == false)
                                 {
-                                    throw new UnauthorizedException("this admin is inactive!");
+                                    throw new UnauthorizedException(USER_IS_INACTIVE);
                                 }
                                 var authClaims = new List<Claim>
                                 {
@@ -201,14 +222,18 @@ public class AuthService : IAuthService
                                     RefreshToken = newRefreshToken,
                                     Role = UserRoles.Admin
                                 };
-                                return auth;
+                                return new AuthenticationResponse
+                                {
+                                    Data = auth,
+                                    User = admin.ToUserIdentityDTO()
+                                };
                             }
                         case UserRoles.User:
                             {
-                                var user = await this._usersService.GetUserById(userId) ?? throw new BadRequestException("Invalid user");
+                                var user = await this._usersService.GetUserById(userId) ?? throw new BadRequestException(USER_IS_INVALID);
                                 if (user.IsActive == false)
                                 {
-                                    throw new UnauthorizedException("this user is inactive!");
+                                    throw new UnauthorizedException(USER_IS_INACTIVE);
                                 }
                                 var authClaims = new List<Claim>
                                 {
@@ -229,10 +254,14 @@ public class AuthService : IAuthService
                                     RefreshToken = newRefreshToken,
                                     Role = UserRoles.User
                                 };
-                                return auth;
+                                return new AuthenticationResponse
+                                {
+                                    Data = auth,
+                                    User = user.ToUserIdentityDTO()
+                                };
                             }
                         default:
-                            throw new BadRequestException("Invalid role");
+                            throw new BadRequestException(ROLE_IS_INVALID);
                     }
                 }
             }
@@ -241,7 +270,7 @@ public class AuthService : IAuthService
                 if (fetchedAuthModel.UsedRefreshTokens.Contains(refreshToken))
                 {
                     await db.KeyDeleteAsync(key);
-                    throw new BadRequestException("Expired token, please login again!");
+                    throw new BadRequestException(EXPIRED_TOKEN);
                 }
                 throw new ForbiddenException("Don't have permission to request for new token");
             }
@@ -352,7 +381,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            var user = await _usersService.GetUserByEmail(email) ?? throw new Exception("Invalid user");
+            var user = await _usersService.GetUserByEmail(email) ?? throw new Exception(WRONG_EMAIL_OR_PASSWORD);
             if (user.IsEmailConfirmed)
             {
                 throw new BadRequestException("This user is already confirmed!");
@@ -416,7 +445,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            var user = await _usersService.GetUserByEmail(email) ?? throw new BadRequestException("Invalid user");
+            var user = await _usersService.GetUserByEmail(email) ?? throw new BadRequestException(WRONG_EMAIL_OR_PASSWORD);
             var authClaims = new List<Claim>
             {
                 new(ClaimTypes.Email,user.Email),
@@ -454,7 +483,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            var user = await _usersService.GetUserById(userId) ?? throw new BadRequestException("Invalid userId");
+            var user = await _usersService.GetUserById(userId) ?? throw new BadRequestException(USER_IS_INVALID);
             var isValid = TokenUtil.ValidateToken(token, out JwtSecurityToken? jwt, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.SecretKey);
             if (isValid)
             {
@@ -484,12 +513,20 @@ public class AuthService : IAuthService
             throw;
         }
     }
-    public async Task Logout(string userRole, int userId)
+    public async Task Logout(string userRole, int userId, string? notificationRegistrationToken)
     {
         try
         {
             var db = _redis.GetDatabase();
             await db.KeyDeleteAsync(GetRedisStoredKey(userRole, userId));
+            if (userRole == UserRoles.User)
+            {
+                if (notificationRegistrationToken is null)
+                {
+                    throw new BadRequestException(MISSING_REGISTRATION_TOKEN);
+                }
+                await _cloudMessageRegistrationTokenService.DeleteTokenAsync(userId, notificationRegistrationToken);
+            }
         }
         catch (Exception)
         {

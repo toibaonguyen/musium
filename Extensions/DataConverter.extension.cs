@@ -1,6 +1,7 @@
 
 using System.Text;
 using System.Web;
+using JobNet.Contants;
 using JobNet.DTOs;
 using JobNet.Models.Entities;
 using JobNet.Utilities;
@@ -127,7 +128,6 @@ public static class DataConverterExtensions
         }
         ExperienceDTO dto = new()
         {
-            Id = experience.Id,
             Title = experience.Title,
             EmploymentType = employmentType,
             Location = experience.Location,
@@ -153,7 +153,7 @@ public static class DataConverterExtensions
             Certifications = user.Certifications.Select(c => c.ToCertificationDTO()),
             Educations = user.Educations.Select(c => c.ToEducationDTO()),
             Experiences = user.Experiences.Select(e => e.ToExperienceDTO()),
-            Skills = user.Skills.Select(e => new SkillDTO { Id = e.Id, Name = e.Name }).ToList(),
+            Skills = user.UserSkills.Select(e => new SkillDTO { Id = e.SkillId, Name = e.Skill.Name }).ToList(),
             IsHiring = user.IsHiring,
         };
         return dto;
@@ -194,5 +194,23 @@ public static class DataConverterExtensions
             IsActive = dto.IsActive
         };
         return admin;
+    }
+    public static UserIdentityDTO ToUserIdentityDTO(this User user)
+    {
+        return new UserIdentityDTO
+        {
+            Id = user.Id,
+            Email = user.Email,
+            Role = UserRoles.User
+        };
+    }
+    public static UserIdentityDTO ToUserIdentityDTO(this Admin admin)
+    {
+        return new UserIdentityDTO
+        {
+            Id = admin.Id,
+            Email = admin.Email,
+            Role = UserRoles.Admin
+        };
     }
 }

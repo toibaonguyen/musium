@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using JobNet.Settings;
 using JobNet.Services;
-// using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using JobNet.Data;
@@ -11,29 +10,41 @@ using StackExchange.Redis;
 using JobNet.Middlewares;
 using JobNet.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.Extensions.Options;
-using SendGrid.Helpers.Mail;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using JobNet.Contants;
 using System.Security.Claims;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 // Add services to the container.
 
+//set environment variable GOOGLE_APPLICATION_CREDENTIALS by service-account-file.json before running below code
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.GetApplicationDefault(),
+    ProjectId = builder.Configuration["FirebaseSetting:ProjectId"] ?? throw new Exception("missing firebase's projectId in app.json file")
+});
 JobNetDatabaseSettings dbsettings = builder.Configuration.GetSection("JobNetDatabase").Get<JobNetDatabaseSettings>() ?? throw new Exception("missing setting in app.json file");
 JWTAuthSettings tokenAuthSettings = builder.Configuration.GetSection("JWTAuth").Get<JWTAuthSettings>() ?? throw new Exception("missing setting in app.json file");
 
-string redisConnectionString = builder.Configuration.GetSection("RedisConnectionString").Value ?? "";
-if (String.IsNullOrEmpty(redisConnectionString))
+string redisConnectionString = builder.Configuration["RedisConnectionString"] ?? throw new Exception("Missing RedisConnectionString");
+
+//set environment variable AZURE_STORAGE_CONNECTION_STRING by connection string of azure blob storage before running below code
+string azureConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING") ?? throw new Exception("Missing azure connection string!");
+
+if (string.IsNullOrEmpty(redisConnectionString))
 {
     throw new Exception("Redis connection string is missing!");
 }
 string connectionString = dbsettings.ConnectionString;
-if (String.IsNullOrEmpty(connectionString))
+if (string.IsNullOrEmpty(connectionString))
 {
     throw new Exception("Connection string is missing!");
 }
@@ -41,9 +52,12 @@ if (String.IsNullOrEmpty(connectionString))
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
 
+builder.Services.Configure<AzureSetting>(options => { options.ConnectionString = azureConnectionString; });
 builder.Services.Configure<JobNetDatabaseSettings>(builder.Configuration.GetSection("JobNetDatabase"));
 builder.Services.Configure<EmailSenderProviderSetting>(builder.Configuration.GetSection("EmailSettingProvider"));
 builder.Services.Configure<JWTAuthSettings>(builder.Configuration.GetSection("JWTAuth"));
+builder.Services.Configure<NotificationSetting>(builder.Configuration.GetSection("NotificationSetting"));
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -70,21 +84,26 @@ builder.Services.AddAuthentication(options =>
         };
     }
 );
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy(IdentityData.AdminPolicyName, p => p.RequireClaim(ClaimTypes.Role, UserRoles.Admin));
-    options.AddPolicy(IdentityData.UserPolicyName, p => p.RequireClaim(ClaimTypes.Role, UserRoles.User));
-});
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(IdentityData.AdminPolicyName, p => p.RequireClaim(ClaimTypes.Role, UserRoles.Admin))
+    .AddPolicy(IdentityData.UserPolicyName, p => p.RequireClaim(ClaimTypes.Role, UserRoles.User));
 
 
 builder.Services.AddDbContext<JobNetDatabaseContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
+
 builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IUserService, UsersService>();
 builder.Services.AddTransient<IAdminService, AdminsService>();
+builder.Services.AddSingleton<IFileService, FileService>();
+builder.Services.AddTransient<IPostService, PostService>();
+builder.Services.AddTransient<ISkillService, SkillsService>();
+builder.Services.AddTransient<ICloudMessageRegistrationTokenService, CloudMessageRegistrationTokenService>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
 
-builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

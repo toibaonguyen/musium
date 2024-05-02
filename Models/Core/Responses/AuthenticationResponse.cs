@@ -6,6 +6,7 @@ namespace JobNet.Models.Core.Responses;
 
 public class AuthenticationResponse : BaseResponse
 {
+    public required UserIdentityDTO User { get; set; }
     public required AuthenticationTokenDTO Data { get; set; }
     public override string ToString()
     {

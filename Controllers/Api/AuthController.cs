@@ -1,4 +1,5 @@
 using JobNet.Contants;
+using JobNet.Extensions;
 using JobNet.Interfaces.Services;
 using JobNet.Models.Core.Requests;
 using JobNet.Models.Core.Responses;
@@ -13,16 +14,26 @@ namespace JobNet.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
+    private readonly string CREATE_ACCOUNT_SUCCESSFULLY = "Create account successfully, please confirm email!";
+    private readonly string CHECK_EMAIL = "Please check your email!";
+    private readonly string LOGOUT_SUCCESSFULLY = "Logout successfully!";
+    private readonly string INVALID_TOKEN = "Invalid token!";
+    private readonly string INVALID_USER = "Invalid user!";
     private readonly IAuthService _authService;
+    private readonly IUserService _userService;
+    private readonly IAdminService _adminService;
     private readonly ILogger<AuthController> _logger;
     private readonly IUrlHelperFactory _urlHelperFactory;
-    public AuthController(ILogger<AuthController> logger, IAuthService authService, IUrlHelperFactory urlHelperFactory)
+    public AuthController(ILogger<AuthController> logger, IAuthService authService, IUrlHelperFactory urlHelperFactory, IUserService userService, IAdminService adminService)
     {
-        this._authService = authService;
-        this._logger = logger;
-        this._urlHelperFactory = urlHelperFactory;
+        _userService = userService;
+        _authService = authService;
+        _adminService = adminService;
+        _logger = logger;
+        _urlHelperFactory = urlHelperFactory;
     }
 
+    [AllowAnonymous]
     [HttpPost("users")]
     public async Task<ActionResult<BaseResponse>> RegisterUser([FromBody] RegisterUserRequest requestBody)
     {
@@ -34,7 +45,7 @@ public class AuthController : ControllerBase
 
             var res = new MessageResponse
             {
-                Message = "Create account successfully, please confirm email!"
+                Message = CREATE_ACCOUNT_SUCCESSFULLY
             };
             return Ok(res);
         }
@@ -44,27 +55,21 @@ public class AuthController : ControllerBase
             throw;
         }
     }
+    [AllowAnonymous]
     [HttpPost("users/login")]
     public async Task<ActionResult<BaseResponse>> LoginAsUser([FromBody] LoginRequest account)
     {
         try
         {
             var auth = await _authService.LoginAsUser(account.Email, account.Password);
-            if (auth == null)
-            {
-                throw new Exception("Something wrong!");
-            }
-            var Response = new AuthenticationResponse
-            {
-                Data = auth
-            };
-            return Ok(Response);
+            return Ok(auth);
         }
         catch (Exception)
         {
             throw;
         }
     }
+    [AllowAnonymous]
     [HttpPost("users/re-verify-email")]
     public async Task<ActionResult<BaseResponse>> ReVerifyEmailUser([FromBody] LoginRequest account)
     {
@@ -73,7 +78,7 @@ public class AuthController : ControllerBase
             await _authService.ResendVerificationEmail(account.Email);
             var Response = new MessageResponse
             {
-                Message = "Please check your email!"
+                Message = CHECK_EMAIL
             };
             return Ok(Response);
         }
@@ -88,10 +93,6 @@ public class AuthController : ControllerBase
         try
         {
             var auth = await _authService.LoginAsAdmin(account.Email, account.Password);
-            if (auth == null)
-            {
-                throw new Exception("Something wrong!");
-            }
             return Ok(auth);
         }
         catch (Exception)
@@ -99,42 +100,47 @@ public class AuthController : ControllerBase
             throw;
         }
     }
+    [Authorize(Policy = IdentityData.UserPolicyName)]
     [HttpPost("users/{userId}/refresh-tokens")]
     public async Task<ActionResult<BaseResponse>> RefreshUserToken(int userId, [FromBody] RefreshTokenRequest refreshToken)
     {
         try
         {
-            var auth = await _authService.RefreshTokens(userId, UserRoles.User, refreshToken.RefreshToken);
-            if (auth == null)
+            var user = await _userService.GetUserById(userId);
+            if (user == null)
             {
-                throw new Exception("Something wrong!");
+                return BadRequest(
+                    new MessageResponse
+                    {
+                        Message = INVALID_USER
+                    });
             }
-            var response = new AuthenticationResponse
-            {
-                Data = auth
-            };
-            return Ok(response);
+
+            var auth = await _authService.RefreshTokens(userId, UserRoles.User, refreshToken.RefreshToken) ?? throw new Exception();
+
+            return Ok(auth);
         }
         catch (Exception)
         {
             throw;
         }
     }
+    [AllowAnonymous]
     [HttpPost("admins/{userId}/refresh-tokens")]
     public async Task<ActionResult<BaseResponse>> RefreshAdminToken(int userId, [FromBody] RefreshTokenRequest refreshToken)
     {
         try
         {
-            var auth = await _authService.RefreshTokens(userId, UserRoles.Admin, refreshToken.RefreshToken);
-            if (auth == null)
+            var admin = await _adminService.GetAdminById(userId);
+            if (admin == null)
             {
-                throw new Exception("Something wrong!");
+                return BadRequest(new MessageResponse
+                {
+                    Message = INVALID_USER
+                });
             }
-            var response = new AuthenticationResponse
-            {
-                Data = auth
-            };
-            return Ok(response);
+            AuthenticationResponse auth = await _authService.RefreshTokens(userId, UserRoles.Admin, refreshToken.RefreshToken) ?? throw new Exception();
+            return Ok(auth);
         }
         catch (Exception)
         {
@@ -164,7 +170,7 @@ public class AuthController : ControllerBase
             await _authService.SendResetUserPasswordConfirmationEmail(request.Email);
             return Ok(new MessageResponse
             {
-                Message = "Please check your email!"
+                Message = CHECK_EMAIL
             });
         }
         catch (Exception)
@@ -179,19 +185,20 @@ public class AuthController : ControllerBase
         try
         {
             var userId = HttpContext.User.FindFirst("userId")?.Value;
-            if (userId == null)
+            if (userId is null)
             {
-                return BadRequest(
+                return Unauthorized(
                     new MessageResponse
                     {
-                        Message = "missing field in token"
+                        Message = INVALID_TOKEN
                     }
                 );
             }
-            await _authService.Logout(UserRoles.User, int.Parse(userId));
+            //sua sau
+            await _authService.Logout(UserRoles.User, int.Parse(userId), null);
             return Ok(new MessageResponse
             {
-                Message = "Logout successfully!"
+                Message = LOGOUT_SUCCESSFULLY
             });
         }
         catch (Exception)
@@ -206,19 +213,19 @@ public class AuthController : ControllerBase
         try
         {
             var userId = HttpContext.User.FindFirst("userId")?.Value;
-            if (userId == null)
+            if (userId is null)
             {
-                return BadRequest(
+                return Unauthorized(
                     new MessageResponse
                     {
-                        Message = "missing field in token"
+                        Message = INVALID_TOKEN
                     }
                 );
             }
-            await _authService.Logout(UserRoles.Admin, int.Parse(userId));
+            await _authService.Logout(UserRoles.Admin, int.Parse(userId), null);
             return Ok(new MessageResponse
             {
-                Message = "Logout successfully!"
+                Message = LOGOUT_SUCCESSFULLY
             });
         }
         catch (Exception)

@@ -8,7 +8,6 @@ public class Experience : Entity
     public required User Author { get; set; } = null!;
     public required string Title { get; set; }
     public required EmploymentType EmploymentType { get; set; }
-    //Cai nay dang ngo vl
     public int CompanyId { get; set; }
     public Company Company { get; set; } = null!;
     public required string Location { get; set; }

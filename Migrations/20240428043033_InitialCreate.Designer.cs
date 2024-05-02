@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JobNet.Migrations
 {
     [DbContext(typeof(JobNetDatabaseContext))]
-    [Migration("20240407071205_InitialCreate")]
+    [Migration("20240428043033_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -24,21 +24,6 @@ namespace JobNet.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("GroupUser", b =>
-                {
-                    b.Property<int>("JobNetGroupsId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("JobNetGroupsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("GroupUser");
-                });
 
             modelBuilder.Entity("JobNet.Models.Entities.Admin", b =>
                 {
@@ -72,6 +57,32 @@ namespace JobNet.Migrations
                     b.ToTable("admins", (string)null);
                 });
 
+            modelBuilder.Entity("JobNet.Models.Entities.BannedPost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BannedReason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId")
+                        .IsUnique();
+
+                    b.ToTable("banned_posts", (string)null);
+                });
+
             modelBuilder.Entity("JobNet.Models.Entities.Certification", b =>
                 {
                     b.Property<int>("Id")
@@ -87,10 +98,10 @@ namespace JobNet.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ExpirationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("IssueDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("IssuingOrganizationName")
                         .IsRequired()
@@ -126,7 +137,7 @@ namespace JobNet.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -135,7 +146,7 @@ namespace JobNet.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -165,14 +176,14 @@ namespace JobNet.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("FoundedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Headquarters")
                         .IsRequired()
@@ -184,26 +195,34 @@ namespace JobNet.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("ManagerId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Website")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IndustryId");
-
-                    b.HasIndex("ManagerId");
-
                     b.ToTable("companies", (string)null);
+                });
+
+            modelBuilder.Entity("JobNet.Models.Entities.CompanyPageAdmin", b =>
+                {
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PageAdminId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CompanyId", "PageAdminId");
+
+                    b.HasIndex("PageAdminId");
+
+                    b.ToTable("company_page_admins", (string)null);
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.CompanyPost", b =>
@@ -222,7 +241,7 @@ namespace JobNet.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string[]>("Images")
                         .IsRequired()
@@ -231,8 +250,16 @@ namespace JobNet.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string[]>("OtherFiles")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string[]>("Videos")
+                        .IsRequired()
+                        .HasColumnType("text[]");
 
                     b.HasKey("Id");
 
@@ -257,7 +284,7 @@ namespace JobNet.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -266,7 +293,7 @@ namespace JobNet.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -275,6 +302,39 @@ namespace JobNet.Migrations
                     b.HasIndex("PostId");
 
                     b.ToTable("company_post_comments", (string)null);
+                });
+
+            modelBuilder.Entity("JobNet.Models.Entities.Conversation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsImage")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ReceiverId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("conversations", (string)null);
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.Education", b =>
@@ -296,7 +356,7 @@ namespace JobNet.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Grade")
                         .HasColumnType("text");
@@ -310,7 +370,7 @@ namespace JobNet.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -324,16 +384,10 @@ namespace JobNet.Migrations
 
             modelBuilder.Entity("JobNet.Models.Entities.Experience", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("CompanyId")
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AuthorId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("CompanyId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
@@ -344,7 +398,7 @@ namespace JobNet.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsUserCurentlyWorking")
                         .HasColumnType("boolean");
@@ -357,17 +411,15 @@ namespace JobNet.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("CompanyId", "AuthorId");
 
                     b.HasIndex("AuthorId");
-
-                    b.HasIndex("CompanyId");
 
                     b.ToTable("experiences", (string)null);
                 });
@@ -387,15 +439,18 @@ namespace JobNet.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Background")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("IndustryId")
-                        .HasColumnType("integer");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -412,26 +467,27 @@ namespace JobNet.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.HasIndex("IndustryId");
-
                     b.ToTable("groups", (string)null);
                 });
 
-            modelBuilder.Entity("JobNet.Models.Entities.Industry", b =>
+            modelBuilder.Entity("JobNet.Models.Entities.GroupMember", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("MemberId")
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.HasKey("Id");
+                    b.HasKey("MemberId", "GroupId");
 
-                    b.ToTable("industries", (string)null);
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("group_members", (string)null);
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.JobPost", b =>
@@ -449,14 +505,14 @@ namespace JobNet.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("DescriptionInHtml")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ExpiredAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -476,12 +532,8 @@ namespace JobNet.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string[]>("SkillKeywords")
-                        .IsRequired()
-                        .HasColumnType("text[]");
-
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("WorkplaceType")
                         .HasColumnType("integer");
@@ -493,6 +545,21 @@ namespace JobNet.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("job_posts", (string)null);
+                });
+
+            modelBuilder.Entity("JobNet.Models.Entities.JobPostSkill", b =>
+                {
+                    b.Property<int>("SkillId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("JobPostId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("SkillId", "JobPostId");
+
+                    b.HasIndex("JobPostId");
+
+                    b.ToTable("job_post_skills", (string)null);
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.Message", b =>
@@ -508,7 +575,7 @@ namespace JobNet.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsImage")
                         .HasColumnType("boolean");
@@ -541,7 +608,9 @@ namespace JobNet.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int?>("GroupId")
                         .HasColumnType("integer");
@@ -553,11 +622,19 @@ namespace JobNet.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string[]>("OtherFiles")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
                     b.Property<int>("OwnerId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string[]>("Videos")
+                        .IsRequired()
+                        .HasColumnType("text[]");
 
                     b.HasKey("Id");
 
@@ -566,6 +643,23 @@ namespace JobNet.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("posts", (string)null);
+                });
+
+            modelBuilder.Entity("JobNet.Models.Entities.Skill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("skills", (string)null);
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.User", b =>
@@ -585,7 +679,7 @@ namespace JobNet.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("Birthday")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -616,28 +710,63 @@ namespace JobNet.Migrations
                         .IsRequired()
                         .HasColumnType("bytea");
 
-                    b.Property<string[]>("Skills")
-                        .IsRequired()
-                        .HasColumnType("text[]");
-
                     b.HasKey("Id");
 
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("GroupUser", b =>
+            modelBuilder.Entity("JobNet.Models.Entities.UserSkill", b =>
                 {
-                    b.HasOne("JobNet.Models.Entities.Group", null)
-                        .WithMany()
-                        .HasForeignKey("JobNetGroupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
-                    b.HasOne("JobNet.Models.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("SkillId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId", "SkillId");
+
+                    b.HasIndex("SkillId");
+
+                    b.ToTable("user_skills", (string)null);
+                });
+
+            modelBuilder.Entity("JobPostSkill", b =>
+                {
+                    b.Property<int>("JobPostsId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SkillsId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("JobPostsId", "SkillsId");
+
+                    b.HasIndex("SkillsId");
+
+                    b.ToTable("JobPostSkill");
+                });
+
+            modelBuilder.Entity("SkillUser", b =>
+                {
+                    b.Property<int>("SkillsId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UsersId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("SkillsId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("SkillUser");
+                });
+
+            modelBuilder.Entity("JobNet.Models.Entities.BannedPost", b =>
+                {
+                    b.HasOne("JobNet.Models.Entities.Post", "Post")
+                        .WithOne("BannedPost")
+                        .HasForeignKey("JobNet.Models.Entities.BannedPost", "PostId");
+
+                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.Certification", b =>
@@ -670,23 +799,23 @@ namespace JobNet.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("JobNet.Models.Entities.Company", b =>
+            modelBuilder.Entity("JobNet.Models.Entities.CompanyPageAdmin", b =>
                 {
-                    b.HasOne("JobNet.Models.Entities.Industry", "Industry")
-                        .WithMany("Companies")
-                        .HasForeignKey("IndustryId")
+                    b.HasOne("JobNet.Models.Entities.Company", "Company")
+                        .WithMany("PageAdmins")
+                        .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JobNet.Models.Entities.User", "Manager")
-                        .WithMany()
-                        .HasForeignKey("ManagerId")
+                    b.HasOne("JobNet.Models.Entities.User", "PageAdmin")
+                        .WithMany("PageAdminAtCompanies")
+                        .HasForeignKey("PageAdminId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Industry");
+                    b.Navigation("Company");
 
-                    b.Navigation("Manager");
+                    b.Navigation("PageAdmin");
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.CompanyPost", b =>
@@ -719,6 +848,25 @@ namespace JobNet.Migrations
                     b.Navigation("Post");
                 });
 
+            modelBuilder.Entity("JobNet.Models.Entities.Conversation", b =>
+                {
+                    b.HasOne("JobNet.Models.Entities.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JobNet.Models.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("JobNet.Models.Entities.Education", b =>
                 {
                     b.HasOne("JobNet.Models.Entities.User", "User")
@@ -739,7 +887,7 @@ namespace JobNet.Migrations
                         .IsRequired();
 
                     b.HasOne("JobNet.Models.Entities.Company", "Company")
-                        .WithMany("Experiences")
+                        .WithMany("UserExperiences")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -752,20 +900,31 @@ namespace JobNet.Migrations
             modelBuilder.Entity("JobNet.Models.Entities.Group", b =>
                 {
                     b.HasOne("JobNet.Models.Entities.User", "Admin")
-                        .WithMany("AdminAtJobNetGroups")
+                        .WithMany("AdminAtGroups")
                         .HasForeignKey("AdminId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("JobNet.Models.Entities.Industry", "Industry")
-                        .WithMany("Groups")
-                        .HasForeignKey("IndustryId")
+                    b.Navigation("Admin");
+                });
+
+            modelBuilder.Entity("JobNet.Models.Entities.GroupMember", b =>
+                {
+                    b.HasOne("JobNet.Models.Entities.Group", "Group")
+                        .WithMany("Members")
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Admin");
+                    b.HasOne("JobNet.Models.Entities.User", "Member")
+                        .WithMany("MemberAtGroups")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Industry");
+                    b.Navigation("Group");
+
+                    b.Navigation("Member");
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.JobPost", b =>
@@ -785,6 +944,25 @@ namespace JobNet.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("JobNet.Models.Entities.JobPostSkill", b =>
+                {
+                    b.HasOne("JobNet.Models.Entities.JobPost", "JobPost")
+                        .WithMany("JobPostSkills")
+                        .HasForeignKey("JobPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JobNet.Models.Entities.Skill", "Skill")
+                        .WithMany("JobPostSkills")
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("JobPost");
+
+                    b.Navigation("Skill");
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.Message", b =>
@@ -823,11 +1001,62 @@ namespace JobNet.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("JobNet.Models.Entities.UserSkill", b =>
+                {
+                    b.HasOne("JobNet.Models.Entities.Skill", "Skill")
+                        .WithMany("UserSkills")
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JobNet.Models.Entities.User", "User")
+                        .WithMany("UserSkills")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Skill");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("JobPostSkill", b =>
+                {
+                    b.HasOne("JobNet.Models.Entities.JobPost", null)
+                        .WithMany()
+                        .HasForeignKey("JobPostsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JobNet.Models.Entities.Skill", null)
+                        .WithMany()
+                        .HasForeignKey("SkillsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SkillUser", b =>
+                {
+                    b.HasOne("JobNet.Models.Entities.Skill", null)
+                        .WithMany()
+                        .HasForeignKey("SkillsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JobNet.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("JobNet.Models.Entities.Company", b =>
                 {
-                    b.Navigation("Experiences");
+                    b.Navigation("PageAdmins");
 
                     b.Navigation("Posts");
+
+                    b.Navigation("UserExperiences");
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.CompanyPost", b =>
@@ -837,24 +1066,33 @@ namespace JobNet.Migrations
 
             modelBuilder.Entity("JobNet.Models.Entities.Group", b =>
                 {
+                    b.Navigation("Members");
+
                     b.Navigation("Posts");
                 });
 
-            modelBuilder.Entity("JobNet.Models.Entities.Industry", b =>
+            modelBuilder.Entity("JobNet.Models.Entities.JobPost", b =>
                 {
-                    b.Navigation("Companies");
-
-                    b.Navigation("Groups");
+                    b.Navigation("JobPostSkills");
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.Post", b =>
                 {
+                    b.Navigation("BannedPost");
+
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("JobNet.Models.Entities.Skill", b =>
+                {
+                    b.Navigation("JobPostSkills");
+
+                    b.Navigation("UserSkills");
                 });
 
             modelBuilder.Entity("JobNet.Models.Entities.User", b =>
                 {
-                    b.Navigation("AdminAtJobNetGroups");
+                    b.Navigation("AdminAtGroups");
 
                     b.Navigation("Certifications");
 
@@ -866,11 +1104,17 @@ namespace JobNet.Migrations
 
                     b.Navigation("JobPosts");
 
+                    b.Navigation("MemberAtGroups");
+
+                    b.Navigation("PageAdminAtCompanies");
+
                     b.Navigation("Posts");
 
                     b.Navigation("ReceivedMessages");
 
                     b.Navigation("SentMessages");
+
+                    b.Navigation("UserSkills");
                 });
 #pragma warning restore 612, 618
         }

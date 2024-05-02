@@ -17,5 +17,4 @@ public class UsersController : ControllerBase
         _logger = logger;
     }
 
-
 }

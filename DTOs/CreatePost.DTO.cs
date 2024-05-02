@@ -1,9 +1,16 @@
 
+using System.ComponentModel.DataAnnotations;
+
 namespace JobNet.DTOs;
 
 public class CreatePostDTO
 {
-    public int? GroupId { get; set; }
-    public required string HTMLContent { get; set; }
-    public IList<string> Images { get; set; } = new List<string>();
+    [Required]
+    public required string Content { get; set; }
+    [Required]
+    public IList<IFormFile> Images { get; set; } = [];
+    [Required]
+    public IList<IFormFile> Videos { get; set; } = [];
+    [Required]
+    public IList<IFormFile> OtherFiles { get; set; } = [];
 }

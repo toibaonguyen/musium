@@ -3,7 +3,6 @@ namespace JobNet.DTOs;
 
 public class ExperienceDTO
 {
-    public required int Id { get; set; }
     public required string Title { get; set; }
     public required string EmploymentType { get; set; }
     public required string Location { get; set; }

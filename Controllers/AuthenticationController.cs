@@ -10,6 +10,10 @@ namespace JobNet.Controllers;
 [Controller]
 public class AuthenticationController : ControllerBase
 {
+    private readonly string VERIFY_EMAIL_FAIL = "Can't verify email!";
+    private readonly string VERIFY_EMAIL_SUCCESSFULLY = "Verify email successfully!";
+    private readonly string CONFIRM_RESET_PASSWORD_FAIL = "Can't confirm reset password!";
+    private readonly string CONFIRM_RESET_PASSWORD_SUCCESSFULLY = "Confirm reset password successfully!";
     private readonly ILogger<AuthenticationController> _logger;
     private readonly IAuthService _authService;
     public AuthenticationController(ILogger<AuthenticationController> logger, IAuthService authService)
@@ -23,12 +27,12 @@ public class AuthenticationController : ControllerBase
     {
         if (string.IsNullOrEmpty(token))
         {
-            return BadRequest("Can't verify email!");
+            return BadRequest(VERIFY_EMAIL_FAIL);
         }
         try
         {
             await _authService.ConfirmUser(userId, token);
-            return Ok("Verify email successfully!");
+            return Ok(VERIFY_EMAIL_SUCCESSFULLY);
         }
         catch (Exception)
         {
@@ -40,12 +44,12 @@ public class AuthenticationController : ControllerBase
     {
         if (string.IsNullOrEmpty(token))
         {
-            return Unauthorized("Can't reset password");
+            return Unauthorized(CONFIRM_RESET_PASSWORD_FAIL);
         }
         try
         {
             await _authService.ConfirmResetPassword(userId, token);
-            return Ok("Reset password success your new password is sent to your email, check it out!");
+            return Ok(CONFIRM_RESET_PASSWORD_SUCCESSFULLY);
         }
         catch (Exception)
         {

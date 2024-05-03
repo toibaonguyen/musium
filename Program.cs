@@ -25,6 +25,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 // Add services to the container.
 
+
 //set environment variable GOOGLE_APPLICATION_CREDENTIALS by service-account-file.json before running below code
 FirebaseApp.Create(new AppOptions()
 {

@@ -28,7 +28,7 @@ public class CloudMessageRegistrationTokenController : ControllerBase
     }
 
     [Authorize(Policy = IdentityData.UserPolicyName)]
-    [HttpPost]
+    [HttpPut]
     public async Task<ActionResult<BaseResponse>> AddOrRefreshToken([FromBody] StoreCloudMessageRegistrationRequest request)
     {
         try

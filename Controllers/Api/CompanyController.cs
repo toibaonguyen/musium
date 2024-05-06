@@ -11,12 +11,12 @@ namespace JobNet.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PostsController : ControllerBase
+public class CompanyController : ControllerBase
 {
     private readonly string INVALID_TOKEN = "Invalid token!";
-    private readonly ILogger<PostsController> _logger;
+    private readonly ILogger<CompanyController> _logger;
     private readonly IPostService _postService;
-    public PostsController(ILogger<PostsController> logger, IPostService postService)
+    public CompanyController(ILogger<CompanyController> logger, IPostService postService)
     {
         _logger = logger;
         _postService = postService;

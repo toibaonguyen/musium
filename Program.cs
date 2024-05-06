@@ -19,7 +19,6 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 
 
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -101,8 +100,8 @@ builder.Services.AddTransient<IAdminService, AdminsService>();
 builder.Services.AddSingleton<IFileService, FileService>();
 builder.Services.AddTransient<IPostService, PostService>();
 builder.Services.AddTransient<ISkillService, SkillsService>();
-builder.Services.AddTransient<ICloudMessageRegistrationTokenService, CloudMessageRegistrationTokenService>();
-builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddScoped<ICloudMessageRegistrationTokenService, CloudMessageRegistrationTokenService>();
+builder.Services.AddScoped<IFirebaseCloudNotificationService, FirebaseCloudNotificationService>();
 
 builder.Services.AddControllers();
 

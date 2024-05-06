@@ -14,9 +14,6 @@ public class CloudMessageRegistrationTokenController : ControllerBase
 {
     private readonly string INVALID_TOKEN = "Invalid token!";
     private readonly string TOKEN_IS_STORED_SUCCESSFULLY = "Token is stored successfully!";
-    private readonly string TOKEN_IS_STORED = "STORED";
-    private readonly string TOKEN_IS_NOT_STORED = "NOT_STORED";
-
 
     private readonly ILogger<CloudMessageRegistrationTokenController> _logger;
     private readonly ICloudMessageRegistrationTokenService _cloudMessageRegistrationTokenService;

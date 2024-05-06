@@ -28,7 +28,6 @@ public class User : Entity
     public ICollection<CompanyPostReaction> CompanyPostReactions { get; } = [];
     public ICollection<CloudMessageRegistrationToken> CloudMessageRegistrationTokens { get; } = [];
     public ICollection<UserSkill> UserSkills { get; } = [];
-    public bool? IsHiring { get; set; }
     public required bool IsActive { get; set; }
     public required bool IsEmailConfirmed { get; set; } = false;
 }

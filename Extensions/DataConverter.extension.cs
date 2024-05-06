@@ -3,6 +3,7 @@ using System.Text;
 using System.Web;
 using JobNet.Contants;
 using JobNet.DTOs;
+using JobNet.Enums;
 using JobNet.Models.Entities;
 using JobNet.Utilities;
 
@@ -128,6 +129,7 @@ public static class DataConverterExtensions
         }
         ExperienceDTO dto = new()
         {
+            Id = experience.Id,
             Title = experience.Title,
             EmploymentType = employmentType,
             Location = experience.Location,
@@ -211,6 +213,36 @@ public static class DataConverterExtensions
             Id = admin.Id,
             Email = admin.Email,
             Role = UserRoles.Admin
+        };
+    }
+
+    public static PostDTO ToPostDTO(this Post post)
+    {
+        var reactionTypesInPost = post.Reactions.GroupBy(r => r.React).Select(r => new { ReactionType = r.Key, Count = r.Count() }).OrderByDescending(x => x.Count).ToList();
+        List<string> Top3ReactionsInPost = [];
+        for (int i = 0; i < 3; i++)
+        {
+            var reaction = reactionTypesInPost.Skip(i).FirstOrDefault();
+            if (reaction is null)
+            {
+                break;
+            }
+            Top3ReactionsInPost.Add(reaction.ReactionType.ToString());
+        }
+
+        return new PostDTO
+        {
+            User = post.Owner.ToListUserDTO(),
+            Id = post.Id,
+            Content = post.Content,
+            Images = post.Images,
+            Videos = post.Videos,
+            OtherFiles = post.OtherFiles,
+            CreatedAt = post.CreatedAt,
+            UpdatedAt = post.UpdatedAt,
+            CommentCount = post.Comments.Count,
+            ReactionCount = post.Reactions.Count,
+            Top3Reactions = Top3ReactionsInPost,
         };
     }
 }

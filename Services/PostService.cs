@@ -5,13 +5,15 @@ using JobNet.Extensions;
 using JobNet.Interfaces.Services;
 using JobNet.Models.Entities;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
 
 namespace JobNet.Services;
 
 public class PostService : IPostService
 {
-    private readonly string USER_IS_NOT_EXIST = "User is not exist!";
+    private readonly string USER_IS_NOT_EXIST = "User is invalid!";
+    private readonly string POST_IS_NOT_EXIST = "Post is invalid!";
     private readonly ILogger<PostService> _logger;
     private readonly JobNetDatabaseContext _databaseContext;
     private readonly IFileService _fileService;
@@ -24,23 +26,37 @@ public class PostService : IPostService
         _userService = userService;
     }
 
-    public Task<bool> CheckIfUserIsOwner(int UserId, int PostId)
+    public async Task<Post?> GetPostById(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return await _databaseContext.Posts.FindAsync(id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception when get post");
+            throw;
+        }
+    }
+    public async Task<bool> CheckIfUserIsOwner(int UserId, int PostId)
+    {
+        try
+        {
+            return await _databaseContext.Posts.AnyAsync(p => p.Id == PostId && p.OwnerId == UserId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception when checking post's owner");
+            throw;
+        }
     }
 
-    public Task<bool> CheckIsOwner(int PostId, int OwnerId)
-    {
-        throw new NotImplementedException();
-    }
 
     public async Task<PostDTO> CreateNewPost(CreatePostDTO post, int OwnerId)
     {
         try
         {
             User? user = await _userService.GetUserById(OwnerId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
-#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
             Post newPost = new()
             {
                 OwnerId = user.Id,
@@ -51,20 +67,10 @@ public class PostService : IPostService
                 OtherFiles = (await _fileService.UploadFilesAsync(post.OtherFiles, $"{OwnerId}-{Guid.NewGuid()}-{new DateTime()}")).Where(x => x is not null).Select(e => e.Uri).Where(x => x is not null).ToList(),
                 IsActive = true
             };
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-#pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
+
             await _databaseContext.Posts.AddAsync(newPost);
             await _databaseContext.SaveChangesAsync();
-            return new PostDTO()
-            {
-                User = user.ToListUserDTO(),
-                Id = newPost.Id,
-                Content = newPost.Content,
-                Images = newPost.Images,
-                Videos = newPost.Videos,
-                OtherFiles = newPost.OtherFiles,
-                CreatedAt = newPost.CreatedAt,
-            };
+            return newPost.ToPostDTO();
 
         }
         catch (Exception ex)
@@ -74,18 +80,43 @@ public class PostService : IPostService
         }
     }
 
-    public Task<PostDTO> GetActiveAndNotBanPostDTOById(int PostId)
+    public async Task<PostDTO?> GetActivePostDTOById(int PostId)
+    {
+        try
+        {
+            return (await _databaseContext.Posts.FirstOrDefaultAsync(x => x.Id == PostId && x.IsActive))?.ToPostDTO();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception when getting active and not ban post by id");
+            throw;
+        }
+    }
+
+    public Task<List<PostDTO>> SearchForActivePostDTOsWithKeyword(string keyword)
     {
         throw new NotImplementedException();
     }
 
-    public Task<List<PostDTO>> SearchForActiveAndNotBanPostsDTOWithKeyword(string keyword)
+    public async Task<PostDTO> UpdatePost(int PostId, UpdatePostDTO postUpdates)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task UpdatePost(int PostId, JsonPatchDocument<Post> postUpdates)
-    {
-        throw new NotImplementedException();
+        try
+        {
+            var post = await GetPostById(PostId) ?? throw new BadRequestException(POST_IS_NOT_EXIST);
+            await _fileService.DeleteFilesAsync([.. post.Images]);
+            await _fileService.DeleteFilesAsync([.. post.Videos]);
+            await _fileService.DeleteFilesAsync([.. post.OtherFiles]);
+            post.Content = postUpdates.Content;
+            post.Images = (await _fileService.UploadFilesAsync(postUpdates.Images, $"{post.OwnerId}-{Guid.NewGuid()}-{new DateTime()}")).Where(x => x is not null).Select(e => e.Uri).Where(x => x is not null).ToList();
+            post.Videos = (await _fileService.UploadFilesAsync(postUpdates.Videos, $"{post.OwnerId}-{Guid.NewGuid()}-{new DateTime()}")).Where(x => x is not null).Select(e => e.Uri).Where(x => x is not null).ToList();
+            post.OtherFiles = (await _fileService.UploadFilesAsync(postUpdates.OtherFiles, $"{post.OwnerId}-{Guid.NewGuid()}-{new DateTime()}")).Where(x => x is not null).Select(e => e.Uri).Where(x => x is not null).ToList();
+            await _databaseContext.SaveChangesAsync();
+            return post.ToPostDTO();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception when updating post");
+            throw;
+        }
     }
 }

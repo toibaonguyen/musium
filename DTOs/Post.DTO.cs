@@ -8,5 +8,9 @@ public class PostDTO
     public IList<string> Images { get; set; } = [];
     public IList<string> Videos { get; set; } = [];
     public IList<string> OtherFiles { get; set; } = [];
+    public int CommentCount { get; set; }
+    public int ReactionCount { get; set; }
+    public IList<string> Top3Reactions { get; set; } = [];
     public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }

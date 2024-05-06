@@ -4,10 +4,10 @@ using JobNet.Interfaces.Services;
 
 namespace JobNet.Services;
 
-public class NotificationService : INotificationService
+public class FirebaseCloudNotificationService : IFirebaseCloudNotificationService
 {
-    private readonly ILogger<NotificationService> _logger;
-    public NotificationService(ILogger<NotificationService> logger)
+    private readonly ILogger<FirebaseCloudNotificationService> _logger;
+    public FirebaseCloudNotificationService(ILogger<FirebaseCloudNotificationService> logger)
     {
         _logger = logger;
     }

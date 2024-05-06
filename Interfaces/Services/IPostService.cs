@@ -6,10 +6,13 @@ namespace JobNet.Interfaces.Services;
 
 public interface IPostService
 {
-    Task<bool> CheckIsOwner(int PostId, int OwnerId);
+    Task<Post?> GetPostById(int PostId);
     Task<PostDTO> CreateNewPost(CreatePostDTO post, int OwnerId);
-    Task UpdatePost(int PostId, JsonPatchDocument<Post> postUpdates);
-    Task<PostDTO> GetActiveAndNotBanPostDTOById(int PostId);
-    Task<List<PostDTO>> SearchForActiveAndNotBanPostsDTOWithKeyword(string keyword);
+    Task<PostDTO> UpdatePost(int PostId, UpdatePostDTO postUpdates);
+    Task<PostDTO?> GetActivePostDTOById(int PostId);
+    Task<List<PostDTO>> SearchForActivePostDTOsWithKeyword(string keyword);
     Task<bool> CheckIfUserIsOwner(int UserId, int PostId);
+    Task DisablePost(int PostId);
+    // Task<List<PostDTO>> GetRandomActivePostDTOFromFriends(int UserId, int limit);
+    // Task<List<PostDTO>> GetRandomActivePostDTOFromStranger(int UserId, int limit);
 }

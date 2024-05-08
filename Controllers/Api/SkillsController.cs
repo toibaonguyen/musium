@@ -36,11 +36,11 @@ public class SkillsController : ControllerBase
         }
     }
     [HttpGet]
-    public async Task<ActionResult<BaseResponse>> GetListSkills([FromQuery] int limit)
+    public async Task<ActionResult<BaseResponse>> GetListSkills([FromQuery] int limit, [FromQuery] int offset)
     {
         try
         {
-            return Ok(new SkillsResponse { Skills = await _skillService.GetSkillDTOs(limit) });
+            return Ok(new SkillsResponse { Skills = await _skillService.GetSkillDTOs(limit, offset) });
         }
         catch (Exception)
         {
@@ -49,11 +49,11 @@ public class SkillsController : ControllerBase
     }
     [HttpGet]
     [Route("similar")]
-    public async Task<ActionResult<BaseResponse>> GetListSkills([FromQuery] string similar, [FromQuery] int limit)
+    public async Task<ActionResult<BaseResponse>> GetListSkills([FromQuery] string similar, [FromQuery] int limit, [FromQuery] int offset)
     {
         try
         {
-            return Ok(new SkillsResponse { Skills = await _skillService.GetSkillDTOs(similar, limit) });
+            return Ok(new SkillsResponse { Skills = await _skillService.GetSkillDTOs(similar, limit, offset) });
         }
         catch (Exception)
         {

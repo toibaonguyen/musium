@@ -9,6 +9,6 @@ public interface ISkillService
     Task DeleteSkill(int skillId);
     Task<Skill?> GetSkillById(int skillId);
     Task<Skill?> GetSkillByName(string skillName);
-    Task<IList<SkillDTO>> GetSkillDTOs(int limit = -1);
-    Task<IList<SkillDTO>> GetSkillDTOs(string similar, int limit = -1);
+    Task<IList<SkillDTO>> GetSkillDTOs(int limit, int offset);
+    Task<IList<SkillDTO>> GetSkillDTOs(string similar, int limit, int offset);
 }

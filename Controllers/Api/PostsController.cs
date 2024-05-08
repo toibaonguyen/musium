@@ -55,8 +55,6 @@ public class PostsController : ControllerBase
             throw;
         }
     }
-
-
     [HttpGet]
     [Route("{postId}")]
     public async Task<ActionResult<BaseResponse>> GetActivePostDTO(int postId)
@@ -151,7 +149,7 @@ public class PostsController : ControllerBase
 
     [Authorize(Policy = IdentityData.UserPolicyName)]
     [HttpPost]
-    [Route("{postId}/comment")]
+    [Route("{postId}/comments")]
     public async Task<ActionResult<BaseResponse>> CommentPost(int postId, [FromForm] CreatePostCommentDTO comment)
     {
         try
@@ -183,7 +181,7 @@ public class PostsController : ControllerBase
     }
     [Authorize(Policy = IdentityData.UserPolicyName)]
     [HttpPut]
-    [Route("{postId}/comment/{commentId}")]
+    [Route("{postId}/comments/{commentId}")]
     public async Task<ActionResult<BaseResponse>> EditComment(int postId, int commentId, [FromForm] CreatePostCommentDTO comment)
     {
         try

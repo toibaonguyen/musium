@@ -82,15 +82,11 @@ public class SkillsService : ISkillService
         }
     }
 
-    public async Task<IList<SkillDTO>> GetSkillDTOs(int limit = -1)
+    public async Task<IList<SkillDTO>> GetSkillDTOs(int limit, int offset)
     {
         try
         {
-            if (limit == -1)
-            {
-                return await _databaseContext.Skills.Select(e => e.ToSkillDTO()).OrderBy(e => e.Name).ToListAsync();
-            }
-            return await _databaseContext.Skills.Take(limit).Select(e => e.ToSkillDTO()).OrderBy(e => e.Name).ToListAsync();
+            return await _databaseContext.Skills.Select(e => e.ToSkillDTO()).OrderBy(e => e.Name).Skip(offset).Take(limit).ToListAsync();
         }
         catch (Exception)
         {
@@ -98,15 +94,11 @@ public class SkillsService : ISkillService
         }
     }
 
-    public async Task<IList<SkillDTO>> GetSkillDTOs(string similar, int limit = -1)
+    public async Task<IList<SkillDTO>> GetSkillDTOs(string similar, int limit, int offset)
     {
         try
         {
-            if (limit == -1)
-            {
-                return await _databaseContext.Skills.Where(e => e.Name.Contains(similar)).Select(e => e.ToSkillDTO()).OrderBy(e => e.Name).ToListAsync();
-            }
-            return await _databaseContext.Skills.Where(e => e.Name.Contains(similar)).Take(limit).Select(e => e.ToSkillDTO()).OrderBy(e => e.Name).ToListAsync();
+            return await _databaseContext.Skills.Where(e => e.Name.Contains(similar)).Select(e => e.ToSkillDTO()).OrderBy(e => e.Name).Skip(offset).Take(limit).ToListAsync();
         }
         catch (Exception)
         {

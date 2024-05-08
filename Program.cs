@@ -17,6 +17,7 @@ using JobNet.Contants;
 using System.Security.Claims;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using JobNet.Hubs;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -103,12 +104,17 @@ builder.Services.AddTransient<ISkillService, SkillsService>();
 builder.Services.AddScoped<ICloudMessageRegistrationTokenService, CloudMessageRegistrationTokenService>();
 builder.Services.AddScoped<IFirebaseCloudNotificationService, FirebaseCloudNotificationService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IConnectionService, ConnectionService>();
+builder.Services.AddScoped<IPostReactService, PostReactService>();
+
 
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -121,12 +127,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<ChatHub>("chat-hub");
 
 app.Run();

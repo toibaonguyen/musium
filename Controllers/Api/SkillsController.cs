@@ -11,11 +11,11 @@ namespace JobNet.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class SkillController : ControllerBase
+public class SkillsController : ControllerBase
 {
     private readonly ISkillService _skillService;
-    private readonly ILogger<SkillController> _logger;
-    public SkillController(ISkillService skillService, ILogger<SkillController> logger)
+    private readonly ILogger<SkillsController> _logger;
+    public SkillsController(ISkillService skillService, ILogger<SkillsController> logger)
     {
         _skillService = skillService;
         _logger = logger;
@@ -30,7 +30,7 @@ public class SkillController : ControllerBase
             await _skillService.CreateNewSkill(skill.Name);
             return Created();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             throw;
         }
@@ -48,6 +48,7 @@ public class SkillController : ControllerBase
         }
     }
     [HttpGet]
+    [Route("similar")]
     public async Task<ActionResult<BaseResponse>> GetListSkills([FromQuery] string similar, [FromQuery] int limit)
     {
         try

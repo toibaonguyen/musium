@@ -277,4 +277,40 @@ public static class DataConverterExtensions
             Name = skill.Name
         };
     }
+    public static AdminDTO ToAdminDTO(this Admin admin)
+    {
+        return new AdminDTO
+        {
+            Id = admin.Id,
+            Name = admin.Name,
+            Email = admin.Email,
+            IsActive = admin.IsActive
+        };
+    }
+    public static CommentDTO ToCommentDTO(this Comment comment)
+    {
+        return new CommentDTO
+        {
+            id = comment.Id,
+            Content = comment.Content,
+            Image = comment.Image
+        };
+    }
+    public static CompanyDTO ToCompanyDTO(this Company company)
+    {
+        return new CompanyDTO
+        {
+            Id = company.Id,
+            Name = company.Name,
+            Avatar = company.Avatar,
+            BackgroundImage = company.BackgroundImage,
+            Description = company.Description,
+            Website = company.Website,
+            CompanySize = company.CompanySize,
+            Headquarters = company.Headquarters,
+            FoundedAt = company.FoundedAt,
+            NumberOfFollowers = company.Followers.Count,
+        };
+    }
+
 }

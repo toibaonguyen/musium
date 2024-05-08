@@ -18,24 +18,7 @@ public class AdminsService : IAdminService
     {
         _databaseContext = jobNetDatabaseContext;
     }
-    public async Task CreateNewAdmin(CreateAdminDTO admin)
-    {
-        try
-        {
-            var existence = await this.GetAdminByEmail(admin.Email);
-            if (existence != null)
-            {
-                //Throw exception because this user has been existed
-                throw new ConflictException(ADMIN_EMAIL_IS_ALREADY_REGISTERED);
-            }
-            await _databaseContext.Admins.AddAsync(admin.ToAdmin());
-            await _databaseContext.SaveChangesAsync();
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-    }
+
     public async Task<Admin?> GetAdminById(int id)
     {
         try
@@ -94,6 +77,26 @@ public class AdminsService : IAdminService
             existence.Password = hashedPassword;
             existence.PasswordSalt = salt;
             await _databaseContext.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public async Task<AdminDTO> CreateNewAdmin(CreateAdminDTO user)
+    {
+        try
+        {
+            bool isExist = await _databaseContext.Admins.AnyAsync(e => user.Email == e.Email);
+            if (isExist)
+            {
+                throw new BadRequestException(ADMIN_EMAIL_IS_ALREADY_REGISTERED);
+            }
+            Admin newAdmin = user.ToAdmin();
+            await _databaseContext.Admins.AddAsync(newAdmin);
+            await _databaseContext.SaveChangesAsync();
+            return newAdmin.ToAdminDTO();
         }
         catch (Exception)
         {

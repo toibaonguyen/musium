@@ -396,7 +396,7 @@ public class UsersService : IUserService
                 var newSki = new UserSkill
                 {
                     User = user,
-                    Skill = await _skillService.GetSkillByName(skill.Name) ?? throw new Exception("Something wrong with server!")
+                    Skill = await _skillService.GetSkillByName(skill.Name) ?? throw new Exception(SKILL_IS_EXIST_BUT_CAN_NOT_GET)
                 };
                 newSkills.Add(newSki);
             }

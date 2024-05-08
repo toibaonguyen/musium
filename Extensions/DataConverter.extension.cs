@@ -155,8 +155,7 @@ public static class DataConverterExtensions
             Certifications = user.Certifications.Select(c => c.ToCertificationDTO()),
             Educations = user.Educations.Select(c => c.ToEducationDTO()),
             Experiences = user.Experiences.Select(e => e.ToExperienceDTO()),
-            Skills = user.UserSkills.Select(e => new SkillDTO { Id = e.SkillId, Name = e.Skill.Name }).ToList(),
-            IsHiring = user.IsHiring,
+            Skills = user.UserSkills.Select(e => new SkillDTO { Id = e.SkillId, Name = e.Skill.Name }).ToList()
         };
         return dto;
     }
@@ -243,6 +242,31 @@ public static class DataConverterExtensions
             CommentCount = post.Comments.Count,
             ReactionCount = post.Reactions.Count,
             Top3Reactions = Top3ReactionsInPost,
+        };
+    }
+
+    public static NotificationDTO ToNotificationDTO(this ConnectionRequestNotification notification)
+    {
+        return new NotificationDTO
+        {
+            Content = notification.Content,
+            CreatedAt = notification.CreatedAt
+        };
+    }
+    public static NotificationDTO ToNotificationDTO(this MessageNotification notification)
+    {
+        return new NotificationDTO
+        {
+            Content = notification.Content,
+            CreatedAt = notification.CreatedAt
+        };
+    }
+    public static NotificationDTO ToNotificationDTO(this PostNotification notification)
+    {
+        return new NotificationDTO
+        {
+            Content = notification.Content,
+            CreatedAt = notification.CreatedAt
         };
     }
 }

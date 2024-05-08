@@ -8,7 +8,7 @@ public class Comment : Entity
     public int UserId { get; set; }
     public User User { get; set; } = null!;
     public required string Content { get; set; }
-    public IList<string> Images { get; set; } = [];
+    public string? Image { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public bool IsDeleted { get; set; }

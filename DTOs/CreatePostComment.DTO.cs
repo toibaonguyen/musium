@@ -7,5 +7,5 @@ public class CreatePostCommentDTO
     [Required]
     public required string Content { get; set; }
     [Required]
-    public IList<IFormFile> Images { get; set; } = [];
+    public IFormFile? Image { get; set; }
 }

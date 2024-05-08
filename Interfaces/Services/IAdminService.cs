@@ -6,7 +6,7 @@ using JobNet.Models.Entities;
 namespace JobNet.Interfaces.Services;
 public interface IAdminService
 {
-    Task CreateNewAdmin(CreateAdminDTO user);
+    Task<AdminDTO> CreateNewAdmin(CreateAdminDTO user);
     Task<Admin?> GetAdminById(int id);
     Task<Admin?> GetAdminByEmail(string email);
     Task ChangeName(int adminId, string newName);

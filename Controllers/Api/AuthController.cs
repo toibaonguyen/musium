@@ -162,8 +162,8 @@ public class AuthController : ControllerBase
         }
     }
     [AllowAnonymous]
-    [HttpPost("users/reset-password")]
-    public async Task<ActionResult<BaseResponse>> ResetPassword([FromBody] ResetPasswordRequest request)
+    [HttpPost("users/forget-password")]
+    public async Task<ActionResult<BaseResponse>> ForgetPassword([FromBody] ResetPasswordRequest request)
     {
         try
         {

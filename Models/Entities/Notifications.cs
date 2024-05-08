@@ -22,11 +22,6 @@ public class PostNotification : Notification
     public Post Post { get; set; } = null!;
 }
 
-public class CompanyPostNotification : Notification
-{
-    public int CompanyPostId { get; set; }
-    public CompanyPost CompanyPost { get; set; } = null!;
-}
 
 public class MessageNotification : Notification
 {

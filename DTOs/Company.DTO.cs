@@ -1,6 +1,7 @@
-using System;
-namespace JobNet.Models.Entities;
-public class Company : Entity
+
+namespace JobNet.DTOs;
+
+public class CompanyDTO
 {
     public int Id { get; set; }
     public required string Name { get; set; }
@@ -11,9 +12,5 @@ public class Company : Entity
     public required int CompanySize { get; set; }
     public required string Headquarters { get; set; }
     public required DateTime FoundedAt { get; set; }
-    public ICollection<UserFollowCompany> Followers { get; } = [];
-    public ICollection<Experience> UserExperiences { get; } = [];
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-    public bool IsActive { get; set; }
+    public required int NumberOfFollowers { get; set; }
 }

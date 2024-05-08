@@ -14,7 +14,6 @@ public class User : Entity
     public ICollection<Experience> Experiences { get; } = [];
     public ICollection<Certification> Certifications { get; } = [];
     public ICollection<Education> Educations { get; } = [];
-    public ICollection<CompanyPageAdmin> PageAdminAtCompanies { get; } = [];
     public ICollection<Connection> InviteeConnections { get; } = [];
     public ICollection<Connection> InviterConnections { get; } = [];
     public ICollection<Post> Posts { get; } = [];
@@ -24,9 +23,10 @@ public class User : Entity
     public ICollection<Comment> PostComments { get; } = [];
     public ICollection<PostReaction> PostReactions { get; } = [];
     public ICollection<UserFollowCompany> FollowCompanies { get; } = [];
-    public ICollection<CompanyPostComment> CompanyPostComments { get; } = [];
-    public ICollection<CompanyPostReaction> CompanyPostReactions { get; } = [];
     public ICollection<CloudMessageRegistrationToken> CloudMessageRegistrationTokens { get; } = [];
+    public ICollection<ConnectionRequestNotification> ConnectionRequestNotifications { get; } = [];
+    public ICollection<PostNotification> PostNotifications { get; } = [];
+    public ICollection<MessageNotification> MessageNotifications { get; } = [];
     public ICollection<UserSkill> UserSkills { get; } = [];
     public required bool IsActive { get; set; }
     public required bool IsEmailConfirmed { get; set; } = false;

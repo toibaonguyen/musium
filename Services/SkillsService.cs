@@ -1,5 +1,6 @@
 
 
+using JobNet.DTOs;
 using JobNet.Interfaces.Services;
 using JobNet.Models.Entities;
 
@@ -23,6 +24,16 @@ public class SkillsService : ISkillService
     }
 
     public Task<Skill?> GetSkillByName(string skillName)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IList<SkillDTO>> GetSkillDTOs(int limit)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IList<SkillDTO>> GetSkillDTOs(string similar, int limit)
     {
         throw new NotImplementedException();
     }

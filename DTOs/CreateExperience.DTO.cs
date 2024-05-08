@@ -9,6 +9,8 @@ public class CreateExperienceDTO
     [Required]
     public required string EmploymentType { get; set; }
     [Required]
+    public required int CompanyId { get; set; }
+    [Required]
     public required string Location { get; set; }
     [Required]
     public required string LocationType { get; set; }

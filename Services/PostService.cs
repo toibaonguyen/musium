@@ -119,4 +119,19 @@ public class PostService : IPostService
             throw;
         }
     }
+
+    public async Task DisablePost(int PostId)
+    {
+        try
+        {
+            var post = await GetPostById(PostId) ?? throw new BadRequestException(POST_IS_NOT_EXIST);
+            post.IsActive = false;
+            await _databaseContext.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception when updating post");
+            throw;
+        }
+    }
 }

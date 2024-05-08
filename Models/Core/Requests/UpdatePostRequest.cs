@@ -1,13 +1,11 @@
-
-
-
 using System.ComponentModel.DataAnnotations;
 using JobNet.DTOs;
 
 namespace JobNet.Models.Core.Requests;
 
-public class CreateCommentRequest : BaseRequest
+
+public class UpdatePostRequest : BaseRequest
 {
     [Required]
-    public required CreatePostCommentDTO Data { get; set; }
+    public required PostDTO Data { get; set; }
 }

@@ -102,6 +102,7 @@ builder.Services.AddTransient<IPostService, PostService>();
 builder.Services.AddTransient<ISkillService, SkillsService>();
 builder.Services.AddScoped<ICloudMessageRegistrationTokenService, CloudMessageRegistrationTokenService>();
 builder.Services.AddScoped<IFirebaseCloudNotificationService, FirebaseCloudNotificationService>();
+builder.Services.AddScoped<IConnectionService, ConnectionService>();
 
 builder.Services.AddControllers();
 

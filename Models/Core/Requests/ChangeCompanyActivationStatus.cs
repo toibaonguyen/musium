@@ -6,8 +6,8 @@ using JobNet.DTOs;
 
 namespace JobNet.Models.Core.Requests;
 
-public class CreateCommentRequest : BaseRequest
+public class ChangeCompanyActivationStatus : BaseRequest
 {
     [Required]
-    public required CreatePostCommentDTO Data { get; set; }
+    public required bool IsActive { get; set; }
 }

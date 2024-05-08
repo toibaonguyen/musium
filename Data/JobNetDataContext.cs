@@ -13,10 +13,6 @@ public class JobNetDatabaseContext : DbContext
     public DbSet<CloudMessageRegistrationToken> CloudMessageRegistrationTokens { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Company> Companies { get; set; }
-    public DbSet<CompanyPageAdmin> CompanyPageAdmins { get; set; }
-    public DbSet<CompanyPost> CompanyPosts { get; set; }
-    public DbSet<CompanyPostComment> CompanyPostComments { get; set; }
-    public DbSet<CompanyPostReaction> CompanyPostReactions { get; set; }
     public DbSet<Connection> Connections { get; set; }
     public DbSet<Education> Educations { get; set; }
     public DbSet<Experience> Experiences { get; set; }
@@ -26,7 +22,6 @@ public class JobNetDatabaseContext : DbContext
     public DbSet<Message> Messages { get; set; }
     public DbSet<ConnectionRequestNotification> ConnectionRequestNotifications { get; set; }
     public DbSet<PostNotification> PostNotifications { get; set; }
-    public DbSet<CompanyPostNotification> CompanyPostNotifications { get; set; }
     public DbSet<MessageNotification> MessageNotifications { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<PostReaction> PostReactions { get; set; }
@@ -61,7 +56,6 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<User>().HasMany(e => e.Experiences).WithOne(e => e.Author).HasForeignKey(e => e.AuthorId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.Certifications).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.Educations).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
-        modelBuilder.Entity<User>().HasMany(e => e.PageAdminAtCompanies).WithOne(e => e.PageAdmin).HasForeignKey(e => e.PageAdminId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.Posts).WithOne(e => e.Owner).HasForeignKey(e => e.OwnerId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.JobPosts).WithOne(e => e.Author).HasForeignKey(e => e.AuthorId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.SentMessages).WithOne(e => e.Sender).HasForeignKey(e => e.SenderId).IsRequired();
@@ -69,12 +63,13 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<User>().HasMany(e => e.PostComments).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.PostReactions).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.FollowCompanies).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
-        modelBuilder.Entity<User>().HasMany(e => e.CompanyPostComments).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
-        modelBuilder.Entity<User>().HasMany(e => e.CompanyPostReactions).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.CloudMessageRegistrationTokens).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.UserSkills).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.InviterConnections).WithOne(e => e.Sender).HasForeignKey(e => e.SenderId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.InviteeConnections).WithOne(e => e.Reciever).HasForeignKey(e => e.RecieverId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.ConnectionRequestNotifications).WithOne(e => e.Reciever).HasForeignKey(e => e.RecieverId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.PostNotifications).WithOne(e => e.Reciever).HasForeignKey(e => e.RecieverId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.MessageNotifications).WithOne(e => e.Reciever).HasForeignKey(e => e.RecieverId).IsRequired();
 
         //Skill
         modelBuilder.Entity<Skill>().HasKey(e => e.Id);
@@ -107,10 +102,6 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<ConnectionRequestNotification>().HasKey(e => e.Id);
         modelBuilder.Entity<ConnectionRequestNotification>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        //CompanyPostNotification
-        modelBuilder.Entity<CompanyPostNotification>().HasKey(e => e.Id);
-        modelBuilder.Entity<CompanyPostNotification>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-
         //------------------------------------------------------------//
 
         //Message
@@ -138,27 +129,9 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<Connection>().HasIndex(e => new { e.SenderId, e.RecieverId }).IsUnique();
         modelBuilder.Entity<Connection>().HasOne(e => e.Notification).WithOne(e => e.Connection).HasForeignKey<ConnectionRequestNotification>(e => e.ConnectionRequestId).IsRequired();
 
-        //CompanyPostReaction
-        modelBuilder.Entity<CompanyPostReaction>().HasKey(e => new { e.UserId, e.CompanyPostId });
-
-        //CompanyPostComment
-        modelBuilder.Entity<CompanyPostComment>().HasKey(e => e.Id);
-        modelBuilder.Entity<CompanyPostComment>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-        modelBuilder.Entity<CompanyPostComment>().Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-        //CompanyPost
-        modelBuilder.Entity<CompanyPost>().HasKey(e => e.Id);
-        modelBuilder.Entity<CompanyPost>().HasMany(e => e.Reactions).WithOne(e => e.CompanyPost).HasForeignKey(e => e.CompanyPostId).IsRequired();
-        modelBuilder.Entity<CompanyPost>().HasMany(e => e.Comments).WithOne(e => e.Post).HasForeignKey(e => e.PostId).IsRequired();
-        modelBuilder.Entity<CompanyPost>().HasOne(e => e.Notification).WithOne(e => e.CompanyPost).HasForeignKey<CompanyPostNotification>(e => e.CompanyPostId).IsRequired();
-
-        //CompanyPageAdmin
-        modelBuilder.Entity<CompanyPageAdmin>().HasKey(e => new { e.CompanyId, e.PageAdminId });
 
         //Company
-        modelBuilder.Entity<Company>().HasMany(e => e.Posts).WithOne(e => e.OwnCompany).HasForeignKey(e => e.CompanyId).IsRequired();
         modelBuilder.Entity<Company>().HasMany(e => e.UserExperiences).WithOne(e => e.Company).HasForeignKey(e => e.CompanyId).IsRequired();
-        modelBuilder.Entity<Company>().HasMany(e => e.PageAdmins).WithOne(e => e.Company).HasForeignKey(e => e.CompanyId).IsRequired();
         modelBuilder.Entity<Company>().HasMany(e => e.Followers).WithOne(e => e.Company).HasForeignKey(e => e.CompanyId).IsRequired();
 
         //Comment

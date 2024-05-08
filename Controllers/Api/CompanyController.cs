@@ -1,6 +1,5 @@
 
 using JobNet.Contants;
-using JobNet.DTOs;
 using JobNet.Interfaces.Services;
 using JobNet.Models.Core.Requests;
 using JobNet.Models.Core.Responses;
@@ -13,83 +12,61 @@ namespace JobNet.Controllers;
 [ApiController]
 public class CompanyController : ControllerBase
 {
-    private readonly string INVALID_TOKEN = "Invalid token!";
+    private readonly string CREATE_SUCCESSFULLY = "Create successfully!";
+    private readonly string UPDATE_SUCCESSFULLY = "Update successfully!";
+    private readonly ICompanyService _companyService;
     private readonly ILogger<CompanyController> _logger;
-    private readonly IPostService _postService;
-    public CompanyController(ILogger<CompanyController> logger, IPostService postService)
+    public CompanyController(ILogger<CompanyController> logger, ICompanyService companyService)
     {
+        _companyService = companyService;
         _logger = logger;
-        _postService = postService;
     }
-    [Authorize(Policy = IdentityData.UserPolicyName)]
+
+    [Authorize(Policy = IdentityData.AdminPolicyName)]
     [HttpPost]
-    public async Task<ActionResult<BaseResponse>> CreateNewPost([FromForm] CreatePostDTO request)
+    public async Task<ActionResult<BaseResponse>> CreateCompany([FromBody] CreateCompanyDTO request)
     {
         try
         {
-            var userId = HttpContext.User.FindFirst("userId")?.Value;
-            if (userId == null)
-            {
-                return Unauthorized(
-                    new MessageResponse
-                    {
-                        Message = INVALID_TOKEN
-                    }
-                );
-            }
-            CreatedPostResponse res = new() { Data = await _postService.CreateNewPost(request, int.Parse(userId)) };
-            return Ok(res);
+            await _companyService.CreateCompany(request);
+            return Ok(new MessageResponse { Message = CREATE_SUCCESSFULLY });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error when creating new Post!");
+            _logger.LogError(ex, "Error when create Company");
             throw;
         }
     }
-
-    [Authorize(Policy = IdentityData.UserPolicyName)]
-    [HttpGet]
-    [Route("{postId}")]
-    public async Task<ActionResult<BaseResponse>> GetActivePostDTO(int postId)
-    {
-    }
-
-    [Authorize(Policy = IdentityData.UserPolicyName)]
+    [Authorize(Policy = IdentityData.AdminPolicyName)]
     [HttpPut]
-    [Route("{postId}")]
-    public async Task<ActionResult<BaseResponse>> UpdatePost(int postId, [FromForm] UpdatePostDTO update)
+    [Route("{companyId}")]
+    public async Task<ActionResult<BaseResponse>> UpdateCompany(int companyId, [FromBody] CreateCompanyDTO request)
     {
+        try
+        {
+            await _companyService.UpdateCompany(companyId, request);
+            return Ok(new MessageResponse { Message = UPDATE_SUCCESSFULLY });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error when create Company");
+            throw;
+        }
     }
-
-    [Authorize(Policy = IdentityData.UserPolicyName)]
+    [Authorize(Policy = IdentityData.AdminPolicyName)]
     [HttpPut]
-    [Route("{postId}/activation-status")]
-    public async Task<ActionResult<BaseResponse>> DisablePostPost(int postId)
+    [Route("{companyId}/activation-status")]
+    public async Task<ActionResult<BaseResponse>> UpdateCompany(int companyId, [FromBody] ChangeCompanyActivationStatus request)
     {
-    }
-
-    [Authorize(Policy = IdentityData.UserPolicyName)]
-    [HttpPost]
-    [Route("{postId}/comment")]
-    public async Task<ActionResult<BaseResponse>> CommentPost(int postId, [FromForm] CreatePostCommentDTO comment)
-    {
-    }
-    [Authorize(Policy = IdentityData.UserPolicyName)]
-    [HttpPut]
-    [Route("{postId}/comment/{commentId}")]
-    public async Task<ActionResult<BaseResponse>> EditComment(int postId, int commentId, [FromForm] CreatePostCommentDTO comment)
-    {
-    }
-    [Authorize(Policy = IdentityData.UserPolicyName)]
-    [HttpPut]
-    [Route("{postId}/reaction")]
-    public async Task<ActionResult<BaseResponse>> ReactPost(int postId, [FromBody] CreatePostReactionDTO react)
-    {
-    }
-    [Authorize(Policy = IdentityData.UserPolicyName)]
-    [HttpDelete]
-    [Route("{postId}/reaction")]
-    public async Task<ActionResult<BaseResponse>> UnReactPost(int postId, [FromBody] CreatePostReactionDTO react)
-    {
+        try
+        {
+            await _companyService.UpdateCompanyStatus(companyId, request.IsActive);
+            return Ok(new MessageResponse { Message = UPDATE_SUCCESSFULLY });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error when create Company");
+            throw;
+        }
     }
 }

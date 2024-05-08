@@ -269,4 +269,12 @@ public static class DataConverterExtensions
             CreatedAt = notification.CreatedAt
         };
     }
+    public static SkillDTO ToSkillDTO(this Skill skill)
+    {
+        return new SkillDTO
+        {
+            Id = skill.Id,
+            Name = skill.Name
+        };
+    }
 }

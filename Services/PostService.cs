@@ -93,9 +93,18 @@ public class PostService : IPostService
         }
     }
 
-    public Task<List<PostDTO>> SearchForActivePostDTOsWithKeyword(string keyword)
+    public async Task<List<PostDTO>> SearchForActivePostDTOsWithKeyword(string keyword)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var posts = await _databaseContext.Posts.Where(x => x.Content.Contains(keyword)).ToListAsync();
+            return posts.Select(e => e.ToPostDTO()).ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception when updating post");
+            throw;
+        }
     }
 
     public async Task<PostDTO> UpdatePost(int PostId, UpdatePostDTO postUpdates)

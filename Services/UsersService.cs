@@ -7,6 +7,7 @@ using JobNet.Interfaces.Services;
 using JobNet.Exceptions;
 using JobNet.Utilities;
 using JobNet.Enums;
+using System.Text;
 
 namespace JobNet.Services;
 
@@ -419,16 +420,50 @@ public class UsersService : IUserService
             List<Connection> inviterCconnections = user.InviterConnections.OrderByDescending(e => e.UpdatedAt).DistinctBy(e => e.RecieverId).Where(e => e.Status == ConnectionRequestStatusType.ACCEPT).ToList();
             foreach (var connection in inviteeCconnections)
             {
+                var experience = connection.Sender.Experiences.OrderByDescending(e => e.StartDate).FirstOrDefault();
+                StringBuilder currentJobPosition = new();
+                if (experience != null)
+                {
+                    if (experience.IsUserCurentlyWorking)
+                    {
+                        currentJobPosition.Append(experience.Title);
+                        currentJobPosition.Append(" at ");
+                        //Test here
+                        currentJobPosition.Append(experience.Company.Name);
+                    }
+                }
                 connections.Add(new ConnectionDTO
                 {
                     Id = connection.SenderId,
                     Name = connection.Sender.Name,
                     Avatar = connection.Sender.Avatar,
-                    CurrentJobPosition = connection.Sender,
+                    CurrentJobPosition = currentJobPosition.ToString(),
                     Location = connection.Sender.Location
                 });
             }
-
+            foreach (var connection in inviterCconnections)
+            {
+                var experience = connection.Reciever.Experiences.OrderByDescending(e => e.StartDate).FirstOrDefault();
+                StringBuilder currentJobPosition = new();
+                if (experience != null)
+                {
+                    if (experience.IsUserCurentlyWorking)
+                    {
+                        currentJobPosition.Append(experience.Title);
+                        currentJobPosition.Append(" at ");
+                        //Test here
+                        currentJobPosition.Append(experience.Company.Name);
+                    }
+                }
+                connections.Add(new ConnectionDTO
+                {
+                    Id = connection.SenderId,
+                    Name = connection.Sender.Name,
+                    Avatar = connection.Sender.Avatar,
+                    CurrentJobPosition = currentJobPosition.ToString(),
+                    Location = connection.Sender.Location
+                });
+            }
             return connections;
         }
         catch (Exception)
@@ -437,9 +472,43 @@ public class UsersService : IUserService
         }
     }
 
-    public Task<IEnumerable<ConnectionRequestDTO>> GetConnectionRequestDTOsOfUserByUserId(int userId)
+    public async Task<IEnumerable<ConnectionRequestDTO>> GetConnectionRequestDTOsOfUserByUserId(int userId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
+            List<ConnectionRequestDTO> requests = [];
+            List<Connection> inviteeConnections = user.InviteeConnections.OrderByDescending(e => e.UpdatedAt).DistinctBy(e => e.SenderId).Where(e => e.Status == ConnectionRequestStatusType.PENDING).ToList();
+            foreach (var connection in inviteeConnections)
+            {
+                var experience = connection.Sender.Experiences.OrderByDescending(e => e.StartDate).FirstOrDefault();
+                StringBuilder currentJobPosition = new();
+                if (experience != null)
+                {
+                    if (experience.IsUserCurentlyWorking)
+                    {
+                        currentJobPosition.Append(experience.Title);
+                        currentJobPosition.Append(" at ");
+                        //Test here
+                        currentJobPosition.Append(experience.Company.Name);
+                    }
+                }
+                requests.Add(new ConnectionRequestDTO
+                {
+                    Id = connection.SenderId,
+                    Name = connection.Sender.Name,
+                    Avatar = connection.Sender.Avatar,
+                    CurrentJobPosition = currentJobPosition.ToString(),
+                    Location = connection.Sender.Location,
+                    RequestedAt = connection.RequestedAt
+                });
+            }
+            return requests.OrderByDescending(e => e.RequestedAt);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public async Task<IEnumerable<ListFollowingCompanyDTO>> GetListFollowingCompanyDTOsOfUserByUserId(int userId)
@@ -492,7 +561,7 @@ public class UsersService : IUserService
             {
                 notifications.Add(notification.ToNotificationDTO());
             }
-            return notifications;
+            return notifications.OrderByDescending(e => e.CreatedAt);
 
         }
         catch (Exception)

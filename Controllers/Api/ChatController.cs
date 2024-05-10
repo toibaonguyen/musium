@@ -1,8 +1,8 @@
 
+using System.Security.Claims;
 using JobNet.Contants;
 using JobNet.DTOs;
 using JobNet.Interfaces.Services;
-using JobNet.Models.Core.Requests;
 using JobNet.Models.Core.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,42 +13,96 @@ namespace JobNet.Controllers;
 [ApiController]
 public class ChatController : ControllerBase
 {
-    private readonly string UPDATE_SUCCESSFULLY = "update successfully!";
-    private readonly IAdminService _adminService;
-    private readonly ILogger<AdminController> _logger;
-    public ChatController(IAdminService adminService, ILogger<AdminController> logger)
+    private readonly IPrivateChatService _privateChatService;
+    private readonly string INVALID_TOKEN = "Invalid token!";
+    private readonly string DO_NOT_HAVE_PERMISSION = "Do not have permission!";
+    private readonly string SENT_MESSAGE_SUCCESSFULLY = "message sent!";
+    public ChatController(IPrivateChatService privateChatService)
     {
-        _adminService = adminService;
-        _logger = logger;
+        _privateChatService = privateChatService;
     }
-    [Authorize(Policy = IdentityData.AdminPolicyName)]
-    [HttpPost]
-    public async Task<ActionResult<BaseResponse>> CreateAdmin([FromBody] CreateAdminRequest request)
+    [Authorize(Policy = IdentityData.UserPolicyName)]
+    [HttpGet]
+    [Route("conversations")]
+    public async Task<ActionResult<BaseResponse>> GetConversationsOfUser([FromQuery] int limit, [FromQuery] DateTime cursor)
     {
         try
         {
-            AdminDTO admin = await _adminService.CreateNewAdmin(request.Data);
-            return Ok(new AdminResponse { Data = admin });
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+            {
+                return Unauthorized(
+                    new MessageResponse
+                    {
+                        Message = INVALID_TOKEN
+                    }
+                );
+            }
+
+            return Ok(new ConversationBoxsResponse { Data = await _privateChatService.GetConversationBoxsOfUserOrderByLastMessageSentTimeDesc(int.Parse(userId), limit, cursor) });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _logger.LogError(ex, "error when creating admin!");
             throw;
         }
     }
-    [Authorize(Policy = IdentityData.AdminPolicyName)]
-    [HttpPut]
-    [Route("{adminId}/activation-status")]
-    public async Task<ActionResult<BaseResponse>> ChangeActivationStatus(int adminId, [FromBody] UpdateActivationStatusRequest request)
+    [Authorize(Policy = IdentityData.UserPolicyName)]
+    [HttpGet]
+    [Route("conversations/{conversationId}/messages")]
+    public async Task<ActionResult<BaseResponse>> GetPrivateMessagesOfConersation(int conversationId, [FromQuery] int limit, [FromQuery] DateTime cursor)
     {
         try
         {
-            await _adminService.ChangeActiveStatus(adminId, request.IsActive);
-            return Ok(new MessageResponse { Message = UPDATE_SUCCESSFULLY });
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (authUserId is null)
+            {
+                return Unauthorized(
+                    new MessageResponse
+                    {
+                        Message = INVALID_TOKEN
+                    }
+                );
+            }
+            if (!await _privateChatService.CheckIfUserIsInConversation(int.Parse(authUserId), conversationId))
+            {
+                return Unauthorized(
+                    new MessageResponse
+                    {
+                        Message = DO_NOT_HAVE_PERMISSION
+                    }
+                );
+            }
+
+            return Ok(new ChatMessagesResponse { Data = await _privateChatService.GetMessagesOfConversationOrderBySentTimeDesc(conversationId, limit, cursor) });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _logger.LogError(ex, "error when updating admin!");
+            throw;
+        }
+    }
+    [Authorize(Policy = IdentityData.UserPolicyName)]
+    [HttpPost]
+    [Route("{userId}/messages")]
+    public async Task<ActionResult<BaseResponse>> SendMessage(int userId, [FromForm] CreateMessageDTO message)
+    {
+        try
+        {
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (authUserId is null)
+            {
+                return Unauthorized(
+                    new MessageResponse
+                    {
+                        Message = INVALID_TOKEN
+                    }
+                );
+            }
+            await _privateChatService.SendPrivateMessage(int.Parse(authUserId), userId, message);
+
+            return Ok(new MessageResponse { Message = SENT_MESSAGE_SUCCESSFULLY });
+        }
+        catch (Exception)
+        {
             throw;
         }
     }

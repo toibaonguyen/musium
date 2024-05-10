@@ -7,5 +7,4 @@ namespace JobNet.Controllers;
 [ApiController]
 public class JobPostController : ControllerBase
 {
-
 }

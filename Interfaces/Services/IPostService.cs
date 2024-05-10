@@ -13,6 +13,6 @@ public interface IPostService
     Task<List<PostDTO>> SearchForActivePostDTOsWithKeyword(string keyword);
     Task<bool> CheckIfUserIsOwner(int UserId, int PostId);
     Task DisablePost(int PostId);
-    // Task<List<PostDTO>> GetRandomActivePostDTOFromFriends(int UserId, int limit);
+    Task<List<PostDTO>> GetRandomActivePostDTOs(int limit);
     // Task<List<PostDTO>> GetRandomActivePostDTOFromStranger(int UserId, int limit);
 }

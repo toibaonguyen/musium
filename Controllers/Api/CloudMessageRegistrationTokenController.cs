@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using JobNet.Contants;
 using JobNet.Interfaces.Services;
 using JobNet.Models.Core.Requests;
@@ -30,7 +31,7 @@ public class CloudMessageRegistrationTokenController : ControllerBase
     {
         try
         {
-            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 return Unauthorized(
@@ -49,6 +50,4 @@ public class CloudMessageRegistrationTokenController : ControllerBase
             throw;
         }
     }
-
-
 }

@@ -107,6 +107,7 @@ builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<IPostReactService, PostReactService>();
+builder.Services.AddScoped<IPrivateChatService, PrivateChatService>();
 
 
 builder.Services.AddControllers();
@@ -135,6 +136,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapHub<ChatHub>("chat-hub");
+app.MapHub<PrivateChatHub>("chathub");
 
 app.Run();

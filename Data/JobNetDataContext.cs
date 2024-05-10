@@ -14,6 +14,7 @@ public class JobNetDatabaseContext : DbContext
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Company> Companies { get; set; }
     public DbSet<Connection> Connections { get; set; }
+    public DbSet<Conversation> Conversations { get; set; }
     public DbSet<Education> Educations { get; set; }
     public DbSet<Experience> Experiences { get; set; }
     public DbSet<JobPost> JobPosts { get; set; }
@@ -28,6 +29,7 @@ public class JobNetDatabaseContext : DbContext
     public DbSet<Skill> Skills { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserFollowCompany> UserFollowCompanies { get; set; }
+    public DbSet<UserInConversation> UserInConversations { get; set; }
     public DbSet<UserSkill> UserSkills { get; set; }
 
 
@@ -47,6 +49,9 @@ public class JobNetDatabaseContext : DbContext
         //UserSkill
         modelBuilder.Entity<UserSkill>().HasKey(e => new { e.UserId, e.SkillId });
 
+        //UserInConversation
+        modelBuilder.Entity<UserInConversation>().HasKey(e => new { e.UserId, e.ConversationId });
+
         //UserFollowCompany
         modelBuilder.Entity<UserFollowCompany>().HasKey(e => new { e.UserId, e.CompanyId });
         modelBuilder.Entity<UserFollowCompany>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -59,7 +64,7 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<User>().HasMany(e => e.Posts).WithOne(e => e.Owner).HasForeignKey(e => e.OwnerId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.JobPosts).WithOne(e => e.Author).HasForeignKey(e => e.AuthorId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.SentMessages).WithOne(e => e.Sender).HasForeignKey(e => e.SenderId).IsRequired();
-        modelBuilder.Entity<User>().HasMany(e => e.ReceivedMessages).WithOne(e => e.Receiver).HasForeignKey(e => e.ReceiverId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.Conversations).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.PostComments).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.PostReactions).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.FollowCompanies).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
@@ -123,6 +128,11 @@ public class JobNetDatabaseContext : DbContext
 
         //Education
         modelBuilder.Entity<Education>().HasKey(e => e.Id);
+
+        //Conversation
+        modelBuilder.Entity<Conversation>().HasKey(e => e.Id);
+        modelBuilder.Entity<Conversation>().HasMany(e => e.Users).WithOne(e => e.Conversation).HasForeignKey(e => e.ConversationId).IsRequired();
+        modelBuilder.Entity<Conversation>().HasMany(e => e.Messages).WithOne(e => e.Conversation).HasForeignKey(e => e.ConversationId).IsRequired();
 
         //Connection
         modelBuilder.Entity<Connection>().HasKey(e => e.Id);

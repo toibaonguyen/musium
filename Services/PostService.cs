@@ -143,4 +143,17 @@ public class PostService : IPostService
             throw;
         }
     }
+
+    public async Task<List<PostDTO>> GetRandomActivePostDTOs(int limit)
+    {
+        try
+        {
+            return await _databaseContext.Posts.OrderBy(e => EF.Functions.Random()).Take(limit).Select(e => e.ToPostDTO()).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception when updating post");
+            throw;
+        }
+    }
 }

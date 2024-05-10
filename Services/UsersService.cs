@@ -410,7 +410,7 @@ public class UsersService : IUserService
         }
     }
 
-    public async Task<IEnumerable<ConnectionDTO>> GetConnectionDTOsOfUserByUserId(int userId)
+    public async Task<IEnumerable<ConnectionDTO>> GetConnectionDTOsOfUserByUserId(int userId, int limit, int offset)
     {
         try
         {
@@ -464,7 +464,7 @@ public class UsersService : IUserService
                     Location = connection.Sender.Location
                 });
             }
-            return connections;
+            return connections.Skip(offset).Take(limit);
         }
         catch (Exception)
         {
@@ -472,13 +472,13 @@ public class UsersService : IUserService
         }
     }
 
-    public async Task<IEnumerable<ConnectionRequestDTO>> GetConnectionRequestDTOsOfUserByUserId(int userId)
+    public async Task<IEnumerable<ConnectionRequestDTO>> GetConnectionRequestDTOsOfUserByUserId(int userId, int limit, DateTime cursor)
     {
         try
         {
             var user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
             List<ConnectionRequestDTO> requests = [];
-            List<Connection> inviteeConnections = user.InviteeConnections.OrderByDescending(e => e.UpdatedAt).DistinctBy(e => e.SenderId).Where(e => e.Status == ConnectionRequestStatusType.PENDING).ToList();
+            List<Connection> inviteeConnections = user.InviteeConnections.OrderByDescending(e => e.UpdatedAt).DistinctBy(e => e.SenderId).Where(e => e.Status == ConnectionRequestStatusType.PENDING && e.UpdatedAt <= cursor).Take(limit).ToList();
             foreach (var connection in inviteeConnections)
             {
                 var experience = connection.Sender.Experiences.OrderByDescending(e => e.StartDate).FirstOrDefault();
@@ -530,12 +530,12 @@ public class UsersService : IUserService
         }
     }
 
-    public async Task<IEnumerable<PostDTO>> GetPostDTOsOfUserByUserId(int userId)
+    public async Task<IEnumerable<PostDTO>> GetActivePostDTOsOfUserByUserId(int userId, int limit, int offset)
     {
         try
         {
             var user = await GetUserById(userId) ?? throw new BadRequestException(USER_IS_NOT_EXIST);
-            return user.Posts.Select(c => c.ToPostDTO()).ToList();
+            return user.Posts.Where(p => p.IsActive).Select(c => c.ToPostDTO()).Skip(offset).Take(limit).ToList();
         }
         catch (Exception)
         {
@@ -543,7 +543,7 @@ public class UsersService : IUserService
         }
     }
 
-    public async Task<IEnumerable<NotificationDTO>> GetNotificationDTOsOfUserByUserId(int userId)
+    public async Task<IEnumerable<NotificationDTO>> GetNotificationDTOsOfUserByUserId(int userId, int limit, DateTime cursor)
     {
         try
         {
@@ -553,15 +553,11 @@ public class UsersService : IUserService
             {
                 notifications.Add(notification.ToNotificationDTO());
             }
-            foreach (var notification in user.MessageNotifications)
-            {
-                notifications.Add(notification.ToNotificationDTO());
-            }
             foreach (var notification in user.ConnectionRequestNotifications)
             {
                 notifications.Add(notification.ToNotificationDTO());
             }
-            return notifications.OrderByDescending(e => e.CreatedAt);
+            return notifications.Where(e => e.CreatedAt <= cursor).OrderByDescending(e => e.CreatedAt).Take(limit);
 
         }
         catch (Exception)
@@ -569,5 +565,4 @@ public class UsersService : IUserService
             throw;
         }
     }
-
 }

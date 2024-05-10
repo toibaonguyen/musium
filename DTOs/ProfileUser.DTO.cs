@@ -3,7 +3,7 @@ namespace JobNet.DTOs;
 
 public class ProfileUserDTO
 {
-    public int Id { get; set; }
+    public required int Id { get; set; }
     public required string Name { get; set; }
     public required string Avatar { get; set; }
     public required string BackgroundImage { get; set; }

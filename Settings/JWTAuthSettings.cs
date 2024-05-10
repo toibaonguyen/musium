@@ -7,4 +7,5 @@ public class JWTAuthSettings
     public string SecretKey { get; set; } = string.Empty;
     public int TokenValidityInMinutes { get; set; }
     public int RefreshTokenValidityInDays { get; set; }
+    public int OuterTokenValidityInMinutes { get; set; }
 }

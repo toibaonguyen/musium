@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using JobNet.Contants;
 using JobNet.DTOs;
 using JobNet.Enums;
@@ -35,7 +36,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -56,7 +57,8 @@ public class UsersController : ControllerBase
             }
             return Ok(new UserProfileResponse
             {
-                Data = await _userService.ChangeUserName(userId, request.Name)
+                Data = await _userService.ChangeUserName(userId, request.Name),
+                IsConnected = false
             });
         }
         catch (Exception)
@@ -71,7 +73,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -90,7 +92,7 @@ public class UsersController : ControllerBase
                     }
                 );
             }
-            return Ok(new UserProfileResponse { Data = await _userService.ChangeUserAvatar(userId, request.Avatar) });
+            return Ok(new UserProfileResponse { Data = await _userService.ChangeUserAvatar(userId, request.Avatar), IsConnected = false });
         }
         catch (Exception)
         {
@@ -105,7 +107,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -124,8 +126,7 @@ public class UsersController : ControllerBase
                     }
                 );
             }
-            await _userService.ChangeUserBackground(userId, request.BackgroundImage);
-            return Ok(new MessageResponse { Message = UPDATE_SUCCESSFULLY });
+            return Ok(new UserProfileResponse { Data = await _userService.ChangeUserBackground(userId, request.BackgroundImage), IsConnected = false });
         }
         catch (Exception)
         {
@@ -139,7 +140,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -158,8 +159,7 @@ public class UsersController : ControllerBase
                     }
                 );
             }
-            await _userService.ChangeLocation(userId, request.Location);
-            return Ok(new MessageResponse { Message = UPDATE_SUCCESSFULLY });
+            return Ok(new UserProfileResponse { Data = await _userService.ChangeLocation(userId, request.Location), IsConnected = false });
 
         }
         catch (Exception)
@@ -174,7 +174,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -193,8 +193,8 @@ public class UsersController : ControllerBase
                     }
                 );
             }
-            await _userService.ChangeBirthday(userId, request.Birthday);
-            return Ok(new MessageResponse { Message = UPDATE_SUCCESSFULLY });
+            return Ok(new UserProfileResponse { Data = await _userService.ChangeBirthday(userId, request.Birthday), IsConnected = false });
+
 
         }
         catch (Exception)
@@ -209,7 +209,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -243,7 +243,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -277,7 +277,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -311,7 +311,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -338,13 +338,30 @@ public class UsersController : ControllerBase
             throw;
         }
     }
+    [Authorize(Policy = IdentityData.UserPolicyName)]
     [HttpGet]
     [Route("{userId}/profile")]
     public async Task<ActionResult<BaseResponse>> GetActiveProfileUserDTOByUserId(int userId)
     {
+        var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (authUserId is null)
+        {
+            return Unauthorized(
+                new MessageResponse
+                {
+                    Message = INVALID_TOKEN
+                }
+            );
+        }
         try
         {
-            return Ok(new UserProfileResponse { Data = await _userService.GetActiveProfileUserDTOById(userId) });
+            ProfileUserDTO? userProfile = await _userService.GetActiveProfileUserDTOById(userId);
+            bool isConnected = false;
+            if (userProfile != null && userId != int.Parse(authUserId))
+            {
+                isConnected = await _connectionService.CheckIfIsConnected(userId, int.Parse(authUserId));
+            }
+            return Ok(new UserProfileResponse { Data = userProfile, IsConnected = isConnected });
         }
         catch (Exception)
         {
@@ -369,11 +386,11 @@ public class UsersController : ControllerBase
     [Authorize(Policy = IdentityData.UserPolicyName)]
     [HttpGet]
     [Route("{userId}/connections")]
-    public async Task<ActionResult<BaseResponse>> GetConnectionDTOsOfUserById(int userId)
+    public async Task<ActionResult<BaseResponse>> GetConnectionDTOsOfUserById(int userId, [FromQuery] int limit, [FromQuery] int offset)
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -392,7 +409,7 @@ public class UsersController : ControllerBase
                     }
                 );
             }
-            return Ok(new ConnectionsResponse { Data = (await _userService.GetConnectionDTOsOfUserByUserId(userId)).ToList() });
+            return Ok(new ConnectionsResponse { Data = (await _userService.GetConnectionDTOsOfUserByUserId(userId, limit, offset)).ToList() });
         }
         catch (Exception)
         {
@@ -402,11 +419,11 @@ public class UsersController : ControllerBase
     [Authorize(Policy = IdentityData.UserPolicyName)]
     [HttpGet]
     [Route("{userId}/connection-requests")]
-    public async Task<ActionResult<BaseResponse>> GetConnectionRequestsOfUser(int userId)
+    public async Task<ActionResult<BaseResponse>> GetConnectionRequestsOfUser(int userId, [FromQuery] int limit, [FromQuery] DateTime cursor)
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -425,7 +442,7 @@ public class UsersController : ControllerBase
                     }
                 );
             }
-            return Ok(new ConnectionRequestsResponse { Data = (await _userService.GetConnectionRequestDTOsOfUserByUserId(userId)).ToList() });
+            return Ok(new ConnectionRequestsResponse { Data = (await _userService.GetConnectionRequestDTOsOfUserByUserId(userId, limit, cursor)).ToList() });
         }
         catch (Exception)
         {
@@ -452,7 +469,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -486,7 +503,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -524,11 +541,11 @@ public class UsersController : ControllerBase
     }
     [HttpGet]
     [Route("{userId}/posts")]
-    public async Task<ActionResult<BaseResponse>> GetPostDTOsOfUser(int userId)
+    public async Task<ActionResult<BaseResponse>> GetPostDTOsOfUser(int userId, [FromQuery] int limit, [FromQuery] int offset)
     {
         try
         {
-            return Ok(new PostsResponse { Data = (await _userService.GetPostDTOsOfUserByUserId(userId)).ToList() });
+            return Ok(new PostsResponse { Data = (await _userService.GetActivePostDTOsOfUserByUserId(userId, limit, offset)).ToList() });
         }
         catch (Exception)
         {
@@ -538,11 +555,11 @@ public class UsersController : ControllerBase
     [Authorize(Policy = IdentityData.UserPolicyName)]
     [HttpGet]
     [Route("{userId}/notifications")]
-    public async Task<ActionResult<BaseResponse>> GetNotificationDTOsOfUser(int userId)
+    public async Task<ActionResult<BaseResponse>> GetNotificationDTOsOfUser(int userId, [FromQuery] int limit, [FromQuery] DateTime cursor)
     {
         try
         {
-            var authUserId = HttpContext.User.FindFirst("userId")?.Value;
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (authUserId is null)
             {
                 return Unauthorized(
@@ -561,7 +578,7 @@ public class UsersController : ControllerBase
                     }
                 );
             }
-            return Ok(new NotificationsResponse { Data = (await _userService.GetNotificationDTOsOfUserByUserId(userId)).ToList() });
+            return Ok(new NotificationsResponse { Data = (await _userService.GetNotificationDTOsOfUserByUserId(userId, limit, cursor)).ToList() });
         }
         catch (Exception)
         {

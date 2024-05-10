@@ -25,9 +25,9 @@ public interface IUserService
     Task ChangeActiveStatus(int userId, bool isActive);
     Task ChangeEmailConfirmationStatus(int userId, bool isEmailConfirmed);
     Task DeleteUser(int userId);
-    Task<IEnumerable<ConnectionDTO>> GetConnectionDTOsOfUserByUserId(int userId);
-    Task<IEnumerable<ConnectionRequestDTO>> GetConnectionRequestDTOsOfUserByUserId(int userId);
+    Task<IEnumerable<ConnectionDTO>> GetConnectionDTOsOfUserByUserId(int userId, int limit, int offset);
+    Task<IEnumerable<ConnectionRequestDTO>> GetConnectionRequestDTOsOfUserByUserId(int userId, int limit, DateTime cursor);
     Task<IEnumerable<ListFollowingCompanyDTO>> GetListFollowingCompanyDTOsOfUserByUserId(int userId);
-    Task<IEnumerable<PostDTO>> GetPostDTOsOfUserByUserId(int userId);
-    Task<IEnumerable<NotificationDTO>> GetNotificationDTOsOfUserByUserId(int userId);
+    Task<IEnumerable<PostDTO>> GetActivePostDTOsOfUserByUserId(int userId, int limit, int offset);
+    Task<IEnumerable<NotificationDTO>> GetNotificationDTOsOfUserByUserId(int userId, int limit, DateTime cursor);
 }

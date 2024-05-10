@@ -253,14 +253,6 @@ public static class DataConverterExtensions
             CreatedAt = notification.CreatedAt
         };
     }
-    public static NotificationDTO ToNotificationDTO(this MessageNotification notification)
-    {
-        return new NotificationDTO
-        {
-            Content = notification.Content,
-            CreatedAt = notification.CreatedAt
-        };
-    }
     public static NotificationDTO ToNotificationDTO(this PostNotification notification)
     {
         return new NotificationDTO
@@ -312,5 +304,35 @@ public static class DataConverterExtensions
             NumberOfFollowers = company.Followers.Count,
         };
     }
-
+    public static MessageDTO ToMessageDTO(this Message message)
+    {
+        return new MessageDTO
+        {
+            SenderId = message.SenderId,
+            ConversationId = message.ConversationId,
+            Content = message.Content,
+            ImageURL = message.Image,
+            VideoURL = message.Video,
+            OtherFileURL = message.OtherFile,
+            SentAt = message.CreatedAt
+        };
+    }
+    public static ChatUserDTO ToChatUserDTO(this User user)
+    {
+        return new ChatUserDTO
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Avatar = user.Avatar
+        };
+    }
+    public static ConversationDTO ToConversationDTO(this Conversation conversation, ChatUserDTO withUser)
+    {
+        return new ConversationDTO
+        {
+            ConversationId = conversation.Id,
+            LastestMessage = conversation.Messages.OrderByDescending(e => e.CreatedAt).First().ToMessageDTO(),
+            WithUser = withUser
+        };
+    }
 }

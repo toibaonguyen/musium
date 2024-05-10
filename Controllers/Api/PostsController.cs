@@ -1,4 +1,5 @@
 
+using System.Security.Claims;
 using Azure.Storage.Blobs.Models;
 using JobNet.Contants;
 using JobNet.DTOs;
@@ -36,7 +37,7 @@ public class PostsController : ControllerBase
     {
         try
         {
-            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 return Unauthorized(
@@ -79,7 +80,7 @@ public class PostsController : ControllerBase
     {
         try
         {
-            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 return Unauthorized(
@@ -117,7 +118,7 @@ public class PostsController : ControllerBase
     {
         try
         {
-            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 return Unauthorized(
@@ -154,7 +155,7 @@ public class PostsController : ControllerBase
     {
         try
         {
-            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 return Unauthorized(
@@ -186,7 +187,7 @@ public class PostsController : ControllerBase
     {
         try
         {
-            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 return Unauthorized(
@@ -218,7 +219,7 @@ public class PostsController : ControllerBase
     {
         try
         {
-            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 return Unauthorized(
@@ -261,7 +262,7 @@ public class PostsController : ControllerBase
     {
         try
         {
-            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
                 return Unauthorized(
@@ -280,6 +281,33 @@ public class PostsController : ControllerBase
             await _postReactService.DeteleReact(int.Parse(userId), postId);
 
             return Ok(new MessageResponse { Message = UPDATE_SUCCESSFULLY });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error when unreacting to Post!");
+            throw;
+        }
+    }
+    [HttpGet]
+    [Route("random")]
+    public async Task<ActionResult<BaseResponse>> GetRandomPosts([FromQuery] int limit)
+    {
+        try
+        {
+            return Ok(new PostsResponse { Data = await _postService.GetRandomActivePostDTOs(limit) });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error when unreacting to Post!");
+            throw;
+        }
+    }
+    [HttpGet]
+    public async Task<ActionResult<BaseResponse>> GetPostsByKeyword([FromQuery] string keyword)
+    {
+        try
+        {
+            return Ok(new PostsResponse { Data = await _postService.SearchForActivePostDTOsWithKeyword(keyword) });
         }
         catch (Exception ex)
         {

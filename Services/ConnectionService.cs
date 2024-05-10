@@ -20,6 +20,12 @@ public class ConnectionService : IConnectionService
         _databaseContext = databaseContext;
         _userService = userService;
     }
+
+    public Task<bool> CheckIfIsConnected(int userId1, int userId2)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task CreateConnection(int senderId, int recieverId)
     {
         try

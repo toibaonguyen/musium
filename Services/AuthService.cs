@@ -74,7 +74,7 @@ public class AuthService : IAuthService
                 var authClaims = new List<Claim>
                 {
                     new(ClaimTypes.Email,user.Email),
-                    new("userId", user.Id.ToString()),
+                    new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new(ClaimTypes.Role,UserRoles.User)
                 };
@@ -130,7 +130,7 @@ public class AuthService : IAuthService
                 var authClaims = new List<Claim>
                 {
                     new(ClaimTypes.Email,admin.Email),
-                    new("userId", admin.Id.ToString()),
+                    new(ClaimTypes.NameIdentifier, admin.Id.ToString()),
                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new(ClaimTypes.Role,UserRoles.Admin)
                 };
@@ -139,7 +139,7 @@ public class AuthService : IAuthService
                 AuthModel authModel = new()
                 {
                     RefreshToken = refreshToken,
-                    RefreshTokenExpiryTime = DateTime.Now.AddDays(this._jwtAuthSettings.RefreshTokenValidityInDays),
+                    RefreshTokenExpiryTime = DateTime.Now.AddDays(_jwtAuthSettings.RefreshTokenValidityInDays),
                     UsedRefreshTokens = []
                 };
                 var db = _redis.GetDatabase();
@@ -206,7 +206,7 @@ public class AuthService : IAuthService
                                 var authClaims = new List<Claim>
                                 {
                                     new(ClaimTypes.Email,admin.Email),
-                                    new("userId", admin.Id.ToString()),
+                                    new(ClaimTypes.NameIdentifier, admin.Id.ToString()),
                                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                                     new(ClaimTypes.Role,UserRoles.Admin)
                                 };
@@ -238,7 +238,7 @@ public class AuthService : IAuthService
                                 var authClaims = new List<Claim>
                                 {
                                     new(ClaimTypes.Email,user.Email),
-                                    new("userId", user.Id.ToString()),
+                                    new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                                     new(ClaimTypes.Role,UserRoles.User)
                                 };
@@ -301,11 +301,11 @@ public class AuthService : IAuthService
             var authClaims = new List<Claim>
             {
                 new(ClaimTypes.Email,user.Email),
-                new("userId", user.Id.ToString()),
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(ClaimTypes.Role,UserRoles.User)
             };
-            var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.TokenValidityInMinutes);
+            var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.OuterTokenValidityInMinutes);
             if (_httpContextAccessor.HttpContext is null)
             {
                 throw new Exception("HttpContext is null");
@@ -390,11 +390,11 @@ public class AuthService : IAuthService
             var authClaims = new List<Claim>
             {
                 new(ClaimTypes.Email,user.Email),
-                new("userId", user.Id.ToString()),
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(ClaimTypes.Role,UserRoles.User)
             };
-            var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.TokenValidityInMinutes);
+            var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.OuterTokenValidityInMinutes);
             if (_httpContextAccessor.HttpContext is null)
             {
                 throw new Exception("HttpContext is null");
@@ -449,11 +449,11 @@ public class AuthService : IAuthService
             var authClaims = new List<Claim>
             {
                 new(ClaimTypes.Email,user.Email),
-                new("userId", user.Id.ToString()),
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(ClaimTypes.Role,UserRoles.User)
             };
-            var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.TokenValidityInMinutes);
+            var token = TokenUtil.CreateToken(authClaims, _jwtAuthSettings.SecretKey, _jwtAuthSettings.ValidIssuerURL, _jwtAuthSettings.ValidAudienceURL, _jwtAuthSettings.OuterTokenValidityInMinutes);
             if (_httpContextAccessor.HttpContext is null)
             {
                 throw new Exception("HttpContext is null");

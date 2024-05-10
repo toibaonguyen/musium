@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using JobNet.Contants;
 using JobNet.Extensions;
 using JobNet.Interfaces.Services;
@@ -184,7 +185,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId is null)
             {
                 return Unauthorized(
@@ -212,7 +213,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var userId = HttpContext.User.FindFirst("userId")?.Value;
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId is null)
             {
                 return Unauthorized(

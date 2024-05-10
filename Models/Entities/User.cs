@@ -19,7 +19,7 @@ public class User : Entity
     public ICollection<Post> Posts { get; } = [];
     public ICollection<JobPost> JobPosts { get; } = [];
     public ICollection<Message> SentMessages { get; } = [];
-    public ICollection<Message> ReceivedMessages { get; } = [];
+    public ICollection<UserInConversation> Conversations { get; } = [];
     public ICollection<Comment> PostComments { get; } = [];
     public ICollection<PostReaction> PostReactions { get; } = [];
     public ICollection<UserFollowCompany> FollowCompanies { get; } = [];

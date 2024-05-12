@@ -303,11 +303,11 @@ public class PostsController : ControllerBase
         }
     }
     [HttpGet]
-    public async Task<ActionResult<BaseResponse>> GetPostsByKeyword([FromQuery] string keyword)
+    public async Task<ActionResult<BaseResponse>> GetPostsByKeyword([FromQuery] string keyword, [FromQuery] int limit)
     {
         try
         {
-            return Ok(new PostsResponse { Data = await _postService.SearchForActivePostDTOsWithKeyword(keyword) });
+            return Ok(new PostsResponse { Data = await _postService.SearchForActivePostDTOsWithKeyword(keyword, limit) });
         }
         catch (Exception ex)
         {

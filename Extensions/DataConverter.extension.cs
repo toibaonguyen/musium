@@ -1,6 +1,4 @@
-
 using System.Text;
-using System.Web;
 using JobNet.Contants;
 using JobNet.DTOs;
 using JobNet.Enums;
@@ -249,16 +247,22 @@ public static class DataConverterExtensions
     {
         return new NotificationDTO
         {
+            NavigationType = ResourceNotificationType.POST.ToString(),
             Content = notification.Content,
-            CreatedAt = notification.CreatedAt
+            CreatedAt = notification.CreatedAt,
+            ResourceId = notification.ConnectionRequestId
+
         };
     }
     public static NotificationDTO ToNotificationDTO(this PostNotification notification)
     {
         return new NotificationDTO
         {
+            NavigationType = ResourceNotificationType.CONNECTION.ToString(),
             Content = notification.Content,
-            CreatedAt = notification.CreatedAt
+            CreatedAt = notification.CreatedAt,
+            ResourceId = notification.PostId
+
         };
     }
     public static SkillDTO ToSkillDTO(this Skill skill)

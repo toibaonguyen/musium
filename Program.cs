@@ -18,6 +18,10 @@ using System.Security.Claims;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using JobNet.Hubs;
+using JobNet.DTOs;
+using Microsoft.AspNetCore.SignalR;
+using JobNet.Interfaces.Hubs;
+using FirebaseAdmin.Messaging;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -128,13 +132,44 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+//Test service api
+app.MapPost("Test/send-message-to-user/{userId}", async (string userId, MessageDTO message, IHubContext<PrivateChatHub, IPrivateChatListenerHub> context) =>
+{
+    await context.Clients.User(userId).RecieveMessage(message);
+    return Results.NoContent();
+});
+//Test service api
+app.MapPost("Test/fcm/{clientToken}", async (string clientToken) =>
+{
+    Message message = new()
+    {
+        Data = new Dictionary<string, string>()
+        {
+            { "score", "850" },
+            { "time", "2:45" },
+        },
+        Notification = new Notification()
+        {
+
+            Title = "$GOOG up 1.43% on the day",
+            Body = "$GOOG gained 11.80 points to close at 835.67, up 1.43% on the day."
+        },
+
+        Token = clientToken,
+    };
+    string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+    Console.WriteLine($"Phan hoi khi gui thong bao!! {response}");
+    return Results.NoContent();
+});
+
 
 app.MapHub<PrivateChatHub>("chathub");
 

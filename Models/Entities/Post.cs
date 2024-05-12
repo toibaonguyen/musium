@@ -15,5 +15,5 @@ public class Post : Entity
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public required bool IsActive { get; set; }
-    public PostNotification? Notification { get; set; }
+    public ICollection<PostNotification> Notifications { get; set; } = [];
 }

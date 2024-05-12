@@ -93,11 +93,11 @@ public class PostService : IPostService
         }
     }
 
-    public async Task<List<PostDTO>> SearchForActivePostDTOsWithKeyword(string keyword)
+    public async Task<List<PostDTO>> SearchForActivePostDTOsWithKeyword(string keyword, int limit)
     {
         try
         {
-            var posts = await _databaseContext.Posts.Where(x => x.Content.Contains(keyword)).ToListAsync();
+            var posts = await _databaseContext.Posts.Where(x => x.Content.Contains(keyword)).OrderBy(e => EF.Functions.Random()).Take(limit).ToListAsync();
             return posts.Select(e => e.ToPostDTO()).ToList();
         }
         catch (Exception ex)

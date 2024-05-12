@@ -91,7 +91,7 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<Post>().HasMany(e => e.Reactions).WithOne(e => e.Post).HasForeignKey(e => e.PostId).IsRequired();
         modelBuilder.Entity<Post>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
         modelBuilder.Entity<Post>().Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-        modelBuilder.Entity<Post>().HasOne(e => e.Notification).WithOne(e => e.Post).HasForeignKey<PostNotification>(e => e.PostId).IsRequired();
+        modelBuilder.Entity<Post>().HasMany(e => e.Notifications).WithOne(e => e.Post).HasForeignKey(e => e.PostId).IsRequired();
 
         //--------------------------Notifications---------------------//
 

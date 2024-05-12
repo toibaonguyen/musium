@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using JobNet.Contants;
+using JobNet.DTOs;
 using JobNet.Extensions;
 using JobNet.Interfaces.Services;
 using JobNet.Models.Core.Requests;
@@ -181,7 +182,7 @@ public class AuthController : ControllerBase
     }
     [Authorize(Policy = IdentityData.UserPolicyName)]
     [HttpPost("users/logout")]
-    public async Task<ActionResult<BaseResponse>> LogoutUser()
+    public async Task<ActionResult<BaseResponse>> LogoutUser([FromBody] CloudMessageRegistrationTokenDTO? token)
     {
         try
         {
@@ -196,7 +197,7 @@ public class AuthController : ControllerBase
                 );
             }
             //sua sau
-            await _authService.Logout(UserRoles.User, int.Parse(userId), null);
+            await _authService.Logout(UserRoles.User, int.Parse(userId), token?.Token);
             return Ok(new MessageResponse
             {
                 Message = LOGOUT_SUCCESSFULLY
@@ -209,7 +210,7 @@ public class AuthController : ControllerBase
     }
     [Authorize(Policy = IdentityData.AdminPolicyName)]
     [HttpPost("admins/logout")]
-    public async Task<ActionResult<BaseResponse>> LogoutAdmin()
+    public async Task<ActionResult<BaseResponse>> LogoutAdmin([FromBody] CloudMessageRegistrationTokenDTO? token)
     {
         try
         {
@@ -223,7 +224,7 @@ public class AuthController : ControllerBase
                     }
                 );
             }
-            await _authService.Logout(UserRoles.Admin, int.Parse(userId), null);
+            await _authService.Logout(UserRoles.Admin, int.Parse(userId), token?.Token);
             return Ok(new MessageResponse
             {
                 Message = LOGOUT_SUCCESSFULLY

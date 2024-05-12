@@ -10,7 +10,7 @@ public interface IPostService
     Task<PostDTO> CreateNewPost(CreatePostDTO post, int OwnerId);
     Task<PostDTO> UpdatePost(int PostId, UpdatePostDTO postUpdates);
     Task<PostDTO?> GetActivePostDTOById(int PostId);
-    Task<List<PostDTO>> SearchForActivePostDTOsWithKeyword(string keyword);
+    Task<List<PostDTO>> SearchForActivePostDTOsWithKeyword(string keyword, int limit);
     Task<bool> CheckIfUserIsOwner(int UserId, int PostId);
     Task DisablePost(int PostId);
     Task<List<PostDTO>> GetRandomActivePostDTOs(int limit);

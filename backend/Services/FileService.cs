@@ -92,6 +92,7 @@ public class FileService : IFileService
             {
                 await blobClient.UploadAsync(data);
             }
+            Console.WriteLine("URI moi upload la:", blobClient.Uri.OriginalString.ToString());
             BlobDTO returnBlob = new()
             {
                 Uri = blobClient.Uri.OriginalString,

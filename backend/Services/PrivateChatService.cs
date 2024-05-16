@@ -47,7 +47,22 @@ public class PrivateChatService : IPrivateChatService
         {
             User? user = await _userService.GetUserById(userId) ?? throw new BadRequestException(INVALID_USER);
             var userInConversation = await _databaseContext.UserInConversations.Where(u => u.UserId == userId).ToListAsync();
-            return userInConversation.Select(e => e.Conversation).ToList().OrderByDescending(e => e.Messages.OrderByDescending(t => t.CreatedAt).First().CreatedAt).Where(e => e.Messages.OrderByDescending(t => t.CreatedAt).First().CreatedAt <= cursor).Select(e => e.ToConversationDTO(e.Users.First(u => u.UserId != userId).User.ToChatUserDTO())).ToList();
+            return userInConversation.Select(e => e.Conversation).ToList().OrderByDescending(e => e.Messages.OrderByDescending(t => t.CreatedAt).First().CreatedAt).Where(e => e.Messages.OrderByDescending(t => t.CreatedAt).First().CreatedAt <= cursor).Take(limit).Select(e => e.ToConversationDTO(e.Users.First(u => u.UserId != userId).User.ToChatUserDTO())).ToList();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public async Task<IList<ConversationDTO>> GetConversationBoxsOfUserWithOtherUser(int userId, int limit, DateTime cursor, string similarOtherUserName)
+    {
+        try
+        {
+            User? user = await _userService.GetUserById(userId) ?? throw new BadRequestException(INVALID_USER);
+            IList<int> otherUserIds = await _databaseContext.Users.Where(u => u.Name.Contains(similarOtherUserName) && u.IsActive).Select(u => u.Id).ToListAsync();
+
+            return await _databaseContext.Conversations.Where(c => c.Users.Any(u => u.UserId == userId) && c.Users.Any(u => otherUserIds.Contains(u.UserId))).OrderByDescending(e => e.Messages.OrderByDescending(t => t.CreatedAt).First().CreatedAt).Where(e => e.Messages.OrderByDescending(t => t.CreatedAt).First().CreatedAt <= cursor).Take(limit).Select(e => e.ToConversationDTO(e.Users.First(u => u.UserId != userId).User.ToChatUserDTO())).ToListAsync();
         }
         catch (Exception)
         {

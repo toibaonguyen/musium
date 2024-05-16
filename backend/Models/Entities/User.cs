@@ -30,4 +30,5 @@ public class User : Entity
     public ICollection<UserSkill> UserSkills { get; } = [];
     public required bool IsActive { get; set; }
     public required bool IsEmailConfirmed { get; set; } = false;
+    public DateTime CreatedAt { get; set; }
 }

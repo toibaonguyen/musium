@@ -585,4 +585,18 @@ public class UsersController : ControllerBase
             throw;
         }
     }
+
+    [HttpGet]
+    [Route("active")]
+    public async Task<ActionResult<BaseResponse>> GetListUSerDTOs([FromQuery] int limit, [FromQuery] DateTime cursor, [FromQuery] string? keyword = null)
+    {
+        try
+        {
+            return Ok(new ListUsersResponse { Data = (await _userService.GetActiveListUserDTOs(limit, cursor, keyword)).ToList() });
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
 }

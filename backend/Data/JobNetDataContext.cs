@@ -18,7 +18,6 @@ public class JobNetDatabaseContext : DbContext
     public DbSet<Education> Educations { get; set; }
     public DbSet<Experience> Experiences { get; set; }
     public DbSet<JobPost> JobPosts { get; set; }
-    public DbSet<JobPostBill> JobPostBills { get; set; }
     public DbSet<JobPostSkill> JobPostSkills { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<ConnectionRequestNotification> ConnectionRequestNotifications { get; set; }
@@ -62,7 +61,6 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<User>().HasMany(e => e.Certifications).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.Educations).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.Posts).WithOne(e => e.Owner).HasForeignKey(e => e.OwnerId).IsRequired();
-        modelBuilder.Entity<User>().HasMany(e => e.JobPosts).WithOne(e => e.Author).HasForeignKey(e => e.AuthorId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.SentMessages).WithOne(e => e.Sender).HasForeignKey(e => e.SenderId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.Conversations).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.PostComments).WithOne(e => e.User).HasForeignKey(e => e.UserId).IsRequired();
@@ -75,6 +73,7 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<User>().HasMany(e => e.ConnectionRequestNotifications).WithOne(e => e.Reciever).HasForeignKey(e => e.RecieverId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.PostNotifications).WithOne(e => e.Reciever).HasForeignKey(e => e.RecieverId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.MessageNotifications).WithOne(e => e.Reciever).HasForeignKey(e => e.RecieverId).IsRequired();
+        modelBuilder.Entity<User>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         //Skill
         modelBuilder.Entity<Skill>().HasKey(e => e.Id);
@@ -115,13 +114,11 @@ public class JobNetDatabaseContext : DbContext
         //JobPostSkill
         modelBuilder.Entity<JobPostSkill>().HasKey(e => new { e.SkillId, e.JobPostId });
 
-        //JobPostBill
-        modelBuilder.Entity<JobPostBill>().HasKey(e => e.Id);
-
         //JobPost
         modelBuilder.Entity<JobPost>().HasKey(e => e.Id);
         modelBuilder.Entity<JobPost>().HasMany(e => e.JobPostSkills).WithOne(e => e.JobPost).HasForeignKey(e => e.JobPostId).IsRequired();
-        modelBuilder.Entity<JobPost>().HasOne(e => e.Bill).WithOne(e => e.JobPost).HasForeignKey<JobPostBill>(e => e.JobPostId).IsRequired();
+        modelBuilder.Entity<JobPost>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+        modelBuilder.Entity<JobPost>().Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         //Experience
         modelBuilder.Entity<Experience>().HasKey(e => e.Id);

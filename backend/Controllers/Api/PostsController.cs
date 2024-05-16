@@ -47,7 +47,8 @@ public class PostsController : ControllerBase
                     }
                 );
             }
-            CreatedPostResponse res = new() { Data = await _postService.CreateNewPost(request, int.Parse(userId)) };
+            var data = await _postService.CreateNewPost(request, int.Parse(userId));
+            CreatedPostResponse res = new() { Data = data };
             return Ok(res);
         }
         catch (Exception ex)

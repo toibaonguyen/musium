@@ -11,7 +11,8 @@ public interface IUserService
     Task<User?> GetUserByEmail(string email);
     Task<User?> GetUserById(int id);
     Task<ProfileUserDTO?> GetActiveProfileUserDTOById(int id);
-    Task<IEnumerable<ListUserDTO>> GetListUserDTOs();
+    Task<IList<ListUserDTO>> GetActiveListUserDTOs(int limit, DateTime cursor, string? keyword);
+    Task<IList<ListUserDTO>> GetListUserDTOs(int limit, DateTime cursor, string? keyword);
     Task ChangeUserPassword(int userId, string newPassword);
     Task<ProfileUserDTO> ChangeUserAvatar(int userId, IFormFile newAvatar);
     Task<ProfileUserDTO> ChangeUserBackground(int userId, IFormFile newBackground);

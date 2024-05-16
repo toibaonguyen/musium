@@ -250,7 +250,7 @@ public static class DataConverterExtensions
             NavigationType = ResourceNotificationType.POST.ToString(),
             Content = notification.Content,
             CreatedAt = notification.CreatedAt,
-            ResourceId = notification.ConnectionRequestId
+            ResourceId = notification.Connection.SenderId
 
         };
     }
@@ -337,6 +337,32 @@ public static class DataConverterExtensions
             ConversationId = conversation.Id,
             LastestMessage = conversation.Messages.OrderByDescending(e => e.CreatedAt).First().ToMessageDTO(),
             WithUser = withUser
+        };
+    }
+    public static ListJobPostDTO ToListJobPostDTO(this JobPost jobPost)
+    {
+        return new ListJobPostDTO()
+        {
+            JobTitle = jobPost.JobTitle,
+            CompanyName = jobPost.Company.Name,
+            CompanyAvatar = jobPost.Company.Avatar,
+            JobLocation = jobPost.JobLocation,
+            WorkplaceType = jobPost.WorkplaceTypes.Select(e => e.ToString()).ToList()
+        };
+    }
+    public static JobPostDTO ToJobPostDTO(this JobPost jobPost)
+    {
+        return new JobPostDTO()
+        {
+            JobTitle = jobPost.JobTitle,
+            JobLocation = jobPost.JobLocation,
+            WorkplaceType = jobPost.WorkplaceTypes.Select(e => e.ToString()).ToList(),
+            JobType = jobPost.JobTypes.Select(e => e.ToString()).ToList(),
+            JobDescription = jobPost.JobDescription,
+            Skills = jobPost.JobPostSkills.Select(s => s.Skill.Name).ToList(),
+            JobRequirements = jobPost.JobRequirements,
+            ContactInfo = jobPost.ContactInfo,
+            ExpiredAt = jobPost.ExpiredAt
         };
     }
 }

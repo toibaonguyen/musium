@@ -102,7 +102,7 @@ public class AuthController : ControllerBase
             throw;
         }
     }
-    [Authorize(Policy = IdentityData.UserPolicyName)]
+    [AllowAnonymous]
     [HttpPost("users/{userId}/refresh-tokens")]
     public async Task<ActionResult<BaseResponse>> RefreshUserToken(int userId, [FromBody] RefreshTokenRequest refreshToken)
     {

@@ -113,17 +113,24 @@ public class UsersService : IUserService
             throw;
         }
     }
-    public async Task<IEnumerable<ListUserDTO>> GetListUserDTOs()
+    public async Task<IList<ListUserDTO>> GetListUserDTOs(int limit, DateTime cursor, string? keyword)
     {
         try
         {
-            var users = await _databaseContext.Users.ToListAsync();
-            var listUsers = new List<ListUserDTO>();
-            foreach (User user in users)
-            {
-                listUsers.Add(user.ToListUserDTO());
-            }
-            return listUsers ?? ([]);
+            string pattern = keyword ?? "";
+            return await _databaseContext.Users.Where(u => u.Name.Contains(pattern) && u.CreatedAt <= cursor).OrderByDescending(u => u.CreatedAt).Select(u => u.ToListUserDTO()).Take(limit).ToListAsync();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    public async Task<IList<ListUserDTO>> GetActiveListUserDTOs(int limit, DateTime cursor, string? keyword)
+    {
+        try
+        {
+            string pattern = keyword ?? "";
+            return await _databaseContext.Users.Where(u => u.Name.Contains(pattern) && u.CreatedAt <= cursor && u.IsActive).OrderByDescending(u => u.CreatedAt).Select(u => u.ToListUserDTO()).Take(limit).ToListAsync();
         }
         catch (Exception)
         {
@@ -565,4 +572,6 @@ public class UsersService : IUserService
             throw;
         }
     }
+
+
 }

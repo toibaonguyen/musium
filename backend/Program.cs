@@ -42,7 +42,7 @@ JWTAuthSettings tokenAuthSettings = builder.Configuration.GetSection("JWTAuth").
 string redisConnectionString = builder.Configuration["RedisConnectionString"] ?? throw new Exception("Missing RedisConnectionString");
 
 //set environment variable AZURE_STORAGE_CONNECTION_STRING by connection string of azure blob storage before running below code
-string azureConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING") ?? throw new Exception("Missing azure connection string!");
+string azureConnectionString = builder.Configuration["AZURE_STORAGE_CONNECTION_STRING"] ?? throw new Exception("Missing azure connection string");//Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING") ?? throw new Exception("Missing azure connection string!");
 
 if (string.IsNullOrEmpty(redisConnectionString))
 {

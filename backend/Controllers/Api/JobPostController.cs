@@ -13,7 +13,6 @@ namespace JobNet.Controllers;
 [ApiController]
 public class JobPostController : ControllerBase
 {
-    private readonly string CREATE_SUCCESSFULLY = "Create successfully!";
     private readonly string UPDATE_SUCCESSFULLY = "Update successfully!";
     private readonly string DELETE_SUCCESSFULLY = "Delete successfully!";
     private readonly IJobPostService _jobPostService;
@@ -108,6 +107,7 @@ public class JobPostController : ControllerBase
             throw;
         }
     }
+
     [HttpGet]
     [Route("list/{jobPostId}")]
     public async Task<ActionResult<BaseResponse>> GetActiveListJobPostDTOById(int jobPostId)

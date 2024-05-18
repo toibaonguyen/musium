@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace JobNet.Services;
 
-public class CloudMessageRegistrationTokenService : ICloudMessageRegistrationTokenService
+public class CloudMessageRegistrationTokenService : ICloudMessageRegistrationTokenService, ICloudMessageTokenHandlerService
 {
     private readonly string USER_IS_NOT_EXIST = "User is not exist!";
     private readonly string TOKEN_IS_NOT_EXIST = "Token is not exist!";

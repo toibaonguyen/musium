@@ -6,4 +6,5 @@ public interface IFirebaseCloudNotificationService
 {
     Task SendMessageAsync(Message message);
     Task SendMultipleMessagesAsync(List<Message> messages);
+    Task SendMulticastMessageAsync(MulticastMessage message);
 }

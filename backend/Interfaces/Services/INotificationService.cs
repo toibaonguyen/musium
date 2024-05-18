@@ -4,5 +4,5 @@ using JobNet.Enums;
 namespace JobNet.Interfaces.Services;
 public interface INotificationService
 {
-    Task<NotificationDTO> CreateAndSendNotification(ResourceNotificationType notificationType, int senderId, int recieverId, string content, int resourceId);
+    Task CreateAndSendNotification(ResourceNotificationType notificationType, int recieverId, string content, int resourceId);
 }

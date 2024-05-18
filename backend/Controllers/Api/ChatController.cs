@@ -81,6 +81,40 @@ public class ChatController : ControllerBase
         }
     }
     [Authorize(Policy = IdentityData.UserPolicyName)]
+    [HttpGet]
+    [Route("conversations/{conversationId}")]
+    public async Task<ActionResult<BaseResponse>> GetConversation(int conversationId)
+    {
+        try
+        {
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (authUserId is null)
+            {
+                return Unauthorized(
+                    new MessageResponse
+                    {
+                        Message = INVALID_TOKEN
+                    }
+                );
+            }
+            if (!await _privateChatService.CheckIfUserIsInConversation(int.Parse(authUserId), conversationId))
+            {
+                return Unauthorized(
+                    new MessageResponse
+                    {
+                        Message = DO_NOT_HAVE_PERMISSION
+                    }
+                );
+            }
+
+            return Ok(new ConversationBoxResponse { Data = await _privateChatService.GetConversationBoxById(int.Parse(authUserId), conversationId) });
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    [Authorize(Policy = IdentityData.UserPolicyName)]
     [HttpPost]
     [Route("{userId}/messages")]
     public async Task<ActionResult<BaseResponse>> SendMessage(int userId, [FromForm] CreateMessageDTO message)

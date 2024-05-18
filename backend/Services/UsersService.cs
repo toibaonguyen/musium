@@ -564,6 +564,10 @@ public class UsersService : IUserService
             {
                 notifications.Add(notification.ToNotificationDTO());
             }
+            foreach (var notification in user.JobPostNotifications)
+            {
+                notifications.Add(notification.ToNotificationDTO());
+            }
             return notifications.Where(e => e.CreatedAt <= cursor).OrderByDescending(e => e.CreatedAt).Take(limit);
 
         }

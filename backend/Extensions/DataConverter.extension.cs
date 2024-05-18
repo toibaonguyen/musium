@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using JobNet.Contants;
 using JobNet.DTOs;
@@ -343,6 +344,7 @@ public static class DataConverterExtensions
     {
         return new ListJobPostDTO()
         {
+            Id = jobPost.Id,
             JobTitle = jobPost.JobTitle,
             CompanyName = jobPost.Company.Name,
             CompanyAvatar = jobPost.Company.Avatar,
@@ -354,6 +356,7 @@ public static class DataConverterExtensions
     {
         return new JobPostDTO()
         {
+            Id = jobPost.Id,
             JobTitle = jobPost.JobTitle,
             JobLocation = jobPost.JobLocation,
             WorkplaceType = jobPost.WorkplaceTypes.Select(e => e.ToString()).ToList(),
@@ -363,6 +366,51 @@ public static class DataConverterExtensions
             JobRequirements = jobPost.JobRequirements,
             ContactInfo = jobPost.ContactInfo,
             ExpiredAt = jobPost.ExpiredAt
+        };
+    }
+    public static ListCompanyDTO ToListCompanyDTO(this Company company)
+    {
+        return new ListCompanyDTO()
+        {
+            Id = company.Id,
+            Name = company.Name,
+            Avatar = company.Avatar,
+            NumberOfFollowers = company.Followers.Count,
+            Headquarters = company.Headquarters
+        };
+    }
+    public static Dictionary<string, string> ToStringDictionary(this object obj)
+    {
+        if (obj == null)
+        {
+            throw new ArgumentNullException(nameof(obj));
+        }
+
+        var dict = new Dictionary<string, string>();
+        var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        foreach (var property in properties)
+        {
+            var value = property.GetValue(obj, null);
+            dict[property.Name] = value?.ToString() ?? string.Empty;
+        }
+        return dict;
+    }
+    public static NotificationDTO ToNotificationDTO(this MessageNotification notification)
+    {
+        return new NotificationDTO()
+        {
+            NavigationType = ResourceNotificationType.MESSAGE.ToString(),
+            ResourceId = notification.Message.ConversationId,
+            Content = notification.Content
+        };
+    }
+    public static NotificationDTO ToNotificationDTO(this JobPostNotification notification)
+    {
+        return new NotificationDTO()
+        {
+            NavigationType = ResourceNotificationType.MESSAGE.ToString(),
+            ResourceId = notification.PostId,
+            Content = notification.Content
         };
     }
 }

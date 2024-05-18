@@ -22,6 +22,11 @@ public class PostNotification : Notification
     public Post Post { get; set; } = null!;
 }
 
+public class JobPostNotification : Notification
+{
+    public int PostId { get; set; }
+    public JobPost JobPost { get; set; } = null!;
+}
 
 public class MessageNotification : Notification
 {

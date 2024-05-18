@@ -41,6 +41,19 @@ public class PrivateChatService : IPrivateChatService
         }
     }
 
+    public async Task<ConversationDTO?> GetConversationBoxById(int userId, int conversationId)
+    {
+        try
+        {
+            var conversation = await _databaseContext.Conversations.FindAsync(conversationId);
+            return conversation?.ToConversationDTO(conversation.Users.First(u => u.UserId != userId).User.ToChatUserDTO());
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
     public async Task<IList<ConversationDTO>> GetConversationBoxsOfUserOrderByLastMessageSentTimeDesc(int userId, int limit, DateTime cursor)
     {
         try

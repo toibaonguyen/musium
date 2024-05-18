@@ -22,6 +22,7 @@ public class JobNetDatabaseContext : DbContext
     public DbSet<Message> Messages { get; set; }
     public DbSet<ConnectionRequestNotification> ConnectionRequestNotifications { get; set; }
     public DbSet<PostNotification> PostNotifications { get; set; }
+    public DbSet<JobPostNotification> JobPostNotifications { get; set; }
     public DbSet<MessageNotification> MessageNotifications { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<PostReaction> PostReactions { get; set; }
@@ -37,7 +38,7 @@ public class JobNetDatabaseContext : DbContext
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
-        this._settings = settings.Value;
+        _settings = settings.Value;
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -73,6 +74,7 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<User>().HasMany(e => e.ConnectionRequestNotifications).WithOne(e => e.Reciever).HasForeignKey(e => e.RecieverId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.PostNotifications).WithOne(e => e.Reciever).HasForeignKey(e => e.RecieverId).IsRequired();
         modelBuilder.Entity<User>().HasMany(e => e.MessageNotifications).WithOne(e => e.Reciever).HasForeignKey(e => e.RecieverId).IsRequired();
+        modelBuilder.Entity<User>().HasMany(e => e.JobPostNotifications).WithOne(e => e.Reciever).HasForeignKey(e => e.RecieverId).IsRequired();
         modelBuilder.Entity<User>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         //Skill
@@ -97,6 +99,10 @@ public class JobNetDatabaseContext : DbContext
         //PostNotification
         modelBuilder.Entity<PostNotification>().HasKey(e => e.Id);
         modelBuilder.Entity<PostNotification>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        //JobPostNotification
+        modelBuilder.Entity<JobPostNotification>().HasKey(e => e.Id);
+        modelBuilder.Entity<JobPostNotification>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         //MessageNotification
         modelBuilder.Entity<MessageNotification>().HasKey(e => e.Id);
@@ -138,8 +144,10 @@ public class JobNetDatabaseContext : DbContext
 
 
         //Company
+        modelBuilder.Entity<Company>().HasKey(e => e.Id);
         modelBuilder.Entity<Company>().HasMany(e => e.UserExperiences).WithOne(e => e.Company).HasForeignKey(e => e.CompanyId).IsRequired();
         modelBuilder.Entity<Company>().HasMany(e => e.Followers).WithOne(e => e.Company).HasForeignKey(e => e.CompanyId).IsRequired();
+        modelBuilder.Entity<Company>().HasMany(e => e.JobPosts).WithOne(e => e.Company).HasForeignKey(e => e.CompanyId).IsRequired();
 
         //Comment
         modelBuilder.Entity<Comment>().HasKey(e => e.Id);

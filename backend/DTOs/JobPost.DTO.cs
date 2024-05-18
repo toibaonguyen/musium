@@ -2,6 +2,7 @@ namespace JobNet.DTOs;
 
 public class JobPostDTO
 {
+    public required int Id { get; set; }
     public required string JobTitle { get; set; }
     public required IList<string> WorkplaceType { get; set; }
     public required IList<string> JobType { get; set; }

@@ -22,6 +22,7 @@ using JobNet.DTOs;
 using Microsoft.AspNetCore.SignalR;
 using JobNet.Interfaces.Hubs;
 using FirebaseAdmin.Messaging;
+using JobNet.Services.Background;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,6 +63,7 @@ builder.Services.Configure<JobNetDatabaseSettings>(builder.Configuration.GetSect
 builder.Services.Configure<EmailSenderProviderSetting>(builder.Configuration.GetSection("EmailSettingProvider"));
 builder.Services.Configure<JWTAuthSettings>(builder.Configuration.GetSection("JWTAuth"));
 builder.Services.Configure<NotificationSetting>(builder.Configuration.GetSection("NotificationSetting"));
+builder.Services.Configure<RabbitMqConfiguration>(builder.Configuration.GetSection("RabbitMqConfiguration"));
 
 
 builder.Services.AddAuthentication(options =>
@@ -98,20 +100,25 @@ builder.Services.AddAuthorizationBuilder()
 builder.Services.AddDbContext<JobNetDatabaseContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
 
-builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
+builder.Services.AddSingleton<IEmailSenderService, EmailSenderService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IUserService, UsersService>();
 builder.Services.AddTransient<IAdminService, AdminsService>();
 builder.Services.AddSingleton<IFileService, FileService>();
 builder.Services.AddTransient<IPostService, PostService>();
 builder.Services.AddTransient<ISkillService, SkillsService>();
-builder.Services.AddScoped<ICloudMessageRegistrationTokenService, CloudMessageRegistrationTokenService>();
+builder.Services.AddTransient<ICloudMessageRegistrationTokenService, CloudMessageRegistrationTokenService>();
+builder.Services.AddScoped<ICloudMessageTokenHandlerService, CloudMessageRegistrationTokenService>();
 builder.Services.AddScoped<IFirebaseCloudNotificationService, FirebaseCloudNotificationService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<IPostReactService, PostReactService>();
 builder.Services.AddScoped<IPrivateChatService, PrivateChatService>();
+builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
+
+builder.Services.AddHostedService<BackgroundScaleTokensRemover>();
+builder.Services.AddHostedService<BackgroundEmailSenderService>();
 
 
 builder.Services.AddControllers();

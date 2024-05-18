@@ -26,6 +26,7 @@ public class User : Entity
     public ICollection<CloudMessageRegistrationToken> CloudMessageRegistrationTokens { get; } = [];
     public ICollection<ConnectionRequestNotification> ConnectionRequestNotifications { get; } = [];
     public ICollection<PostNotification> PostNotifications { get; } = [];
+    public ICollection<JobPostNotification> JobPostNotifications { get; } = [];
     public ICollection<MessageNotification> MessageNotifications { get; } = [];
     public ICollection<UserSkill> UserSkills { get; } = [];
     public required bool IsActive { get; set; }

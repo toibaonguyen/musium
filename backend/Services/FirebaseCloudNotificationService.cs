@@ -37,4 +37,18 @@ public class FirebaseCloudNotificationService : IFirebaseCloudNotificationServic
             throw;
         }
     }
+
+    public async Task SendMulticastMessageAsync(MulticastMessage message)
+    {
+        try
+        {
+            var response = await FirebaseMessaging.DefaultInstance.SendEachForMulticastAsync(message);
+            _logger.LogInformation(response.FailureCount, "Failure message count:");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception when sending message");
+            throw;
+        }
+    }
 }

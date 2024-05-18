@@ -2,5 +2,7 @@ namespace JobNet.Enums;
 public enum ResourceNotificationType
 {
     POST,
-    CONNECTION
+    CONNECTION,
+    JOBPOST,
+    MESSAGE
 }

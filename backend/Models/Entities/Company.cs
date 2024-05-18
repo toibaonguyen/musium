@@ -13,6 +13,7 @@ public class Company : Entity
     public required DateTime FoundedAt { get; set; }
     public ICollection<UserFollowCompany> Followers { get; } = [];
     public ICollection<Experience> UserExperiences { get; } = [];
+    public ICollection<JobPost> JobPosts { get; } = [];
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public bool IsActive { get; set; }

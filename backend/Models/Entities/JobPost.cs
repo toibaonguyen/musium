@@ -11,6 +11,7 @@ public class JobPost : Entity
     public IList<EmploymentType> JobTypes { get; set; } = [];
     public required string JobDescription { get; set; }
     public ICollection<JobPostSkill> JobPostSkills { get; } = [];
+    public ICollection<JobPostNotification> JobPostNotifications { get; } = [];
     public IList<string> JobRequirements { get; set; } = [];
     public required string ContactInfo { get; set; }
     public required string JobLocation { get; set; }

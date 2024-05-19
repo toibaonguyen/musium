@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import ImageView from 'react-native-image-viewing'
 import ImageFooter from '../../../components/ImageFooter'
 import { getImageBase64Array } from '../../../utils/imgsUtils'
+import CommentItem from './CommentItem'
 
 const PostDetail = ({route}) => {
   const navigation = useNavigation()
@@ -214,6 +215,14 @@ const PostDetail = ({route}) => {
             <FontAwesome name="send" size={18} color={COLORS.greyDark} />
             <Text style={styles.optionText(false)}>Send</Text>
           </TouchableOpacity>
+        </View>
+
+        <View>
+          <Text>Comments</Text>
+          {data.options.comments.length === 0 ? <Text>Be the first to comment</Text>:
+          <View>
+            {data.options.comments.map((item, index) => <CommentItem key={index} data={item} />)}
+            </View>}
         </View>
       </ScrollView>
       <ImageView

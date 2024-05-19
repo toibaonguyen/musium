@@ -18,6 +18,7 @@ using JobNet.Settings;
 using Microsoft.Extensions.Options;
 using JobNet.Models.Core.Responses;
 using JobNet.Extensions;
+using RabbitMQ.Client;
 namespace JobNet.Services;
 
 public class AuthService : IAuthService
@@ -37,15 +38,15 @@ public class AuthService : IAuthService
     private readonly IAdminService _adminsService;
     private readonly ICloudMessageRegistrationTokenService _cloudMessageRegistrationTokenService;
     private readonly IConnectionMultiplexer _redis;
-    private readonly IEmailSenderService _emailService;
     private readonly IUrlHelperFactory _urlHelperFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IRabbitMqService _rabbitMqService;
 
     private string GetRedisStoredKey(string userRole, int userId)
     {
         return $"Token:{userRole}:{userId}";
     }
-    public AuthService(IOptions<JWTAuthSettings> jwtAuthOptions, IHttpContextAccessor httpContextAccessor, IUrlHelperFactory urlHelperFactory, IAdminService adminsService, IUserService usersService, IEmailSenderService emailService, ICloudMessageRegistrationTokenService cloudMessageRegistrationTokenService, IConnectionMultiplexer redis)
+    public AuthService(IOptions<JWTAuthSettings> jwtAuthOptions, IHttpContextAccessor httpContextAccessor, IUrlHelperFactory urlHelperFactory, IAdminService adminsService, IUserService usersService, IRabbitMqService rabbitMqService, ICloudMessageRegistrationTokenService cloudMessageRegistrationTokenService, IConnectionMultiplexer redis)
     {
         _cloudMessageRegistrationTokenService = cloudMessageRegistrationTokenService;
         _httpContextAccessor = httpContextAccessor;
@@ -53,7 +54,7 @@ public class AuthService : IAuthService
         _usersService = usersService;
         _adminsService = adminsService;
         _redis = redis;
-        _emailService = emailService;
+        _rabbitMqService = rabbitMqService;
         _jwtAuthSettings = jwtAuthOptions.Value;
     }
     public async Task<AuthenticationResponse> LoginAsUser(string email, string password)
@@ -326,7 +327,20 @@ public class AuthService : IAuthService
             verificationUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + verificationUrl;
             try
             {
-                await _emailService.SendEmailVerificationAsync(dto.Email, verificationUrl);
+                EmailMessageBrokerModel message = new()
+                {
+                    Type = EmailTypes.EmailVerification,
+                    ToEmail = dto.Email,
+                    Content = verificationUrl
+                };
+                using var connection = _rabbitMqService.CreateConnection();
+                using var model = connection.CreateModel();
+                var body = Encoding.UTF8.GetBytes(message.ToString());
+                model.BasicPublish("EmailExchange",
+                             string.Empty,
+                             basicProperties: null,
+                             body: body);
+
             }
             catch (Exception)
             {
@@ -412,7 +426,19 @@ public class AuthService : IAuthService
                 throw new Exception("Can't generate verification link, please contact us!");
             }
             verificationUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + verificationUrl;
-            await _emailService.SendEmailVerificationAsync(email, verificationUrl);
+            EmailMessageBrokerModel message = new()
+            {
+                Type = EmailTypes.EmailVerification,
+                ToEmail = email,
+                Content = verificationUrl
+            };
+            using var connection = _rabbitMqService.CreateConnection();
+            using var model = connection.CreateModel();
+            var body = Encoding.UTF8.GetBytes(message.ToString());
+            model.BasicPublish("EmailExchange",
+                         string.Empty,
+                         basicProperties: null,
+                         body: body);
         }
         catch (Exception)
         {
@@ -472,7 +498,19 @@ public class AuthService : IAuthService
             }
             confirmationUrl = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + confirmationUrl;
 
-            await _emailService.SendResetPasswordConfirmationAsync(email, confirmationUrl);
+            EmailMessageBrokerModel message = new()
+            {
+                Type = EmailTypes.ResetPasswordConfirmation,
+                ToEmail = email,
+                Content = confirmationUrl
+            };
+            using var connection = _rabbitMqService.CreateConnection();
+            using var model = connection.CreateModel();
+            var body = Encoding.UTF8.GetBytes(message.ToString());
+            model.BasicPublish("EmailExchange",
+                         string.Empty,
+                         basicProperties: null,
+                         body: body);
         }
         catch (Exception)
         {
@@ -495,7 +533,19 @@ public class AuthService : IAuthService
                 {
                     string newPassword = PasswordUtil.GenerateRandomPassword(this.MIN_PASSWORD_LENGTH, this.MAX_PASSWORD_LENGTH);
                     await _usersService.ChangeUserPassword(userId, newPassword);
-                    await _emailService.SendNewResetPasswordEmailAsync(user.Email, newPassword);
+                    EmailMessageBrokerModel message = new()
+                    {
+                        Type = EmailTypes.NewPassword,
+                        ToEmail = user.Email,
+                        Content = newPassword
+                    };
+                    using var connection = _rabbitMqService.CreateConnection();
+                    using var model = connection.CreateModel();
+                    var body = Encoding.UTF8.GetBytes(message.ToString());
+                    model.BasicPublish("EmailExchange",
+                                 string.Empty,
+                                 basicProperties: null,
+                                 body: body);
                 }
                 else
                 {

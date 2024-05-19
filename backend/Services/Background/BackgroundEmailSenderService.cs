@@ -61,5 +61,13 @@ public class BackgroundEmailSenderService : BackgroundService
             _logger.LogError(ex.Message, ex);
             throw;
         }
+
+    }
+    public override void Dispose()
+    {
+        if (_model.IsOpen)
+            _model.Close();
+        if (_connection.IsOpen)
+            _connection.Close();
     }
 }

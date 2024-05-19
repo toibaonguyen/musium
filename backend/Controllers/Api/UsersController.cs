@@ -488,7 +488,7 @@ public class UsersController : ControllerBase
                     }
                 );
             }
-            await _connectionService.CreateConnection(int.Parse(authUserId), userId);
+            await _connectionService.CreateConnectionAndSendNotificationToReciever(int.Parse(authUserId), userId);
             return Ok();
         }
         catch (Exception)

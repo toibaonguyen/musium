@@ -26,7 +26,7 @@ public class ConnectionService : IConnectionService
         throw new NotImplementedException();
     }
 
-    public async Task CreateConnection(int senderId, int recieverId)
+    public async Task CreateConnectionAndSendNotificationToReciever(int senderId, int recieverId)
     {
         try
         {

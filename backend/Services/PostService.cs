@@ -52,7 +52,7 @@ public class PostService : IPostService
     }
 
 
-    public async Task<PostDTO> CreateNewPost(CreatePostDTO post, int OwnerId)
+    public async Task<PostDTO> CreateNewPostAndSendToticationToConnections(CreatePostDTO post, int OwnerId)
     {
         try
         {

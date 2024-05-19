@@ -47,7 +47,7 @@ public class PostsController : ControllerBase
                     }
                 );
             }
-            var data = await _postService.CreateNewPost(request, int.Parse(userId));
+            var data = await _postService.CreateNewPostAndSendToticationToConnections(request, int.Parse(userId));
             CreatedPostResponse res = new() { Data = data };
             return Ok(res);
         }

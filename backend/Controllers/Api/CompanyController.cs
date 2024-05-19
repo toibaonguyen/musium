@@ -166,7 +166,7 @@ public class CompanyController : ControllerBase
     {
         try
         {
-            return Ok(new ListJobPostsResponse { Data = [await _jobPostService.CreateJobPost(companyId, request.Data)] });
+            return Ok(new ListJobPostsResponse { Data = [await _jobPostService.CreateJobPostAndSendToticationToFollowers(companyId, request.Data)] });
         }
         catch (Exception ex)
         {

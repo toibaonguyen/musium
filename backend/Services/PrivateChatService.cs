@@ -96,7 +96,7 @@ public class PrivateChatService : IPrivateChatService
         }
     }
 
-    public async Task SendPrivateMessage(int SenderId, int RecieverId, CreateMessageDTO message)
+    public async Task SendPrivateMessageAndSendNotificationToReceiver(int SenderId, int RecieverId, CreateMessageDTO message)
     {
         try
         {

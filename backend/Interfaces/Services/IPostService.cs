@@ -7,7 +7,7 @@ namespace JobNet.Interfaces.Services;
 public interface IPostService
 {
     Task<Post?> GetPostById(int PostId);
-    Task<PostDTO> CreateNewPost(CreatePostDTO post, int OwnerId);
+    Task<PostDTO> CreateNewPostAndSendToticationToConnections(CreatePostDTO post, int OwnerId);
     Task<PostDTO> UpdatePost(int PostId, UpdatePostDTO postUpdates);
     Task<PostDTO?> GetActivePostDTOById(int PostId);
     Task<List<PostDTO>> SearchForActivePostDTOsWithKeyword(string keyword, int limit);

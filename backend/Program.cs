@@ -116,6 +116,7 @@ builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<IPostReactService, PostReactService>();
 builder.Services.AddScoped<IPrivateChatService, PrivateChatService>();
 builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
+//builder.Services.AddSingleton<INotificationService, NotificationService>();
 
 builder.Services.AddHostedService<BackgroundScaleTokensRemover>();
 builder.Services.AddHostedService<BackgroundEmailSenderService>();
@@ -147,13 +148,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-//Test service api
+//============================================Test service api============================================//
 app.MapPost("Test/send-message-to-user/{userId}", async (string userId, MessageDTO message, IHubContext<PrivateChatHub, IPrivateChatListenerHub> context) =>
 {
     await context.Clients.User(userId).RecieveMessage(message);
     return Results.NoContent();
 });
-//Test service api
 app.MapPost("Test/fcm/{clientToken}", async (string clientToken) =>
 {
     Message message = new()
@@ -176,7 +176,7 @@ app.MapPost("Test/fcm/{clientToken}", async (string clientToken) =>
     Console.WriteLine($"Phan hoi khi gui thong bao!! {response}");
     return Results.NoContent();
 });
-
+//=======================================End test service api=========================================//
 
 app.MapHub<PrivateChatHub>("chathub");
 

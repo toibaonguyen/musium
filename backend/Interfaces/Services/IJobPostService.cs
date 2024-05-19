@@ -5,7 +5,7 @@ namespace JobNet.Interfaces.Services;
 
 public interface IJobPostService
 {
-    Task<ListJobPostDTO> CreateJobPost(int companyId, CreateJobPostDTO post);
+    Task<ListJobPostDTO> CreateJobPostAndSendToticationToFollowers(int companyId, CreateJobPostDTO post);
     Task ChangeJobPostStatus(int id, bool isActive);
     Task DeleteJobPost(int id);
     Task UpdateJobPost(int jobPostId, CreateJobPostDTO update);

@@ -131,7 +131,7 @@ public class ChatController : ControllerBase
                     }
                 );
             }
-            await _privateChatService.SendPrivateMessage(int.Parse(authUserId), userId, message);
+            await _privateChatService.SendPrivateMessageAndSendNotificationToReceiver(int.Parse(authUserId), userId, message);
 
             return Ok(new MessageResponse { Message = SENT_MESSAGE_SUCCESSFULLY });
         }

@@ -39,7 +39,7 @@ public class JobPostService : IJobPostService
         }
     }
 
-    public async Task<ListJobPostDTO> CreateJobPost(int companyId, CreateJobPostDTO post)
+    public async Task<ListJobPostDTO> CreateJobPostAndSendToticationToFollowers(int companyId, CreateJobPostDTO post)
     {
         try
         {

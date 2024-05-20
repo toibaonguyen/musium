@@ -12,7 +12,7 @@ namespace JobNet.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ReactionController : ControllerBase
+public class TypeController : ControllerBase
 {
     [HttpGet]
     [Route("reaction-type")]

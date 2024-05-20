@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   },
   itemContent: {
     flex: 1,
-    paddingTop: 10,
+    paddingVertical: 10,
     // flexDirection: 'row',
   },
   contentFooter: {

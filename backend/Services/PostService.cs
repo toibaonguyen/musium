@@ -1,13 +1,13 @@
 
 using JobNet.Data;
 using JobNet.DTOs;
+using JobNet.Enums;
 using JobNet.Extensions;
 using JobNet.Interfaces.Services;
 using JobNet.Models.Entities;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
-
 namespace JobNet.Services;
 
 public class PostService : IPostService
@@ -18,12 +18,16 @@ public class PostService : IPostService
     private readonly JobNetDatabaseContext _databaseContext;
     private readonly IFileService _fileService;
     private readonly IUserService _userService;
-    public PostService(ILogger<PostService> logger, JobNetDatabaseContext databaseContext, IFileService fileService, IUserService userService)
+    private readonly INotificationService _notificationService;
+    private readonly IConnectionService _connectionService;
+    public PostService(ILogger<PostService> logger, JobNetDatabaseContext databaseContext, IFileService fileService, IUserService userService, INotificationService notificationService, IConnectionService connectionService)
     {
         _logger = logger;
         _databaseContext = databaseContext;
         _fileService = fileService;
         _userService = userService;
+        _notificationService = notificationService;
+        _connectionService = connectionService;
     }
 
     public async Task<Post?> GetPostById(int id)
@@ -70,12 +74,29 @@ public class PostService : IPostService
 
             await _databaseContext.Posts.AddAsync(newPost);
             await _databaseContext.SaveChangesAsync();
+            List<int> userIds = await _databaseContext.Users.Select(u => u.Id).ToListAsync();
+            List<int> connectedUserIds = [];
+            foreach (int userId in userIds)
+            {
+                if (await _connectionService.CheckIfIsConnected(OwnerId, userId))
+                {
+                    connectedUserIds.Add(userId);
+                }
+            }
+            try
+            {
+                await _notificationService.CreateAndSendNotification(ResourceNotificationType.POST, [.. connectedUserIds], $"{user.Name} posted new post!", newPost.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Can not create and sent message!");
+            }
             return newPost.ToPostDTO();
 
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception when creating new post");
+            _logger.LogError(ex, "Exception when creating new post!");
             throw;
         }
     }

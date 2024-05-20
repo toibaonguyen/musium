@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json;
 using FirebaseAdmin.Messaging;
 using JobNet.Data;
 using JobNet.Enums;
@@ -5,103 +7,143 @@ using JobNet.Extensions;
 using JobNet.Interfaces.Services;
 using JobNet.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
 
 namespace JobNet.Services;
 
 public class NotificationService : INotificationService
 {
     private readonly JobNetDatabaseContext _databaseContext;
-    private readonly IFirebaseCloudNotificationService _fcmService;
-    public NotificationService(JobNetDatabaseContext databaseContext, IFirebaseCloudNotificationService firebaseCloudNotificationService)
+    private readonly IRabbitMqService _rabbitMqService;
+    public NotificationService(JobNetDatabaseContext databaseContext, IRabbitMqService rabbitMqService)
     {
         _databaseContext = databaseContext;
-        _fcmService = firebaseCloudNotificationService;
+        _rabbitMqService = rabbitMqService;
     }
-    public async Task CreateAndSendNotification(ResourceNotificationType notificationType, int recieverId, string content, int resourceId)
+    public async Task CreateAndSendNotification(ResourceNotificationType notificationType, int[] recieverIds, string content, int resourceId)
     {
-        List<CloudMessageRegistrationToken> tokens = await _databaseContext.CloudMessageRegistrationTokens.Where(t => t.UserId == recieverId).ToListAsync();
+        List<CloudMessageRegistrationToken> tokens = await _databaseContext.CloudMessageRegistrationTokens.Where(t => recieverIds.Contains(t.Id) && t.User.IsActive).ToListAsync();
         try
         {
+            if (tokens.Count == 0) return;
+            var connection = _rabbitMqService.CreateConnection();
+            var model = connection.CreateModel();
             switch (notificationType)
             {
                 case ResourceNotificationType.POST:
-                    PostNotification postNotification = new()
+                    List<PostNotification> postNotifications = [];
+                    foreach (var token in tokens)
                     {
-                        Reciever = await _databaseContext.Users.FindAsync(recieverId) ?? throw new Exception("Something wrong when getting user!"),
-                        Content = content,
-                        Post = await _databaseContext.Posts.FindAsync(resourceId) ?? throw new Exception("Something wrong when getting post!")
-                    };
-                    await _databaseContext.PostNotifications.AddAsync(postNotification);
-                    await _databaseContext.SaveChangesAsync();
-                    await _fcmService.SendMulticastMessageAsync(new MulticastMessage
-                    {
-                        Tokens = tokens.Select(t => t.Token).ToList(),
-                        Data = postNotification.ToNotificationDTO().ToStringDictionary(),
-                        Notification = new FirebaseAdmin.Messaging.Notification()
+
+                        PostNotification postNotification = new()
                         {
-                            Title = "New post",
-                            Body = postNotification.Content,
-                        },
-                    });
+                            Reciever = await _databaseContext.Users.FindAsync(token.UserId) ?? throw new Exception("Something wrong when getting user!"),
+                            Content = content,
+                            Post = await _databaseContext.Posts.FindAsync(resourceId) ?? throw new Exception("Something wrong when getting post!")
+                        };
+                        postNotifications.Add(postNotification);
+                    }
+                    await _databaseContext.PostNotifications.AddRangeAsync(postNotifications);
+                    await _databaseContext.SaveChangesAsync();
+                    model.BasicPublish("NotificationExchange",
+                                 string.Empty,
+                                 basicProperties: null,
+                                 body: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new MulticastMessage
+                                 {
+                                     Tokens = tokens.Select(t => t.Token).ToList(),
+                                     Data = postNotifications.FirstOrDefault()?.ToNotificationDTO().ToStringDictionary(),
+                                     Notification = new FirebaseAdmin.Messaging.Notification()
+                                     {
+                                         Title = "New post",
+                                         Body = postNotifications.FirstOrDefault()?.Content,
+                                     },
+                                 })));
+
                     break;
                 case ResourceNotificationType.CONNECTION:
-                    ConnectionRequestNotification connectionNotification = new()
+                    List<ConnectionRequestNotification> connectionNotifications = [];
+                    foreach (var token in tokens)
                     {
-                        Reciever = await _databaseContext.Users.FindAsync(recieverId) ?? throw new Exception("Something wrong when getting user!"),
-                        Content = content,
-                        Connection = await _databaseContext.Connections.FindAsync(resourceId) ?? throw new Exception("Something wrong when getting connection!")
-                    };
-                    await _databaseContext.ConnectionRequestNotifications.AddAsync(connectionNotification);
-                    await _databaseContext.SaveChangesAsync();
-                    await _fcmService.SendMulticastMessageAsync(new MulticastMessage
-                    {
-                        Tokens = tokens.Select(t => t.Token).ToList(),
-                        Data = connectionNotification.ToNotificationDTO().ToStringDictionary(),
-                        Notification = new FirebaseAdmin.Messaging.Notification()
+
+                        ConnectionRequestNotification connectionNotification = new()
                         {
-                            Title = "New connection request",
-                            Body = connectionNotification.Content,
-                        },
-                    });
+                            Reciever = await _databaseContext.Users.FindAsync(token.UserId) ?? throw new Exception("Something wrong when getting user!"),
+                            Content = content,
+                            Connection = await _databaseContext.Connections.FindAsync(resourceId) ?? throw new Exception("Something wrong when getting connection!")
+                        };
+                        connectionNotifications.Add(connectionNotification);
+                    }
+                    await _databaseContext.ConnectionRequestNotifications.AddRangeAsync(connectionNotifications);
+                    await _databaseContext.SaveChangesAsync();
+                    model.BasicPublish("NotificationExchange",
+                                 string.Empty,
+                                 basicProperties: null,
+                                 body: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new MulticastMessage
+                                 {
+                                     Tokens = tokens.Select(t => t.Token).ToList(),
+                                     Data = connectionNotifications.FirstOrDefault()?.ToNotificationDTO().ToStringDictionary(),
+                                     Notification = new FirebaseAdmin.Messaging.Notification()
+                                     {
+                                         Title = "New connection request",
+                                         Body = connectionNotifications.FirstOrDefault()?.Content,
+                                     },
+                                 })));
                     break;
                 case ResourceNotificationType.MESSAGE:
-                    MessageNotification messagenotification = new()
+                    List<MessageNotification> messagenotifications = [];
+                    foreach (var token in tokens)
                     {
-                        Reciever = await _databaseContext.Users.FindAsync(recieverId) ?? throw new Exception("Something wrong when getting user!"),
-                        Content = content,
-                        Message = await _databaseContext.Messages.FindAsync(resourceId) ?? throw new Exception("Something wrong when getting message!")
-                    };
-                    await _databaseContext.MessageNotifications.AddAsync(messagenotification);
-                    await _databaseContext.SaveChangesAsync();
-                    await _fcmService.SendMulticastMessageAsync(new MulticastMessage
-                    {
-                        Tokens = tokens.Select(t => t.Token).ToList(),
-                        Notification = new FirebaseAdmin.Messaging.Notification()
+                        MessageNotification messagenotification = new()
                         {
-                            Title = "New Message"
-                        },
-                        Data = messagenotification.ToNotificationDTO().ToStringDictionary(),
-                    });
+                            Reciever = await _databaseContext.Users.FindAsync(token.UserId) ?? throw new Exception("Something wrong when getting user!"),
+                            Content = content,
+                            Message = await _databaseContext.Messages.FindAsync(resourceId) ?? throw new Exception("Something wrong when getting message!")
+                        };
+                        messagenotifications.Add(messagenotification);
+                    }
+                    await _databaseContext.MessageNotifications.AddRangeAsync(messagenotifications);
+                    await _databaseContext.SaveChangesAsync();
+                    model.BasicPublish("NotificationExchange",
+                                 string.Empty,
+                                 basicProperties: null,
+                                 body: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new MulticastMessage
+                                 {
+                                     Tokens = tokens.Select(t => t.Token).ToList(),
+                                     Notification = new FirebaseAdmin.Messaging.Notification()
+                                     {
+                                         Title = "New Message",
+                                         Body = messagenotifications.FirstOrDefault()?.Content,
+                                     },
+                                     Data = messagenotifications.FirstOrDefault()?.ToNotificationDTO().ToStringDictionary(),
+                                 })));
                     break;
                 case ResourceNotificationType.JOBPOST:
-                    JobPostNotification jobPostNotification = new()
+                    List<JobPostNotification> JobPostNotifications = [];
+                    foreach (var token in tokens)
                     {
-                        Reciever = await _databaseContext.Users.FindAsync(recieverId) ?? throw new Exception("Something wrong when getting user!"),
-                        Content = content,
-                        JobPost = await _databaseContext.JobPosts.FindAsync(resourceId) ?? throw new Exception("Something wrong when getting message!")
-                    };
-                    await _databaseContext.JobPostNotifications.AddAsync(jobPostNotification);
-                    await _databaseContext.SaveChangesAsync();
-                    await _fcmService.SendMulticastMessageAsync(new MulticastMessage
-                    {
-                        Tokens = tokens.Select(t => t.Token).ToList(),
-                        Notification = new FirebaseAdmin.Messaging.Notification()
+                        JobPostNotification JobPostNotification = new()
                         {
-                            Title = "New job opportunities",
-                            Body = jobPostNotification.Content
-                        },
-                        Data = jobPostNotification.ToNotificationDTO().ToStringDictionary(),
-                    });
+                            Reciever = await _databaseContext.Users.FindAsync(token.UserId) ?? throw new Exception("Something wrong when getting user!"),
+                            Content = content,
+                            JobPost = await _databaseContext.JobPosts.FindAsync(resourceId) ?? throw new Exception("Something wrong when getting message!")
+                        };
+                        JobPostNotifications.Add(JobPostNotification);
+                    }
+                    await _databaseContext.JobPostNotifications.AddRangeAsync(JobPostNotifications);
+                    await _databaseContext.SaveChangesAsync();
+                    model.BasicPublish("NotificationExchange",
+                                 string.Empty,
+                                 basicProperties: null,
+                                 body: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new MulticastMessage
+                                 {
+                                     Tokens = tokens.Select(t => t.Token).ToList(),
+                                     Notification = new FirebaseAdmin.Messaging.Notification()
+                                     {
+                                         Title = "New job opportunities",
+                                         Body = JobPostNotifications.FirstOrDefault()?.Content
+                                     },
+                                     Data = JobPostNotifications.FirstOrDefault()?.ToNotificationDTO().ToStringDictionary(),
+                                 })));
                     break;
             }
         }

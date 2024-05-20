@@ -5,12 +5,12 @@ using JobNet.Settings;
 using Microsoft.Extensions.Options;
 
 namespace JobNet.Services.Background;
-public class BackgroundScaleTokensRemover : BackgroundService
+public class BackgroundScaleTokensRemoverService : BackgroundService
 {
-    private readonly ILogger<BackgroundScaleTokensRemover> _logger;
+    private readonly ILogger<BackgroundScaleTokensRemoverService> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly TimeSpan _interval;
-    public BackgroundScaleTokensRemover(IServiceProvider serviceProvider, ILogger<BackgroundScaleTokensRemover> logger)
+    public BackgroundScaleTokensRemoverService(IServiceProvider serviceProvider, ILogger<BackgroundScaleTokensRemoverService> logger)
     {
         _logger = logger;
         _interval = TimeSpan.FromHours(24);

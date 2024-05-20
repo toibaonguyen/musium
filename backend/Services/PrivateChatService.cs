@@ -1,5 +1,6 @@
 using JobNet.Data;
 using JobNet.DTOs;
+using JobNet.Enums;
 using JobNet.Exceptions;
 using JobNet.Extensions;
 using JobNet.Hubs;
@@ -19,13 +20,15 @@ public class PrivateChatService : IPrivateChatService
     private readonly IUserService _userService;
     private readonly IHubContext<PrivateChatHub, IPrivateChatListenerHub> _chatHubContext;
     private readonly IFileService _fileService;
+    private readonly INotificationService _notificationService;
 
-    public PrivateChatService(JobNetDatabaseContext databaseContext, IUserService userService, IHubContext<PrivateChatHub, IPrivateChatListenerHub> chatHubContext, IFileService fileService)
+    public PrivateChatService(JobNetDatabaseContext databaseContext, IUserService userService, IHubContext<PrivateChatHub, IPrivateChatListenerHub> chatHubContext, IFileService fileService, INotificationService notificationService)
     {
         _databaseContext = databaseContext;
         _userService = userService;
         _chatHubContext = chatHubContext;
         _fileService = fileService;
+        _notificationService = notificationService;
     }
     public async Task<bool> CheckIfUserIsInConversation(int userId, int conversationId)
     {
@@ -145,6 +148,7 @@ public class PrivateChatService : IPrivateChatService
                 await _databaseContext.Messages.AddAsync(newMessage);
                 await _databaseContext.SaveChangesAsync();
             }
+            await _notificationService.CreateAndSendNotification(ResourceNotificationType.MESSAGE, [RecieverId], $"{sender.Name} sent new message!", newMessage.ConversationId);
             await _chatHubContext.Clients.User(RecieverId.ToString()).RecieveMessage(newMessage.ToMessageDTO());
         }
         catch (Exception)

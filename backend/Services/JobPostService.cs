@@ -19,11 +19,13 @@ public class JobPostService : IJobPostService
     private readonly JobNetDatabaseContext _databaseContext;
     private readonly ICompanyService _companyService;
     private readonly ISkillService _skillService;
-    public JobPostService(JobNetDatabaseContext databaseContext, ICompanyService companyService, ISkillService skillService)
+    private readonly INotificationService _notificationService;
+    public JobPostService(JobNetDatabaseContext databaseContext, ICompanyService companyService, ISkillService skillService, INotificationService notificationService)
     {
         _databaseContext = databaseContext;
         _companyService = companyService;
         _skillService = skillService;
+        _notificationService = notificationService;
     }
     public async Task ChangeJobPostStatus(int id, bool isActive)
     {
@@ -75,8 +77,8 @@ public class JobPostService : IJobPostService
             }
             await _databaseContext.JobPostSkills.AddRangeAsync(skills);
             await _databaseContext.SaveChangesAsync();
+            await _notificationService.CreateAndSendNotification(ResourceNotificationType.JOBPOST, await _databaseContext.UserFollowCompanies.Where(c => c.CompanyId == companyId).Select(u => u.UserId).ToArrayAsync(), $"{company.Name} posted new job, check it out!", jobPost.Id);
             return jobPost.ToListJobPostDTO();
-
         }
         catch (Exception)
         {

@@ -12,7 +12,7 @@ using RabbitMQ.Client.Events;
 namespace JobNet.Services.Background;
 public class BackgroundEmailSenderService : BackgroundService
 {
-    const string _queueName = "Email";
+    const string _queueName = "Emails";
     private readonly IModel _model;
     private readonly IConnection _connection;
     private readonly IEmailSenderService _emailSenderService;

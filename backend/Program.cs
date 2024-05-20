@@ -109,16 +109,18 @@ builder.Services.AddTransient<IPostService, PostService>();
 builder.Services.AddTransient<ISkillService, SkillsService>();
 builder.Services.AddTransient<ICloudMessageRegistrationTokenService, CloudMessageRegistrationTokenService>();
 builder.Services.AddScoped<ICloudMessageTokenHandlerService, CloudMessageRegistrationTokenService>();
-builder.Services.AddScoped<IFirebaseCloudNotificationService, FirebaseCloudNotificationService>();
+builder.Services.AddSingleton<IFirebaseCloudNotificationService, FirebaseCloudNotificationService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<IPostReactService, PostReactService>();
 builder.Services.AddScoped<IPrivateChatService, PrivateChatService>();
 builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 //builder.Services.AddSingleton<INotificationService, NotificationService>();
 
-builder.Services.AddHostedService<BackgroundScaleTokensRemover>();
+builder.Services.AddHostedService<BackgroundNotificationSenderService>();
+builder.Services.AddHostedService<BackgroundScaleTokensRemoverService>();
 builder.Services.AddHostedService<BackgroundEmailSenderService>();
 
 

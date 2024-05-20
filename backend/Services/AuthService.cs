@@ -344,7 +344,6 @@ public class AuthService : IAuthService
             }
             catch (Exception)
             {
-                await _usersService.DeleteUser(user.Id);
                 throw;
             }
         }

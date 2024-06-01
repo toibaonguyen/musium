@@ -7,6 +7,7 @@ import PostDetail from '../screens/Home/Post/PostDetail'
 import Archive from '../screens/Home/Archive/Archive'
 import Chat from '../screens/Home/Chat/Chat'
 import {COLORS} from '../../constants'
+import Notification from '../screens/Notification/Notification'
 
 const Tab = createMaterialBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -25,6 +26,20 @@ const HomeStack = () => {
     </Stack.Navigator>
   )
 }
+
+const NotificationStack = () => {
+  return (
+    <Stack.Navigator
+      initialRouteName="Notification"
+      screenOptions={{
+        headerShown: false, 
+      }}>
+      <Stack.Screen name="Notification" component={Notification} />
+    </Stack.Navigator>
+  )
+}
+
+
 const PostCreateStack = () => {
   return (
     <Stack.Navigator
@@ -71,7 +86,7 @@ const BottomNavigator = () => {
       />
       <Tab.Screen
         name="Notifications"
-        component={HomeStack}
+        component={NotificationStack}
         options={{
           title: '',
           tabBarIcon: ({focused}) => (

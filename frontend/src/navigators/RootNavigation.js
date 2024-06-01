@@ -4,6 +4,7 @@ import SignUp from '../screens/SignUp/SignUp'
 import Welcome from '../screens/Welcome/Welcome'
 import Splash from '../screens/Splash/Splash'
 import BottomNavigator from './BottomNavigator'
+import Notification from '../screens/Notification/Notification'
 
 const Stack = createNativeStackNavigator()
 
@@ -20,6 +21,7 @@ const RootNavigation = () => {
       <Stack.Screen name="Welcome" component={Welcome} />
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="SignUp" component={SignUp} />
+      <Stack.Screen name="Notification" component={Notification} />
 
       <Stack.Screen name="BottomNavigator" component={BottomNavigator} />
     </Stack.Navigator>

@@ -9,7 +9,13 @@ const images = {
   hero3: require('../assets/images/hero3.jpg'),
 
   next: require('../assets/images/next.png'),
-  previous: require('../assets/images/previous.png')
+  previous: require('../assets/images/previous.png'),
+  LOGOS: {
+    LOGO1: require('../assets/images/LOGO/logo1.jpg'),
+    LOGO2: require('../assets/images/LOGO/logo2.jpg'),
+    LOGO3: require('../assets/images/LOGO/logo3.jpg'),
+    LOGO4: require('../assets/images/LOGO/logo4.jpg')
+  }
 }
 
 export default images;

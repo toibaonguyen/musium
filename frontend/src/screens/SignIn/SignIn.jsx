@@ -10,12 +10,39 @@ import {
 import React, {useState} from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CheckBox from '@react-native-community/checkbox'
+import { useDispatch } from 'react-redux'
 import Button from '../../components/Button'
 import {images, COLORS} from '../../../constants'
 
 const SignIn = ({navigation}) => {
+  const dispatch = useDispatch()
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [isChecked, setIsChecked] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const handleLogin = async () => {
+    const loginResponse = await login(email, password)
+    const decoded = jwtDecode(loginResponse.data.token)
+
+    if (typeof loginResponse.data === 'string') {
+      Alert.alert(loginResponse.data.toString())
+    }
+    else {
+      try {
+        await AsyncStorage.setItem('token', loginResponse.data.token)
+        // await AsyncStorage.setItem('userInfo', JSON.stringify(decoded.context.user))
+
+        dispatch(setInfo(decoded.context.user))
+        dispatch(setFeatures(decoded.context.features))
+        dispatch(setRoom(decoded.room))
+        navigation.replace('BottomNavigator')
+      }
+      catch (err) {
+        console.log(err)
+      }
+    }
+  }
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.white}}>

@@ -10,13 +10,45 @@ import {
 import React, {useState} from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CheckBox from '@react-native-community/checkbox'
+import { useDispatch } from 'react-redux'
 import Button from '../../components/Button'
 import {images, COLORS} from '../../../constants'
 import styles from './signUp.style'
 
 const SignUp = ({navigation}) => {
+  const dispatch = useDispatch()
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [isChecked, setIsChecked] = useState(false)
+  const [name, setName] = useState('')
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [password, setPassword] = useState('')
+
+  const handleSignUp = async () => {
+    const signUpResponse = await register(name, email, phone, password, username)
+  
+    if (signUpResponse.data === 'User already exists') {
+      Alert.alert(signUpResponse.data)
+    }
+    else {
+      const loginResponse = await login(email, password)
+      const decoded = jwtDecode(loginResponse.data.token)
+
+      try {
+        await AsyncStorage.setItem('token', loginResponse.data.token)
+        // await AsyncStorage.setItem('userInfo', JSON.stringify(decoded))
+
+        dispatch(setInfo(decoded.context.user))
+        dispatch(setFeatures(decoded.context.features))
+        dispatch(setRoom(decoded.room))
+        navigation.replace('BottomNavigator')
+      }
+      catch (err) {
+        console.log(err)
+      }
+    }
+  }
 
   return (
     <SafeAreaView style={styles.signUpContainer}>
@@ -24,6 +56,30 @@ const SignUp = ({navigation}) => {
         <Text style={styles.createAccountLabel}>Create Account</Text>
 
         <Text style={styles.connectLabel}>Connect with your friend today!</Text>
+      </View>
+
+      <View style={styles.in4InputWrapper}>
+        <Text style={styles.inputLabel}>Name</Text>
+
+        <View
+          style={{
+            width: '100%',
+            height: 48,
+            borderColor: COLORS.black,
+            borderWidth: 1,
+            borderRadius: 8,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingLeft: 22
+          }}>
+          <TextInput
+            placeholder="Name"
+            placeholderTextColor={COLORS.black}
+            style={{
+              width: '100%'
+            }}
+          />
+        </View>
       </View>
 
       <View style={styles.in4InputWrapper}>
@@ -159,6 +215,7 @@ const SignUp = ({navigation}) => {
 
       <Button
         title="Sign Up"
+        onPress={handleSignUp}
         style={{
           marginTop: 18,
           marginBottom: 4

@@ -25,7 +25,7 @@ export default styles = StyleSheet.create({
     },
 
     in4InputWrapper: {
-        marginBottom: 12
+        marginBottom: 2
     },
 
     inputLabel: {

@@ -10,7 +10,6 @@ import {
 import React, {useState} from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CheckBox from '@react-native-community/checkbox'
-import firebase from 'react-native-firebase';
 import {useDispatch} from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { jwtDecode } from 'jwt-decode'

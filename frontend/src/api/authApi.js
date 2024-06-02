@@ -1,15 +1,14 @@
 import { postgreAPI } from "../axios/axios"
 
-const path = '/Auth/users/'
+const path = '/Auth/users'
 
-export const register = async (name, email, phone, password, username) => {
+export const register = async (name, email, phone, password) => {
     try {
         const registerResponse = await postgreAPI.post(`${path}`, {
             name,
             email,
             phone,
             password,
-            username
         })
 
         return registerResponse
@@ -30,7 +29,20 @@ export const login = async (email, password) => {
         return loginResponse
     }
     catch (err) {
-        console.log(err.response.data)
+        console.log(err)
+        throw err
+    }
+}
+
+export const refreshToken = async (userId) => {
+    try {
+        const rtResponse  = await postgreAPI.post(`${path}/${userId}/refresh-tokens`,{
+            userId
+        })
+        
+        return rtResponse
+    } catch (error) {
+        console.log(err)
         throw err
     }
 }

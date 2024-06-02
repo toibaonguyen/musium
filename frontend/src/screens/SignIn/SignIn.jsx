@@ -10,7 +10,8 @@ import {
 import React, {useState} from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CheckBox from '@react-native-community/checkbox'
-import { useDispatch } from 'react-redux'
+import {useDispatch} from 'react-redux'
+import {login} from '../../api/authApi'
 import Button from '../../components/Button'
 import {images, COLORS} from '../../../constants'
 
@@ -27,8 +28,7 @@ const SignIn = ({navigation}) => {
 
     if (typeof loginResponse.data === 'string') {
       Alert.alert(loginResponse.data.toString())
-    }
-    else {
+    } else {
       try {
         await AsyncStorage.setItem('token', loginResponse.data.token)
         // await AsyncStorage.setItem('userInfo', JSON.stringify(decoded.context.user))
@@ -37,8 +37,7 @@ const SignIn = ({navigation}) => {
         dispatch(setFeatures(decoded.context.features))
         dispatch(setRoom(decoded.room))
         navigation.replace('BottomNavigator')
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err)
       }
     }
@@ -90,6 +89,8 @@ const SignIn = ({navigation}) => {
               paddingLeft: 22
             }}>
             <TextInput
+              value={email}
+              onChangeText={text => setEmail(text)}
               placeholder="Enter your email address"
               placeholderTextColor={COLORS.black}
               keyboardType="email-address"
@@ -122,6 +123,8 @@ const SignIn = ({navigation}) => {
               paddingLeft: 22
             }}>
             <TextInput
+              value={password}
+              onChangeText={text => setPassword(text)}
               placeholder="Enter your password"
               placeholderTextColor={COLORS.black}
               secureTextEntry={isPasswordShown}
@@ -168,7 +171,7 @@ const SignIn = ({navigation}) => {
             marginTop: 18,
             marginBottom: 4
           }}
-          onPress={() => navigation.navigate('BottomNavigator')}
+          onPress={handleLogin}
         />
 
         <View

@@ -2,6 +2,8 @@ import {SafeAreaView, Image} from 'react-native'
 import React, {useEffect} from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch } from 'react-redux'
+import { jwtDecode } from 'jwt-decode'
+import { refreshToken } from '../../api/authApi'
 import {images} from '../../../constants'
 import styles from './splash.style'
 
@@ -14,7 +16,6 @@ const Splash = ({navigation}) => {
 
       if (!token) {
         navigation.replace('Welcome')
-
         return
       }
 
@@ -31,6 +32,7 @@ const Splash = ({navigation}) => {
         // dispatch(setFeatures(decoded.context.features))
         // dispatch(setRoom(decoded.room))
 
+        await refreshToken(decoded.userId)
         navigation.replace('BottomNavigator')
       }
     } catch (err) {

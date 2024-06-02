@@ -5,12 +5,15 @@ import {
   Image,
   Pressable,
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from 'react-native'
 import React, {useState} from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CheckBox from '@react-native-community/checkbox'
-import { useDispatch } from 'react-redux'
+import Toast from 'react-native-toast-message'
+import {useDispatch} from 'react-redux'
+import {register} from '../../api/authApi'
 import Button from '../../components/Button'
 import {images, COLORS} from '../../../constants'
 import styles from './signUp.style'
@@ -18,36 +21,43 @@ import styles from './signUp.style'
 const SignUp = ({navigation}) => {
   const dispatch = useDispatch()
   const [isPasswordShown, setIsPasswordShown] = useState(false)
-  const [isChecked, setIsChecked] = useState(false)
+  const [isChecked, setIsChecked] = useState(true)
   const [name, setName] = useState('')
-  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
 
   const handleSignUp = async () => {
-    const signUpResponse = await register(name, email, phone, password, username)
-  
-    if (signUpResponse.data === 'User already exists') {
-      Alert.alert(signUpResponse.data)
-    }
-    else {
-      const loginResponse = await login(email, password)
-      const decoded = jwtDecode(loginResponse.data.token)
+    if (isChecked) {
+      const signUpResponse = await register(name, email, phone, password)
 
-      try {
-        await AsyncStorage.setItem('token', loginResponse.data.token)
-        // await AsyncStorage.setItem('userInfo', JSON.stringify(decoded))
+      if (signUpResponse.data === 'User already exists') {
+        Alert.alert(signUpResponse.data)
+      } else {
+        const loginResponse = await login(email, password)
+        const decoded = jwtDecode(loginResponse.data.token)
 
-        dispatch(setInfo(decoded.context.user))
-        dispatch(setFeatures(decoded.context.features))
-        dispatch(setRoom(decoded.room))
-        navigation.replace('BottomNavigator')
+        try {
+          await AsyncStorage.setItem('token', loginResponse.data.token)
+          dispatch(setInfo(decoded.context.user))
+          dispatch(setFeatures(decoded.context.features))
+          Toast.show({
+            type: 'success',
+            text1: 'Xin chào',
+            text2: 'Vui lòng xác thực tài khoản qua email trước khi đăng nhập!'
+          })
+        } catch (err) {
+          console.log(err)
+        }
       }
-      catch (err) {
-        console.log(err)
-      }
-    }
+    } else
+      Toast.show({
+        type: 'error',
+        text1: 'Chú ý',
+        text2:
+          'Vui lòng chọn đồng ý với quy định sử dụng trước khi đăng ký tài khoản!',
+        position: 'bottom'
+      })
   }
 
   return (
@@ -73,6 +83,8 @@ const SignUp = ({navigation}) => {
             paddingLeft: 22
           }}>
           <TextInput
+            value={name}
+            onChangeText={text => setName(text)}
             placeholder="Name"
             placeholderTextColor={COLORS.black}
             style={{
@@ -97,6 +109,8 @@ const SignUp = ({navigation}) => {
             paddingLeft: 22
           }}>
           <TextInput
+            value={email}
+            onChangeText={text => setEmail(text)}
             placeholder="Enter your email address"
             placeholderTextColor={COLORS.black}
             keyboardType="email-address"
@@ -142,6 +156,8 @@ const SignUp = ({navigation}) => {
           />
 
           <TextInput
+            value={phone}
+            onChangeText={text => setPhone(text)}
             placeholder="Enter your phone number"
             placeholderTextColor={COLORS.black}
             keyboardType="numeric"
@@ -174,6 +190,8 @@ const SignUp = ({navigation}) => {
             paddingLeft: 22
           }}>
           <TextInput
+            value={password}
+            onChangeText={text => setPassword(text)}
             placeholder="Enter your password"
             placeholderTextColor={COLORS.black}
             secureTextEntry={isPasswordShown}

@@ -6,6 +6,7 @@ import {jwtDecode} from 'jwt-decode'
 import {refreshToken} from '../../api/authApi'
 import {images} from '../../../constants'
 import styles from './splash.style'
+import { register } from '../../api/fcmApi'
 
 const Splash = ({navigation}) => {
   const dispatch = useDispatch()
@@ -14,9 +15,12 @@ const Splash = ({navigation}) => {
     try {
       const user = await AsyncStorage.getItem('userInfo')
       const token = await AsyncStorage.getItem('tokenInfo')
+      const fcmToken = await AsyncStorage.getItem('fcmToken')
+
       return {
         user: user ? JSON.parse(user) : null,
-        token: token ? JSON.parse(token) : null
+        token: token ? JSON.parse(token) : null,
+        fcmToken: fcmToken ? JSON.parse(token) : null
       }
     } catch (err) {
       console.log(err)
@@ -26,7 +30,7 @@ const Splash = ({navigation}) => {
 
   const checkTokenExpired = async () => {
     try {
-      const {user, token} = await getDataStorage()
+      const {user, token, fcmToken} = await getDataStorage()
 
       if (!token) {
         navigation.replace('Welcome')
@@ -35,6 +39,7 @@ const Splash = ({navigation}) => {
 
       if (user) {
         const res = await refreshToken(user.id, token.refreshToken)
+        await register(token, fcmToken)
 
         if (res.status === 200 && res.data) {
           await AsyncStorage.setItem('userInfo', JSON.stringify(res.data.user))

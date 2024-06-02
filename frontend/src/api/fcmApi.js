@@ -2,10 +2,10 @@ import { postgreAPI } from "../axios/axios"
 
 const path = '/CloudMessageRegistrationToken'
 
-export const register = async (accessToken) => {
+export const register = async (accessToken, fcmToken) => {
     try {
         const registerResponse = await postgreAPI.put(`${path}`, {
-            token: accessToken
+            token: fcmToken
         },
         {
             headers: {

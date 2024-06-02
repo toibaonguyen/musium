@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   Dimensions
 } from 'react-native'
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import SearchBar from '../../components/SearchBar'
@@ -23,6 +23,7 @@ import PostData from '../../../assets/data/postData'
 import {closeModal} from '../../redux/slices/modalSlice'
 import {deselectImg, deselectPost} from '../../redux/slices/selectedPostSlice'
 import ImageFooter from '../../components/ImageFooter'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Home = ({navigation}) => {
   const dispatch = useDispatch()

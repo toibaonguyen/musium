@@ -95,7 +95,16 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(IdentityData.AdminPolicyName, p => p.RequireClaim(ClaimTypes.Role, UserRoles.Admin))
     .AddPolicy(IdentityData.UserPolicyName, p => p.RequireClaim(ClaimTypes.Role, UserRoles.User));
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "AllowAllOrigins",
+                      builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+});
 
 builder.Services.AddDbContext<JobNetDatabaseContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));

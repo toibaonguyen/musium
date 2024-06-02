@@ -12,7 +12,7 @@ const Splash = ({navigation}) => {
 
   const checkTokenExpired = async () => {
     try {
-      const token = await AsyncStorage.getItem('token')
+      const token = await AsyncStorage.getItem('tokenInfo')
 
       if (!token) {
         navigation.replace('Welcome')
@@ -23,7 +23,7 @@ const Splash = ({navigation}) => {
       console.log(decoded)
 
       if (Date.now() >= decoded.exp * 1000) {
-        await AsyncStorage.removeItem('token')
+        await AsyncStorage.removeItem('tokenInfo')
 
         navigation.replace('Welcome')
 

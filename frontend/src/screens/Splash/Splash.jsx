@@ -1,49 +1,55 @@
 import {SafeAreaView, Image} from 'react-native'
 import React, {useEffect} from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useDispatch } from 'react-redux'
-import { jwtDecode } from 'jwt-decode'
-import { refreshToken } from '../../api/authApi'
+import {useDispatch} from 'react-redux'
+import {jwtDecode} from 'jwt-decode'
+import {refreshToken} from '../../api/authApi'
 import {images} from '../../../constants'
 import styles from './splash.style'
 
 const Splash = ({navigation}) => {
   const dispatch = useDispatch()
 
+  const getDataStorage = async () => {
+    try {
+      const user = await AsyncStorage.getItem('userInfo')
+      const token = await AsyncStorage.getItem('tokenInfo')
+      return {
+        user: user ? JSON.parse(user) : null,
+        token: token ? JSON.parse(token) : null
+      }
+    } catch (err) {
+      console.log(err)
+      return {user: null, token: null}
+    }
+  }
+
   const checkTokenExpired = async () => {
     try {
-      const token = await AsyncStorage.getItem('tokenInfo')
+      const {user, token} = await getDataStorage()
 
       if (!token) {
         navigation.replace('Welcome')
         return
       }
 
-      const decoded = jwtDecode(token)
-      console.log(decoded)
+      if (user) {
+        const res = await refreshToken(user.id, token.refreshToken)
 
-      if (Date.now() >= decoded.exp * 1000) {
-        await AsyncStorage.removeItem('tokenInfo')
-
-        navigation.replace('Welcome')
-
-      } else {
-        // dispatch(setInfo(decoded.context.user))
-        // dispatch(setFeatures(decoded.context.features))
-        // dispatch(setRoom(decoded.room))
-
-        await refreshToken(decoded.userId)
-        navigation.replace('BottomNavigator')
+        if (res.status === 200 && res.data) {
+          await AsyncStorage.setItem('userInfo', JSON.stringify(res.data.user))
+          await AsyncStorage.setItem('tokenInfo', JSON.stringify(res.data.data))
+          navigation.replace('BottomNavigator')
+        } else navigation.replace('Welcome')
       }
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.log(error)
+      navigation.replace('Welcome')
     }
   }
 
   useEffect(() => {
-    setTimeout(() => {
-      checkTokenExpired()
-    }, 2000)
+    checkTokenExpired()
   }, [])
 
   return (

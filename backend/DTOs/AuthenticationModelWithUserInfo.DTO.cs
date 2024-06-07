@@ -2,7 +2,7 @@
 
 
 namespace JobNet.DTOs;
-
+/*AuthenticationTokenWithUserInfoDTO*/
 public class AuthenticationTokenWithUserInfoDTO : AuthenticationTokenDTO
 {
     public required int UserId { get; set; }

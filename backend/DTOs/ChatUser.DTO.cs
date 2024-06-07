@@ -1,6 +1,6 @@
 
 namespace JobNet.DTOs;
-
+/*ChatUserDTO*/
 public class ChatUserDTO
 {
     public required int Id { get; set; }

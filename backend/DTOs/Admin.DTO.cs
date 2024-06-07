@@ -1,6 +1,6 @@
 
 namespace JobNet.DTOs;
-
+/*Admin DTO*/
 public class AdminDTO
 {
     public int Id { get; set; }

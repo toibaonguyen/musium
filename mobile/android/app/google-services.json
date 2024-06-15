@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "915417584424",
+    "project_id": "jobnet-6b22b",
+    "storage_bucket": "jobnet-6b22b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915417584424:android:3000e55d656005ab89b61d",
+        "android_client_info": {
+          "package_name": "com.jobnet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSjPOJm8F3wQ-KTN2NN7FEBdzrIbR2ivk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

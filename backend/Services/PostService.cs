@@ -169,7 +169,7 @@ public class PostService : IPostService
     {
         try
         {
-            return await _databaseContext.Posts.OrderBy(e => EF.Functions.Random()).Take(limit).Select(e => e.ToPostDTO()).ToListAsync();
+            return await _databaseContext.Posts.OrderBy(e => EF.Functions.Random()).Where(e => e != null).Take(limit).Select(e => e.ToPostDTO()).ToListAsync();
         }
         catch (Exception ex)
         {

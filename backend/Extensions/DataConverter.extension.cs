@@ -227,6 +227,9 @@ public static class DataConverterExtensions
             }
             Top3ReactionsInPost.Add(reaction.ReactionType.ToString());
         }
+        Console.WriteLine("post.Owner.Id:::::=>>>>>>>>>>>>>>>>>>>>");
+        Console.WriteLine(post.Id);
+        Console.WriteLine(post.OwnerId);
 
         return new PostDTO
         {

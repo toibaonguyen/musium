@@ -88,6 +88,7 @@ public class JobNetDatabaseContext : DbContext
 
         //Post
         modelBuilder.Entity<Post>().HasKey(e => e.Id);
+        modelBuilder.Entity<Post>().Navigation(e => e.Owner).AutoInclude();
         modelBuilder.Entity<Post>().HasMany(e => e.Comments).WithOne(e => e.Post).HasForeignKey(e => e.PostId).IsRequired();
         modelBuilder.Entity<Post>().HasMany(e => e.Reactions).WithOne(e => e.Post).HasForeignKey(e => e.PostId).IsRequired();
         modelBuilder.Entity<Post>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");

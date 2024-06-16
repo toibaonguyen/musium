@@ -226,7 +226,7 @@ const PostItem = ({data}) => {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.optionTab}>
+        <TouchableOpacity style={styles.optionTab} onPress={() => navigation.navigate('PostDetail', data.item)}>
           <FontAwesome name="comment-o" size={18} color={COLORS.greyDark} />
           <Text style={styles.optionText(false)}>Comment</Text>
         </TouchableOpacity>

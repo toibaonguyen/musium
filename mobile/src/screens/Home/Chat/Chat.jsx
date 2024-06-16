@@ -122,7 +122,7 @@ const Chat = ({navigation}) => {
           keyExtractor={item => item.login.username}
           disableRightSwipe
           renderItem={item => (
-            <ChatItem data={item} type={'chat'} onPress={() => {}} />
+            <ChatItem data={item} type={'chat'} onPress={() => {navigation.navigate('ChatDetail', item)}} />
           )}
           renderHiddenItem={(data, rowMap) => (
             <View

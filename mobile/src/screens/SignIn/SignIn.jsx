@@ -25,22 +25,24 @@ const SignIn = ({navigation}) => {
   const [password, setPassword] = useState('')
 
   const handleLogin = async () => {
-    const loginResponse = await login(email, password)
-    // const decoded = jwtDecode(loginResponse.data)
-
-    if ( loginResponse.status === 200 && loginResponse.data) {
-      console.log(JSON.stringify(loginResponse.data.data))
-      try {
-        await AsyncStorage.setItem('userInfo', JSON.stringify(loginResponse.data.user))
-        await AsyncStorage.setItem('tokenInfo', JSON.stringify(loginResponse.data.data))
-
         navigation.replace('BottomNavigator')
-      } catch (err) {
-        console.log(err)
-      }
-    } else {
-      Alert.alert(loginResponse.data.toString())
-    }
+
+    // const loginResponse = await login(email, password)
+    // // const decoded = jwtDecode(loginResponse.data)
+
+    // if ( loginResponse.status === 200 && loginResponse.data) {
+    //   console.log(JSON.stringify(loginResponse.data.data))
+    //   try {
+    //     await AsyncStorage.setItem('userInfo', JSON.stringify(loginResponse.data.user))
+    //     await AsyncStorage.setItem('tokenInfo', JSON.stringify(loginResponse.data.data))
+
+    //     navigation.replace('BottomNavigator')
+    //   } catch (err) {
+    //     console.log(err)
+    //   }
+    // } else {
+    //   Alert.alert(loginResponse.data.toString())
+    // }
   }
 
   return (

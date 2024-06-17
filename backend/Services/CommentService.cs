@@ -20,6 +20,7 @@ using JobNet.Models.Core.Responses;
 using JobNet.Extensions;
 using JobNet.Data;
 using JobNet.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace JobNet.Services;
 
@@ -64,6 +65,25 @@ public class CommentService : ICommentService
             await _databaseContext.SaveChangesAsync();
 
             return newComment.ToCommentDTO();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public async Task<List<CommentDTO>> GetCommentsOfPost(int postId, int limit, DateTime cursor)
+    {
+        try
+        {
+            var post = await _postService.GetPostById(postId);
+            if (post == null || !post.IsActive)
+            {
+                throw new BadRequestException(INVALID_POST);
+            }
+            List<CommentDTO> Comments = await _databaseContext.Comments.Where(c => c.PostId == postId && c.CreatedAt <= cursor).OrderByDescending(e => e.CreatedAt).Take(limit).Select(e => e.ToCommentDTO()).ToListAsync();
+
+            return Comments;
         }
         catch (Exception)
         {

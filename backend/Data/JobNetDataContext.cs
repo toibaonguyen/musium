@@ -143,7 +143,6 @@ public class JobNetDatabaseContext : DbContext
         modelBuilder.Entity<Connection>().HasIndex(e => new { e.SenderId, e.RecieverId }).IsUnique();
         modelBuilder.Entity<Connection>().HasOne(e => e.Notification).WithOne(e => e.Connection).HasForeignKey<ConnectionRequestNotification>(e => e.ConnectionRequestId).IsRequired();
 
-
         //Company
         modelBuilder.Entity<Company>().HasKey(e => e.Id);
         modelBuilder.Entity<Company>().HasMany(e => e.UserExperiences).WithOne(e => e.Company).HasForeignKey(e => e.CompanyId).IsRequired();
@@ -152,6 +151,7 @@ public class JobNetDatabaseContext : DbContext
 
         //Comment
         modelBuilder.Entity<Comment>().HasKey(e => e.Id);
+        modelBuilder.Entity<Comment>().Navigation(e => e.User).AutoInclude();
         modelBuilder.Entity<Comment>().Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
         modelBuilder.Entity<Comment>().Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 

@@ -291,6 +291,7 @@ public static class DataConverterExtensions
     {
         return new CommentDTO
         {
+            User = comment.User.ToChatUserDTO(),
             id = comment.Id,
             Content = comment.Content,
             Image = comment.Image

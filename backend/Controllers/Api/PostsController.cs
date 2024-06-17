@@ -182,6 +182,28 @@ public class PostsController : ControllerBase
         }
     }
     [Authorize(Policy = IdentityData.UserPolicyName)]
+    [HttpGet]
+    [Route("{postId}/comments")]
+    public async Task<ActionResult<BaseResponse>> GetCommentsWithLimit(int postId, [FromQuery] int limit, [FromQuery] DateTime cursor)
+    {
+        try
+        {
+            var post = await _postService.GetPostById(postId);
+            if (post is null || !post.IsActive)
+            {
+                return BadRequest(new MessageResponse { Message = INVALID_POST });
+            }
+            List<CommentDTO> Comments = await _commentService.GetCommentsOfPost(postId, limit, cursor);
+
+            return Ok(new CommentsResponse { Data = Comments });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error when commenting to Post!");
+            throw;
+        }
+    }
+    [Authorize(Policy = IdentityData.UserPolicyName)]
     [HttpPut]
     [Route("{postId}/comments/{commentId}")]
     public async Task<ActionResult<BaseResponse>> EditComment(int postId, int commentId, [FromForm] CreatePostCommentDTO comment)

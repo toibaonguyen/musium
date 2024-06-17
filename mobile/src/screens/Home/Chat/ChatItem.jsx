@@ -5,7 +5,7 @@ import formatDate from '../../../utils/formatDateTime'
 
 const ChatItem = ({data, type, onPress}) => {
   return (
-    <TouchableHighlight underlayColor={'#AAA'} style={styles.wrapper}>
+    <TouchableHighlight underlayColor={'#AAA'} style={styles.wrapper} onPress={onPress}>
       <View style={styles.container}>
         <View style={styles.avtContainer}>
           <Image

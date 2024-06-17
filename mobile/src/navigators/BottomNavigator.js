@@ -5,9 +5,10 @@ import Home from '../screens/Home/Home'
 import Post from '../screens/PostCreate/Post'
 import PostDetail from '../screens/Home/Post/PostDetail'
 import Archive from '../screens/Home/Archive/Archive'
-import Chat from '../screens/Home/Chat/Chat'
-import {COLORS} from '../../constants'
 import Notification from '../screens/Notification/Notification'
+import Chat from '../screens/Home/Chat/Chat'
+import ChatDetail from '../screens/Home/Chat/ChatDetail'
+import {COLORS} from '../../constants'
 
 const Tab = createMaterialBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -23,6 +24,7 @@ const HomeStack = () => {
       <Stack.Screen name="PostDetail" component={PostDetail} />
       <Stack.Screen name="Archive" component={Archive} />
       <Stack.Screen name="Chat" component={Chat} />
+      <Stack.Screen name="ChatDetail" component={ChatDetail} />
     </Stack.Navigator>
   )
 }

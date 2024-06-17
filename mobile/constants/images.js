@@ -10,6 +10,10 @@ const images = {
 
   next: require('../assets/images/next.png'),
   previous: require('../assets/images/previous.png'),
+  camera: require('../assets/images/camera.png'),
+  attach: require('../assets/images/attach-file.png'),
+  send: require('../assets/images/send-message.png'),
+  image: require('../assets/images/image.png'),
   LOGOS: {
     LOGO1: require('../assets/images/LOGO/logo1.jpg'),
     LOGO2: require('../assets/images/LOGO/logo2.jpg'),

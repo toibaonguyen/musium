@@ -58,6 +58,8 @@ public class CommentService : ICommentService
             }
             Comment newComment = new Comment
             {
+                UserId = userId,
+                PostId = postId,
                 Content = comment.Content,
                 Image = comment.Image != null ? (await _fileService.UploadFileAsync(comment.Image, $"{userId}-{Guid.NewGuid()}-{new DateTime()}")).Uri : null
             };

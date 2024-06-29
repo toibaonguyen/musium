@@ -1,0 +1,531 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.musium"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="33" />
+10
+11    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+11-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/debug/AndroidManifest.xml:5:5-77
+11-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/debug/AndroidManifest.xml:5:22-75
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:3:5-67
+12-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:3:22-64
+13    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+13-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:4:5-79
+13-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:4:22-76
+14    <uses-permission android:name="android.permission.CAMERA" />
+14-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:5:5-65
+14-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:5:22-62
+15    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+15-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:6:5-71
+15-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:6:22-68
+16    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+16-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:7:5-75
+16-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:7:22-73
+17    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+17-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:8:5-79
+17-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:8:22-77
+18    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+18-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:9:5-80
+18-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:9:22-78
+19    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+19-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:10:5-74
+19-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:10:22-72
+20    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+20-->[com.facebook.flipper:flipper:0.182.0] /Users/builuonghieu/.gradle/caches/transforms-3/426f122c987f1f036bd238635db2dd0e/transformed/jetified-flipper-0.182.0/AndroidManifest.xml:16:5-76
+20-->[com.facebook.flipper:flipper:0.182.0] /Users/builuonghieu/.gradle/caches/transforms-3/426f122c987f1f036bd238635db2dd0e/transformed/jetified-flipper-0.182.0/AndroidManifest.xml:16:22-73
+21    <uses-permission android:name="android.permission.WAKE_LOCK" />
+21-->[:react-native-firebase_auth] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/auth/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:8:5-68
+21-->[:react-native-firebase_auth] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/auth/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:8:22-65
+22
+23    <queries>
+23-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:7:5-11:15
+24        <intent>
+24-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:8:9-10:18
+25            <action android:name="android.media.action.IMAGE_CAPTURE" />
+25-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:13-73
+25-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:21-70
+26        </intent>
+27
+28        <package android:name="com.facebook.katana" />
+28-->[com.facebook.android:facebook-common:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/f73f056ccccfe8cacd24ab5baeebe4a8/transformed/jetified-facebook-common-17.0.0/AndroidManifest.xml:18:9-55
+28-->[com.facebook.android:facebook-common:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/f73f056ccccfe8cacd24ab5baeebe4a8/transformed/jetified-facebook-common-17.0.0/AndroidManifest.xml:18:18-52
+29        <package android:name="androidx.test.orchestrator" />
+29-->[androidx.test:runner:1.4.0] /Users/builuonghieu/.gradle/caches/transforms-3/9b081f24dfd6c2c3dd3e419be648c592/transformed/runner-1.4.0/AndroidManifest.xml:25:9-62
+29-->[androidx.test:runner:1.4.0] /Users/builuonghieu/.gradle/caches/transforms-3/9b081f24dfd6c2c3dd3e419be648c592/transformed/runner-1.4.0/AndroidManifest.xml:25:18-59
+30        <package android:name="androidx.test.services" />
+30-->[androidx.test:runner:1.4.0] /Users/builuonghieu/.gradle/caches/transforms-3/9b081f24dfd6c2c3dd3e419be648c592/transformed/runner-1.4.0/AndroidManifest.xml:26:9-58
+30-->[androidx.test:runner:1.4.0] /Users/builuonghieu/.gradle/caches/transforms-3/9b081f24dfd6c2c3dd3e419be648c592/transformed/runner-1.4.0/AndroidManifest.xml:26:18-55
+31        <package android:name="com.google.android.apps.common.testing.services" />
+31-->[androidx.test:runner:1.4.0] /Users/builuonghieu/.gradle/caches/transforms-3/9b081f24dfd6c2c3dd3e419be648c592/transformed/runner-1.4.0/AndroidManifest.xml:27:9-83
+31-->[androidx.test:runner:1.4.0] /Users/builuonghieu/.gradle/caches/transforms-3/9b081f24dfd6c2c3dd3e419be648c592/transformed/runner-1.4.0/AndroidManifest.xml:27:18-80
+32    </queries>
+33
+34    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+34-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:8:5-77
+34-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:8:22-74
+35    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" /> <!-- Required to access Google Play Licensing -->
+35-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-92
+35-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:22-89
+36    <uses-permission android:name="com.android.vending.CHECK_LICENSE" />
+36-->[:rn-fetch-blob] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/rn-fetch-blob/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:8:5-73
+36-->[:rn-fetch-blob] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/rn-fetch-blob/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:8:22-70
+37    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+37-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:16:5-79
+37-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:16:22-76
+38    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+38-->[com.google.android.recaptcha:recaptcha:18.4.0] /Users/builuonghieu/.gradle/caches/transforms-3/7bbcbe7d903abbc56a8528347d9c8be2/transformed/jetified-recaptcha-18.4.0/AndroidManifest.xml:9:5-98
+38-->[com.google.android.recaptcha:recaptcha:18.4.0] /Users/builuonghieu/.gradle/caches/transforms-3/7bbcbe7d903abbc56a8528347d9c8be2/transformed/jetified-recaptcha-18.4.0/AndroidManifest.xml:9:22-95
+39
+40    <permission
+40-->[androidx.core:core:1.9.0] /Users/builuonghieu/.gradle/caches/transforms-3/d33e9b367f5ae5e8ee054e461d7d82e3/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+41        android:name="com.musium.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+41-->[androidx.core:core:1.9.0] /Users/builuonghieu/.gradle/caches/transforms-3/d33e9b367f5ae5e8ee054e461d7d82e3/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+42        android:protectionLevel="signature" />
+42-->[androidx.core:core:1.9.0] /Users/builuonghieu/.gradle/caches/transforms-3/d33e9b367f5ae5e8ee054e461d7d82e3/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+43
+44    <uses-permission android:name="com.musium.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+44-->[androidx.core:core:1.9.0] /Users/builuonghieu/.gradle/caches/transforms-3/d33e9b367f5ae5e8ee054e461d7d82e3/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+44-->[androidx.core:core:1.9.0] /Users/builuonghieu/.gradle/caches/transforms-3/d33e9b367f5ae5e8ee054e461d7d82e3/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+45    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE" />
+45-->[com.android.installreferrer:installreferrer:1.0] /Users/builuonghieu/.gradle/caches/transforms-3/7daffd9b30b82ef89f8925aea07a320f/transformed/jetified-installreferrer-1.0/AndroidManifest.xml:9:5-110
+45-->[com.android.installreferrer:installreferrer:1.0] /Users/builuonghieu/.gradle/caches/transforms-3/7daffd9b30b82ef89f8925aea07a320f/transformed/jetified-installreferrer-1.0/AndroidManifest.xml:9:22-107
+46
+47    <application
+47-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:11:5-50:19
+48        android:name="com.musium.MainApplication"
+48-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:12:7-38
+49        android:allowBackup="false"
+49-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:16:7-34
+50        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+50-->[androidx.core:core:1.9.0] /Users/builuonghieu/.gradle/caches/transforms-3/d33e9b367f5ae5e8ee054e461d7d82e3/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
+51        android:debuggable="true"
+52        android:icon="@mipmap/ic_launcher"
+52-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:14:7-41
+53        android:label="@string/app_name"
+53-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:13:7-39
+54        android:roundIcon="@mipmap/ic_launcher_round"
+54-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:15:7-52
+55        android:supportsRtl="true"
+55-->[com.facebook.android:facebook-android-sdk:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/e923538f443ba97664514e3f4da5f122/transformed/jetified-facebook-android-sdk-17.0.0/AndroidManifest.xml:16:18-44
+56        android:theme="@style/AppTheme"
+56-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:17:7-38
+57        android:usesCleartextTraffic="true" >
+57-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/debug/AndroidManifest.xml:8:9-44
+58        <activity
+58-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/debug/AndroidManifest.xml:11:9-111
+59            android:name="com.facebook.react.devsupport.DevSettingsActivity"
+59-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/debug/AndroidManifest.xml:11:19-83
+60            android:exported="false" />
+60-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/debug/AndroidManifest.xml:11:84-108
+61        <activity
+61-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:18:7-30:18
+62            android:name="com.musium.MainActivity"
+62-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:19:9-37
+63            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+63-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:21:9-118
+64            android:exported="true"
+64-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:24:9-32
+65            android:label="@string/app_name"
+65-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:20:9-41
+66            android:launchMode="singleTask"
+66-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:22:9-40
+67            android:windowSoftInputMode="adjustResize" >
+67-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:23:9-51
+68            <intent-filter>
+68-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:25:9-29:25
+69                <action android:name="android.intent.action.MAIN" />
+69-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:26:13-65
+69-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:26:21-62
+70
+71                <category android:name="android.intent.category.LAUNCHER" />
+71-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:27:13-73
+71-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:27:23-70
+72
+73                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+73-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:28:13-77
+73-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:28:21-75
+74            </intent-filter>
+75        </activity>
+76
+77        <meta-data
+77-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:31:7-105
+78            android:name="com.facebook.sdk.ApplicationId"
+78-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:31:18-63
+79            android:value="@string/facebook_app_id" />
+79-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:31:64-103
+80        <meta-data
+80-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:32:7-109
+81            android:name="com.facebook.sdk.ClientToken"
+81-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:32:18-61
+82            android:value="@string/facebook_client_token" />
+82-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:32:62-107
+83
+84        <activity
+84-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:34:7-37:46
+85            android:name="com.facebook.FacebookActivity"
+85-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:34:17-61
+86            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+86-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:35:11-113
+87            android:label="@string/app_name"
+87-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:37:11-43
+88            android:theme="@style/com_facebook_activity_theme" />
+88-->[com.facebook.android:facebook-common:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/f73f056ccccfe8cacd24ab5baeebe4a8/transformed/jetified-facebook-common-17.0.0/AndroidManifest.xml:25:13-63
+89        <activity
+89-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:39:7-48:18
+90            android:name="com.facebook.CustomTabActivity"
+90-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:40:11-56
+91            android:exported="true" >
+91-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:41:11-34
+92            <intent-filter>
+92-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:42:11-47:27
+93                <action android:name="android.intent.action.VIEW" />
+93-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:43:15-67
+93-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:43:23-64
+94
+95                <category android:name="android.intent.category.DEFAULT" />
+95-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:44:15-74
+95-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:44:25-71
+96                <category android:name="android.intent.category.BROWSABLE" />
+96-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:45:15-76
+96-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:45:25-73
+97
+98                <data android:scheme="@string/fb_login_protocol_scheme" />
+98-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:46:15-73
+98-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:46:21-70
+99            </intent-filter>
+100            <intent-filter>
+100-->[com.facebook.android:facebook-common:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/f73f056ccccfe8cacd24ab5baeebe4a8/transformed/jetified-facebook-common-17.0.0/AndroidManifest.xml:31:13-40:29
+101                <action android:name="android.intent.action.VIEW" />
+101-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:43:15-67
+101-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:43:23-64
+102
+103                <category android:name="android.intent.category.DEFAULT" />
+103-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:44:15-74
+103-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:44:25-71
+104                <category android:name="android.intent.category.BROWSABLE" />
+104-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:45:15-76
+104-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:45:25-73
+105
+106                <data
+106-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:46:15-73
+107                    android:host="cct.com.musium"
+108                    android:scheme="fbconnect" />
+108-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:46:21-70
+109            </intent-filter>
+110        </activity>
+111
+112        <meta-data
+112-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:9:9-11:36
+113            android:name="app_data_collection_default_enabled"
+113-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:10:13-63
+114            android:value="true" />
+114-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:11:13-33
+115
+116        <service
+116-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:13:9-21:19
+117            android:name="com.google.firebase.components.ComponentDiscoveryService"
+117-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:14:13-84
+118            android:directBootAware="true"
+118-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:15:13-43
+119            android:exported="false" >
+119-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:16:13-37
+120            <meta-data
+120-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:18:13-20:85
+121                android:name="com.google.firebase.components:io.invertase.firebase.app.ReactNativeFirebaseAppRegistrar"
+121-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:19:17-120
+122                android:value="com.google.firebase.components.ComponentRegistrar" />
+122-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:20:17-82
+123            <meta-data
+123-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:69:13-71:85
+124                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+124-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:70:17-109
+125                android:value="com.google.firebase.components.ComponentRegistrar" />
+125-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:71:17-82
+126            <meta-data
+126-->[com.google.firebase:firebase-common-ktx:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/75674215fde5ca8f919c2418ed88ca0a/transformed/jetified-firebase-common-ktx-20.4.2/AndroidManifest.xml:12:13-14:85
+127                android:name="com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar"
+127-->[com.google.firebase:firebase-common-ktx:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/75674215fde5ca8f919c2418ed88ca0a/transformed/jetified-firebase-common-ktx-20.4.2/AndroidManifest.xml:13:17-116
+128                android:value="com.google.firebase.components.ComponentRegistrar" />
+128-->[com.google.firebase:firebase-common-ktx:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/75674215fde5ca8f919c2418ed88ca0a/transformed/jetified-firebase-common-ktx-20.4.2/AndroidManifest.xml:14:17-82
+129            <meta-data
+129-->[com.google.firebase:firebase-common:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/03f67cfbcf95f87693a92c0410f9793e/transformed/jetified-firebase-common-20.4.2/AndroidManifest.xml:35:13-37:85
+130                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
+130-->[com.google.firebase:firebase-common:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/03f67cfbcf95f87693a92c0410f9793e/transformed/jetified-firebase-common-20.4.2/AndroidManifest.xml:36:17-109
+131                android:value="com.google.firebase.components.ComponentRegistrar" />
+131-->[com.google.firebase:firebase-common:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/03f67cfbcf95f87693a92c0410f9793e/transformed/jetified-firebase-common-20.4.2/AndroidManifest.xml:37:17-82
+132        </service>
+133
+134        <provider
+134-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:23:9-27:38
+135            android:name="io.invertase.firebase.app.ReactNativeFirebaseAppInitProvider"
+135-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:24:13-88
+136            android:authorities="com.musium.reactnativefirebaseappinitprovider"
+136-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:25:13-86
+137            android:exported="false"
+137-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:26:13-37
+138            android:initOrder="99" />
+138-->[:react-native-firebase_app] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/@react-native-firebase/app/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:27:13-35
+139        <provider
+139-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:16:9-24:20
+140            android:name="com.reactnative.ivpusic.imagepicker.IvpusicImagePickerFileProvider"
+140-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:17:13-94
+141            android:authorities="com.musium.provider"
+141-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:18:13-60
+142            android:exported="false"
+142-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:19:13-37
+143            android:grantUriPermissions="true" >
+143-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:20:13-47
+144            <meta-data
+144-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:21:13-23:78
+145                android:name="android.support.FILE_PROVIDER_PATHS"
+145-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:22:17-67
+146                android:resource="@xml/ivpusic_imagepicker_provider_paths" />
+146-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:23:17-75
+147        </provider>
+148
+149        <activity
+149-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:26:9-28:72
+150            android:name="com.yalantis.ucrop.UCropActivity"
+150-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:27:13-60
+151            android:theme="@style/Theme.AppCompat.Light.NoActionBar" /> <!-- The main service, handles playback, playlists and media buttons -->
+151-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:28:13-69
+152        <service
+152-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:14:9-22:19
+153            android:name="com.doublesymmetry.trackplayer.service.MusicService"
+153-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:15:13-79
+154            android:enabled="true"
+154-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:16:13-35
+155            android:exported="true"
+155-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:17:13-36
+156            android:foregroundServiceType="mediaPlayback" >
+156-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:18:13-58
+157            <intent-filter>
+157-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:19:13-21:29
+158                <action android:name="android.intent.action.MEDIA_BUTTON" />
+158-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:20:17-77
+158-->[:react-native-track-player] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-track-player/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:20:25-74
+159            </intent-filter>
+160        </service>
+161
+162        <provider
+162-->[:rn-fetch-blob] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/rn-fetch-blob/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:32:9-40:20
+163            android:name="com.RNFetchBlob.Utils.FileProvider"
+163-->[:rn-fetch-blob] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/rn-fetch-blob/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:33:13-62
+164            android:authorities="com.musium.provider"
+164-->[:rn-fetch-blob] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/rn-fetch-blob/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:34:13-60
+165            android:exported="false"
+165-->[:rn-fetch-blob] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/rn-fetch-blob/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:35:13-37
+166            android:grantUriPermissions="true" >
+166-->[:rn-fetch-blob] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/rn-fetch-blob/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:36:13-47
+167            <meta-data
+167-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:21:13-23:78
+168                android:name="android.support.FILE_PROVIDER_PATHS"
+168-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:22:17-67
+169                android:resource="@xml/provider_paths" />
+169-->[:react-native-image-crop-picker] /Users/builuonghieu/Documents/Projects/musium/frontend/node_modules/react-native-image-crop-picker/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:23:17-75
+170        </provider>
+171
+172        <activity android:name="com.facebook.CustomTabMainActivity" />
+172-->[com.facebook.android:facebook-common:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/f73f056ccccfe8cacd24ab5baeebe4a8/transformed/jetified-facebook-common-17.0.0/AndroidManifest.xml:26:9-71
+172-->[com.facebook.android:facebook-common:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/f73f056ccccfe8cacd24ab5baeebe4a8/transformed/jetified-facebook-common-17.0.0/AndroidManifest.xml:26:19-68
+173        <!--
+174         The initialization ContentProvider will call FacebookSdk.sdkInitialize automatically
+175         with the application context. This config is merged in with the host app's manifest,
+176         but there can only be one provider with the same authority activated at any given
+177         point; so if the end user has two or more different apps that use Facebook SDK, only the
+178         first one will be able to use the provider. To work around this problem, we use the
+179         following placeholder in the authority to identify each host application as if it was
+180         a completely different provider.
+181        -->
+182        <provider
+182-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:29:9-32:40
+183            android:name="com.facebook.internal.FacebookInitProvider"
+183-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:30:13-70
+184            android:authorities="com.musium.FacebookInitProvider"
+184-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:31:13-72
+185            android:exported="false" />
+185-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:32:13-37
+186
+187        <receiver
+187-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:34:9-40:20
+188            android:name="com.facebook.CurrentAccessTokenExpirationBroadcastReceiver"
+188-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:35:13-86
+189            android:exported="false" >
+189-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:36:13-37
+190            <intent-filter>
+190-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:37:13-39:29
+191                <action android:name="com.facebook.sdk.ACTION_CURRENT_ACCESS_TOKEN_CHANGED" />
+191-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:38:17-95
+191-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:38:25-92
+192            </intent-filter>
+193        </receiver>
+194        <receiver
+194-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:41:9-47:20
+195            android:name="com.facebook.AuthenticationTokenManager$CurrentAuthenticationTokenChangedBroadcastReceiver"
+195-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:42:13-118
+196            android:exported="false" >
+196-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:43:13-37
+197            <intent-filter>
+197-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:44:13-46:29
+198                <action android:name="com.facebook.sdk.ACTION_CURRENT_AUTHENTICATION_TOKEN_CHANGED" />
+198-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:45:17-103
+198-->[com.facebook.android:facebook-core:17.0.0] /Users/builuonghieu/.gradle/caches/transforms-3/2391b98f73ed5d19d46141dc968575a1/transformed/jetified-facebook-core-17.0.0/AndroidManifest.xml:45:25-100
+199            </intent-filter>
+200        </receiver>
+201
+202        <activity
+202-->[com.google.android.gms:play-services-auth:20.7.0] /Users/builuonghieu/.gradle/caches/transforms-3/0da3cdb9584e89dc47782341d0fe303c/transformed/jetified-play-services-auth-20.7.0/AndroidManifest.xml:23:9-27:75
+203            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+203-->[com.google.android.gms:play-services-auth:20.7.0] /Users/builuonghieu/.gradle/caches/transforms-3/0da3cdb9584e89dc47782341d0fe303c/transformed/jetified-play-services-auth-20.7.0/AndroidManifest.xml:24:13-93
+204            android:excludeFromRecents="true"
+204-->[com.google.android.gms:play-services-auth:20.7.0] /Users/builuonghieu/.gradle/caches/transforms-3/0da3cdb9584e89dc47782341d0fe303c/transformed/jetified-play-services-auth-20.7.0/AndroidManifest.xml:25:13-46
+205            android:exported="false"
+205-->[com.google.android.gms:play-services-auth:20.7.0] /Users/builuonghieu/.gradle/caches/transforms-3/0da3cdb9584e89dc47782341d0fe303c/transformed/jetified-play-services-auth-20.7.0/AndroidManifest.xml:26:13-37
+206            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+206-->[com.google.android.gms:play-services-auth:20.7.0] /Users/builuonghieu/.gradle/caches/transforms-3/0da3cdb9584e89dc47782341d0fe303c/transformed/jetified-play-services-auth-20.7.0/AndroidManifest.xml:27:13-72
+207        <!--
+208            Service handling Google Sign-In user revocation. For apps that do not integrate with
+209            Google Sign-In, this service will never be started.
+210        -->
+211        <service
+211-->[com.google.android.gms:play-services-auth:20.7.0] /Users/builuonghieu/.gradle/caches/transforms-3/0da3cdb9584e89dc47782341d0fe303c/transformed/jetified-play-services-auth-20.7.0/AndroidManifest.xml:33:9-37:51
+212            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+212-->[com.google.android.gms:play-services-auth:20.7.0] /Users/builuonghieu/.gradle/caches/transforms-3/0da3cdb9584e89dc47782341d0fe303c/transformed/jetified-play-services-auth-20.7.0/AndroidManifest.xml:34:13-89
+213            android:exported="true"
+213-->[com.google.android.gms:play-services-auth:20.7.0] /Users/builuonghieu/.gradle/caches/transforms-3/0da3cdb9584e89dc47782341d0fe303c/transformed/jetified-play-services-auth-20.7.0/AndroidManifest.xml:35:13-36
+214            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+214-->[com.google.android.gms:play-services-auth:20.7.0] /Users/builuonghieu/.gradle/caches/transforms-3/0da3cdb9584e89dc47782341d0fe303c/transformed/jetified-play-services-auth-20.7.0/AndroidManifest.xml:36:13-107
+215            android:visibleToInstantApps="true" />
+215-->[com.google.android.gms:play-services-auth:20.7.0] /Users/builuonghieu/.gradle/caches/transforms-3/0da3cdb9584e89dc47782341d0fe303c/transformed/jetified-play-services-auth-20.7.0/AndroidManifest.xml:37:13-48
+216
+217        <activity
+217-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:29:9-46:20
+218            android:name="com.google.firebase.auth.internal.GenericIdpActivity"
+218-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:30:13-80
+219            android:excludeFromRecents="true"
+219-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:31:13-46
+220            android:exported="true"
+220-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:32:13-36
+221            android:launchMode="singleTask"
+221-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:33:13-44
+222            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+222-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:34:13-72
+223            <intent-filter>
+223-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:35:13-45:29
+224                <action android:name="android.intent.action.VIEW" />
+224-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:43:15-67
+224-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:43:23-64
+225
+226                <category android:name="android.intent.category.DEFAULT" />
+226-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:44:15-74
+226-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:44:25-71
+227                <category android:name="android.intent.category.BROWSABLE" />
+227-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:45:15-76
+227-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:45:25-73
+228
+229                <data
+229-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:46:15-73
+230                    android:host="firebase.auth"
+231                    android:path="/"
+232                    android:scheme="genericidp" />
+232-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:46:21-70
+233            </intent-filter>
+234        </activity>
+235        <activity
+235-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:47:9-64:20
+236            android:name="com.google.firebase.auth.internal.RecaptchaActivity"
+236-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:48:13-79
+237            android:excludeFromRecents="true"
+237-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:49:13-46
+238            android:exported="true"
+238-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:50:13-36
+239            android:launchMode="singleTask"
+239-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:51:13-44
+240            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+240-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:52:13-72
+241            <intent-filter>
+241-->[com.google.firebase:firebase-auth:22.3.1] /Users/builuonghieu/.gradle/caches/transforms-3/f97a956b76320aa82c21d0b28c4af2aa/transformed/jetified-firebase-auth-22.3.1/AndroidManifest.xml:53:13-63:29
+242                <action android:name="android.intent.action.VIEW" />
+242-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:43:15-67
+242-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:43:23-64
+243
+244                <category android:name="android.intent.category.DEFAULT" />
+244-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:44:15-74
+244-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:44:25-71
+245                <category android:name="android.intent.category.BROWSABLE" />
+245-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:45:15-76
+245-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:45:25-73
+246
+247                <data
+247-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:46:15-73
+248                    android:host="firebase.auth"
+249                    android:path="/"
+250                    android:scheme="recaptcha" />
+250-->/Users/builuonghieu/Documents/Projects/musium/frontend/android/app/src/main/AndroidManifest.xml:46:21-70
+251            </intent-filter>
+252        </activity>
+253        <activity
+253-->[com.google.android.gms:play-services-base:18.0.1] /Users/builuonghieu/.gradle/caches/transforms-3/7bc77237716ecf9e1a931527d9b3ecd9/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:20:9-22:45
+254            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+254-->[com.google.android.gms:play-services-base:18.0.1] /Users/builuonghieu/.gradle/caches/transforms-3/7bc77237716ecf9e1a931527d9b3ecd9/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:20:19-85
+255            android:exported="false"
+255-->[com.google.android.gms:play-services-base:18.0.1] /Users/builuonghieu/.gradle/caches/transforms-3/7bc77237716ecf9e1a931527d9b3ecd9/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:22:19-43
+256            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+256-->[com.google.android.gms:play-services-base:18.0.1] /Users/builuonghieu/.gradle/caches/transforms-3/7bc77237716ecf9e1a931527d9b3ecd9/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:21:19-78
+257
+258        <provider
+258-->[com.google.firebase:firebase-common:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/03f67cfbcf95f87693a92c0410f9793e/transformed/jetified-firebase-common-20.4.2/AndroidManifest.xml:23:9-28:39
+259            android:name="com.google.firebase.provider.FirebaseInitProvider"
+259-->[com.google.firebase:firebase-common:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/03f67cfbcf95f87693a92c0410f9793e/transformed/jetified-firebase-common-20.4.2/AndroidManifest.xml:24:13-77
+260            android:authorities="com.musium.firebaseinitprovider"
+260-->[com.google.firebase:firebase-common:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/03f67cfbcf95f87693a92c0410f9793e/transformed/jetified-firebase-common-20.4.2/AndroidManifest.xml:25:13-72
+261            android:directBootAware="true"
+261-->[com.google.firebase:firebase-common:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/03f67cfbcf95f87693a92c0410f9793e/transformed/jetified-firebase-common-20.4.2/AndroidManifest.xml:26:13-43
+262            android:exported="false"
+262-->[com.google.firebase:firebase-common:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/03f67cfbcf95f87693a92c0410f9793e/transformed/jetified-firebase-common-20.4.2/AndroidManifest.xml:27:13-37
+263            android:initOrder="100" />
+263-->[com.google.firebase:firebase-common:20.4.2] /Users/builuonghieu/.gradle/caches/transforms-3/03f67cfbcf95f87693a92c0410f9793e/transformed/jetified-firebase-common-20.4.2/AndroidManifest.xml:28:13-36
+264
+265        <meta-data
+265-->[com.google.android.gms:play-services-basement:18.2.0] /Users/builuonghieu/.gradle/caches/transforms-3/6ea5954c9161efc9a3dde92daf120e53/transformed/jetified-play-services-basement-18.2.0/AndroidManifest.xml:21:9-23:69
+266            android:name="com.google.android.gms.version"
+266-->[com.google.android.gms:play-services-basement:18.2.0] /Users/builuonghieu/.gradle/caches/transforms-3/6ea5954c9161efc9a3dde92daf120e53/transformed/jetified-play-services-basement-18.2.0/AndroidManifest.xml:22:13-58
+267            android:value="@integer/google_play_services_version" />
+267-->[com.google.android.gms:play-services-basement:18.2.0] /Users/builuonghieu/.gradle/caches/transforms-3/6ea5954c9161efc9a3dde92daf120e53/transformed/jetified-play-services-basement-18.2.0/AndroidManifest.xml:23:13-66
+268
+269        <provider
+269-->[androidx.emoji2:emoji2:1.2.0] /Users/builuonghieu/.gradle/caches/transforms-3/dfd315444c5e010cf3f48c1ecae621af/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+270            android:name="androidx.startup.InitializationProvider"
+270-->[androidx.emoji2:emoji2:1.2.0] /Users/builuonghieu/.gradle/caches/transforms-3/dfd315444c5e010cf3f48c1ecae621af/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:25:13-67
+271            android:authorities="com.musium.androidx-startup"
+271-->[androidx.emoji2:emoji2:1.2.0] /Users/builuonghieu/.gradle/caches/transforms-3/dfd315444c5e010cf3f48c1ecae621af/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:26:13-68
+272            android:exported="false" >
+272-->[androidx.emoji2:emoji2:1.2.0] /Users/builuonghieu/.gradle/caches/transforms-3/dfd315444c5e010cf3f48c1ecae621af/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:27:13-37
+273            <meta-data
+273-->[androidx.emoji2:emoji2:1.2.0] /Users/builuonghieu/.gradle/caches/transforms-3/dfd315444c5e010cf3f48c1ecae621af/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+274                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+274-->[androidx.emoji2:emoji2:1.2.0] /Users/builuonghieu/.gradle/caches/transforms-3/dfd315444c5e010cf3f48c1ecae621af/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:30:17-75
+275                android:value="androidx.startup" />
+275-->[androidx.emoji2:emoji2:1.2.0] /Users/builuonghieu/.gradle/caches/transforms-3/dfd315444c5e010cf3f48c1ecae621af/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:31:17-49
+276            <meta-data
+276-->[androidx.lifecycle:lifecycle-process:2.5.1] /Users/builuonghieu/.gradle/caches/transforms-3/55172fdf7e5beaf313ebd219400fac6a/transformed/jetified-lifecycle-process-2.5.1/AndroidManifest.xml:31:13-33:52
+277                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+277-->[androidx.lifecycle:lifecycle-process:2.5.1] /Users/builuonghieu/.gradle/caches/transforms-3/55172fdf7e5beaf313ebd219400fac6a/transformed/jetified-lifecycle-process-2.5.1/AndroidManifest.xml:32:17-78
+278                android:value="androidx.startup" />
+278-->[androidx.lifecycle:lifecycle-process:2.5.1] /Users/builuonghieu/.gradle/caches/transforms-3/55172fdf7e5beaf313ebd219400fac6a/transformed/jetified-lifecycle-process-2.5.1/AndroidManifest.xml:33:17-49
+279        </provider>
+280
+281        <meta-data
+281-->[com.facebook.soloader:soloader:0.10.5] /Users/builuonghieu/.gradle/caches/transforms-3/2add1735ebfa5047b843e99834f8ccf7/transformed/jetified-soloader-0.10.5/AndroidManifest.xml:12:9-14:37
+282            android:name="com.facebook.soloader.enabled"
+282-->[com.facebook.soloader:soloader:0.10.5] /Users/builuonghieu/.gradle/caches/transforms-3/2add1735ebfa5047b843e99834f8ccf7/transformed/jetified-soloader-0.10.5/AndroidManifest.xml:13:13-57
+283            android:value="false" />
+283-->[com.facebook.soloader:soloader:0.10.5] /Users/builuonghieu/.gradle/caches/transforms-3/2add1735ebfa5047b843e99834f8ccf7/transformed/jetified-soloader-0.10.5/AndroidManifest.xml:14:13-34
+284    </application>
+285
+286</manifest>

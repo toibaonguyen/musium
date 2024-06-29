@@ -1,13 +1,16 @@
 import {StyleSheet} from 'react-native'
-import {COLORS} from '../../../constants/theme'
+import { COLORS } from '../../constants/colors'
 
-const styles = StyleSheet.create({
-  splashContainer: {
-    flex: 1,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
+export default styles = StyleSheet.create({
+    splashContainer: {
+        flex: 1,
+        backgroundColor: COLORS.background,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    logo: {
+        height: '30%',
+        resizeMode: 'contain'
+    }
 })
-
-export default styles

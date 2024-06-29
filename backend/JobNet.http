@@ -1,6 +1,0 @@
-@JobNet_HostAddress = http://localhost:5227
-
-GET {{JobNet_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
